@@ -1,11 +1,14 @@
-// src/components/features/Hero.tsx
+'use client';
+
 import React from 'react';
-import { Search, MapPin, Calendar, QrCode } from 'lucide-react';
+import { Search, MapPin, Calendar as CalendarIcon, QrCode } from 'lucide-react';
+import DateTimePicker from './DateTimePicker';
 
 export const Hero = () => {
   return (
-    <section className="relative pt-24 md:pt-44 pb-24 px-4 flex flex-col items-center justify-center min-h-[75vh] overflow-hidden">
-      
+    // تغییر مهم: حذف overflow-hidden از این تگ و تبدیل pb-24 به pb-96 برای ایجاد فضای اسکرول
+    <section className="relative pt-24 md:pt-44 pb-96 px-4 flex flex-col items-center justify-center min-h-[75vh]">
+
       {/* Background Gradients (Mirrored for RTL visual balance) */}
       <div className="absolute inset-0 -z-10 bg-[#faf8ff] md:bg-[#faf8ff] overflow-hidden bg-gradient-to-b from-white via-white to-[#faf8ff]">
         <div className="absolute top-[40%] md:top-[-5%] right-[-10%] md:right-[-5%] w-[80%] md:w-[60%] h-[60%] rounded-full bg-purple-200/70 blur-[100px] md:blur-[130px]" />
@@ -25,13 +28,13 @@ export const Hero = () => {
 
       {/* Search Bar Container */}
       <div className="w-full max-w-[950px] mx-auto bg-white/90 md:bg-white/60 lg:bg-white backdrop-blur-md lg:backdrop-blur-none rounded-3xl lg:rounded-full shadow-[0_12px_40px_rgb(0,0,0,0.08)] lg:shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-4 md:p-5 lg:p-2.5 flex flex-col lg:flex-row items-center gap-3 lg:gap-0 z-10 border border-white/40 lg:border-none">
-        
+
         {/* Treatment Input */}
         <div className="flex items-center w-full lg:flex-1 px-4 py-3 lg:py-2 bg-white lg:bg-transparent border border-gray-200 lg:border-none lg:border-l lg:border-gray-100 rounded-xl lg:rounded-none group cursor-text transition-all hover:border-gray-400 lg:hover:border-transparent">
           <Search className="w-5 h-5 text-gray-500 ml-3 stroke-[1.5]" />
-          <input 
-            type="text" 
-            placeholder="همه خدمات" 
+          <input
+            type="text"
+            placeholder="همه خدمات"
             className="w-full bg-transparent border-none outline-none text-[15px] placeholder:text-gray-900/70 text-gray-900 font-medium"
           />
         </div>
@@ -39,21 +42,23 @@ export const Hero = () => {
         {/* Location Input */}
         <div className="flex items-center w-full lg:flex-1 px-4 py-3 lg:py-2 bg-white lg:bg-transparent border border-gray-200 lg:border-none lg:border-l lg:border-gray-100 rounded-xl lg:rounded-none group cursor-text transition-all hover:border-gray-400 lg:hover:border-transparent">
           <MapPin className="w-5 h-5 text-gray-500 ml-3 stroke-[1.5]" />
-          <input 
-            type="text" 
-            placeholder="مکان فعلی" 
+          <input
+            type="text"
+            placeholder="مکان فعلی"
             className="w-full bg-transparent border-none outline-none text-[15px] placeholder:text-gray-900/70 text-gray-900 font-medium"
           />
         </div>
 
         {/* Time/Date Input */}
-        <div className="flex items-center w-full lg:flex-[0.8] px-4 py-3 lg:py-2 bg-white lg:bg-transparent border border-gray-200 lg:border-none rounded-xl lg:rounded-none group cursor-text transition-all hover:border-gray-400 lg:hover:border-transparent">
-          <Calendar className="w-5 h-5 text-gray-500 ml-3 stroke-[1.5]" />
-          <input 
-            type="text" 
-            placeholder="هر زمان" 
-            className="w-full bg-transparent border-none outline-none text-[15px] placeholder:text-gray-900/70 text-gray-900 font-medium"
-          />
+        <div className="flex items-center w-full lg:flex-[0.8] px-4 py-3 lg:py-2 bg-white lg:bg-transparent border border-gray-200 lg:border-none rounded-xl lg:rounded-none group cursor-pointer transition-all hover:border-gray-400 lg:hover:border-transparent">
+          <CalendarIcon className="w-5 h-5 text-gray-500 ml-3 stroke-[1.5]" />
+          <div className="w-full flex items-center h-full">
+            <div className="w-px h-8 bg-gray-200 mx-2 hidden md:block"></div>
+            
+            {/* کامپوننت جدید تاریخ و زمان */}
+            <DateTimePicker />
+            
+          </div>
         </div>
 
         {/* Search Button */}
