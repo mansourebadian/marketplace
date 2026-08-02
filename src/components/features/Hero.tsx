@@ -1,15 +1,15 @@
 'use client';
 
 import React from 'react';
-import { Search, MapPin, Calendar as CalendarIcon, QrCode } from 'lucide-react';
+import { Search, Calendar as CalendarIcon, QrCode } from 'lucide-react';
 import DateTimePicker from './DateTimePicker';
+import LocationPicker from './LocationPicker'; // وارد کردن کامپوننت جدید
 
 export const Hero = () => {
   return (
-    // تغییر مهم: حذف overflow-hidden از این تگ و تبدیل pb-24 به pb-96 برای ایجاد فضای اسکرول
     <section className="relative pt-24 md:pt-44 pb-96 px-4 flex flex-col items-center justify-center min-h-[75vh]">
 
-      {/* Background Gradients (Mirrored for RTL visual balance) */}
+      {/* Background Gradients */}
       <div className="absolute inset-0 -z-10 bg-[#faf8ff] md:bg-[#faf8ff] overflow-hidden bg-gradient-to-b from-white via-white to-[#faf8ff]">
         <div className="absolute top-[40%] md:top-[-5%] right-[-10%] md:right-[-5%] w-[80%] md:w-[60%] h-[60%] rounded-full bg-purple-200/70 blur-[100px] md:blur-[130px]" />
         <div className="absolute top-[50%] md:top-[15%] left-[-10%] md:left-[-5%] w-[70%] md:w-[50%] h-[50%] rounded-full bg-pink-200/60 blur-[90px] md:blur-[110px]" />
@@ -39,30 +39,20 @@ export const Hero = () => {
           />
         </div>
 
-        {/* Location Input */}
-        <div className="flex items-center w-full lg:flex-1 px-4 py-3 lg:py-2 bg-white lg:bg-transparent border border-gray-200 lg:border-none lg:border-l lg:border-gray-100 rounded-xl lg:rounded-none group cursor-text transition-all hover:border-gray-400 lg:hover:border-transparent">
-          <MapPin className="w-5 h-5 text-gray-500 ml-3 stroke-[1.5]" />
-          <input
-            type="text"
-            placeholder="مکان فعلی"
-            className="w-full bg-transparent border-none outline-none text-[15px] placeholder:text-gray-900/70 text-gray-900 font-medium"
-          />
-        </div>
+        {/* جایگزینی بخش Location استاتیک با کامپوننت تعاملی جدید */}
+        <LocationPicker />
 
         {/* Time/Date Input */}
         <div className="flex items-center w-full lg:flex-[0.8] px-4 py-3 lg:py-2 bg-white lg:bg-transparent border border-gray-200 lg:border-none rounded-xl lg:rounded-none group cursor-pointer transition-all hover:border-gray-400 lg:hover:border-transparent">
           <CalendarIcon className="w-5 h-5 text-gray-500 ml-3 stroke-[1.5]" />
           <div className="w-full flex items-center h-full">
             <div className="w-px h-8 bg-gray-200 mx-2 hidden md:block"></div>
-            
-            {/* کامپوننت جدید تاریخ و زمان */}
             <DateTimePicker />
-            
           </div>
         </div>
 
         {/* Search Button */}
-        <button className="w-full lg:w-auto bg-black hover:bg-gray-800 text-white text-[15px] font-semibold rounded-2xl lg:rounded-full px-8 py-3.5 lg:py-3.5 transition-colors whitespace-nowrap mt-1 lg:mt-0 shadow-md lg:shadow-none">
+        <button className="w-full lg:w-auto bg-black hover:bg-gray-800 text-white text-[15px] font-semibold rounded-2xl lg:rounded-full px-8 py-3.5 lg:py-3.5 transition-colors whitespace-nowrap mt-1 lg:mt-0 shadow-md lg:shadow-none cursor-pointer">
           <span className="lg:hidden">جستجوی فریشا</span>
           <span className="hidden lg:inline">جستجو</span>
         </button>
@@ -77,7 +67,7 @@ export const Hero = () => {
           نوبت رزرو شده در امروز
         </p>
 
-        <button className="flex items-center gap-2 px-5 py-2.5 bg-white rounded-full border border-gray-200 shadow-sm hover:bg-gray-50 hover:shadow-md transition-all text-[14px] font-semibold text-gray-900">
+        <button className="flex items-center gap-2 px-5 py-2.5 bg-white rounded-full border border-gray-200 shadow-sm hover:bg-gray-50 hover:shadow-md transition-all text-[14px] font-semibold text-gray-900 cursor-pointer">
           دریافت اپلیکیشن
           <QrCode className="w-4 h-4" />
         </button>
