@@ -17,7 +17,7 @@ const teamMembers = [
   { id: 7, name: 'داریو', role: 'مدیر سالن', rating: '۵.۰', avatar: 'https://i.pravatar.cc/150?img=17' },
 ];
 
-// داده‌های تستی نظرات (بر اساس تصویر پیوست شده)
+// داده‌های تستی نظرات
 const reviewsData = [
   { 
     id: 1, initial: 'D', name: 'Daniel U', date: 'پنجشنبه، ۹ مرداد ۱۴۰۵ ساعت ۱۰:۳۷', rating: 5, 
@@ -42,13 +42,29 @@ const reviewsData = [
   { 
     id: 5, initial: 'Z', name: 'Zeny S', date: 'دوشنبه، ۲۳ تیر ۱۴۰۵ ساعت ۱۴:۴۸', rating: 5, 
     comment: 'باز هم یک جلسه عالی، واقعا تجربه خوبی بود (Weer een top sessie...)', 
-    avatarBg: 'bg-[#004d40]', avatarText: 'text-white' // اعمال رنگ متفاوت بر اساس تصویر
+    avatarBg: 'bg-[#004d40]', avatarText: 'text-white' 
   },
   { 
     id: 6, initial: 'A', name: 'Alexander S', date: 'شنبه، ۲۱ تیر ۱۴۰۵ ساعت ۱۰:۴۴', rating: 5, 
     comment: 'بی‌نظیر (Topper)', 
     avatarBg: 'bg-purple-100', avatarText: 'text-purple-700' 
   },
+];
+
+// داده‌های تستی نمونه‌کارها (Portfolio)
+const portfolioItems = [
+  // آیتم اول (بزرگ و عمودی)
+  { id: 1, src: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=600&auto=format&fit=crop', isTall: true },
+  // سایر آیتم‌ها
+  { id: 2, src: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=400&auto=format&fit=crop' },
+  { id: 3, src: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?q=80&w=400&auto=format&fit=crop' },
+  { id: 4, src: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop' },
+  { id: 5, src: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop' },
+  { id: 6, src: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop' },
+  { id: 7, src: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=400&auto=format&fit=crop' },
+  { id: 8, src: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=400&auto=format&fit=crop' },
+  // آیتم آخر (حاوی overlay تعداد باقیمانده)
+  { id: 9, src: 'https://images.unsplash.com/photo-1517832606709-0b5abf0e4b85?q=80&w=400&auto=format&fit=crop', remainingCount: 18 },
 ];
 
 export default function SalonDetailPage() {
@@ -207,7 +223,6 @@ export default function SalonDetailPage() {
               مشاهده همه
             </button>
 
-
             {/* ----------------- بخش تیم ----------------- */}
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-2xl font-bold text-gray-900">تیم (Team)</h2>
@@ -233,9 +248,8 @@ export default function SalonDetailPage() {
 
             <hr className="border-gray-100 mb-12" />
 
-
             {/* ----------------- بخش نظرات (Reviews) ----------------- */}
-            <div className="mb-8">
+            <div className="mb-14">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">نظرات (Reviews)</h2>
               
               {/* خلاصه امتیازات */}
@@ -292,6 +306,50 @@ export default function SalonDetailPage() {
               <button className="px-6 py-3 rounded-full border border-gray-300 text-[15px] font-semibold text-gray-900 hover:bg-gray-50 transition-colors mt-4">
                 مشاهده همه ۷۷۷ نظر
               </button>
+            </div>
+
+            <hr className="border-gray-100 mb-12" />
+
+            {/* ----------------- بخش نمونه‌کارها (Portfolio) - پیاده‌سازی جدید ----------------- */}
+            <div className="mb-16">
+              {/* عنوان و Badge تعداد */}
+              <div className="flex items-center gap-3 mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">نمونه‌کارها (Portfolio)</h2>
+                <span className="px-2.5 py-0.5 bg-gray-100 text-gray-700 text-[13px] font-semibold rounded-full border border-gray-200/60">
+                  ۲۷
+                </span>
+              </div>
+
+              {/* گرید نمونه‌کارها (مطابق تصویر) */}
+              <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[160px] md:auto-rows-[170px] gap-3">
+                {portfolioItems.map((item) => {
+                  return (
+                    <div 
+                      key={item.id} 
+                      className={`relative rounded-2xl overflow-hidden bg-gray-100 cursor-pointer group select-none ${
+                        item.isTall 
+                          ? 'col-span-2 row-span-2' // تصویر بزرگ سمت راست درlayout RTL
+                          : 'col-span-1 row-span-1'
+                      }`}
+                    >
+                      <img 
+                        src={item.src} 
+                        alt={`Portfolio item ${item.id}`} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                      />
+
+                      {/* Overlay مخصوص آیتم پایانی (+18) */}
+                      {item.remainingCount && (
+                        <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center transition-colors group-hover:bg-black/60">
+                          <span className="text-white font-extrabold text-2xl md:text-3xl tracking-wider" dir="ltr">
+                            +{item.remainingCount}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
           </div>
