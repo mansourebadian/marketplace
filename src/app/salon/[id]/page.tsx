@@ -4,7 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/shared/Header';
 import { Share, Heart, ChevronRight, Star, Clock, MapPin, ChevronDown } from 'lucide-react';
 
-// داده‌های تستی اعضای تیم (بر اساس تصویر پیوست شده)
+// --- Mock Data ---
+
+// داده‌های تستی اعضای تیم
 const teamMembers = [
   { id: 1, name: 'جرارد', role: 'آرایشگر ارشد', rating: '۵.۰', avatar: 'https://i.pravatar.cc/150?img=11' },
   { id: 2, name: 'ملیح', role: 'آرایشگر', rating: '۴.۹', avatar: 'https://i.pravatar.cc/150?img=12' },
@@ -13,6 +15,40 @@ const teamMembers = [
   { id: 5, name: 'شلدون', role: 'آرایشگر ارشد', rating: '۵.۰', avatar: 'https://i.pravatar.cc/150?img=15' },
   { id: 6, name: 'نادیا', role: 'آرایشگر ارشد', rating: '۵.۰', avatar: 'https://i.pravatar.cc/150?img=16' },
   { id: 7, name: 'داریو', role: 'مدیر سالن', rating: '۵.۰', avatar: 'https://i.pravatar.cc/150?img=17' },
+];
+
+// داده‌های تستی نظرات (بر اساس تصویر پیوست شده)
+const reviewsData = [
+  { 
+    id: 1, initial: 'D', name: 'Daniel U', date: 'پنجشنبه، ۹ مرداد ۱۴۰۵ ساعت ۱۰:۳۷', rating: 5, 
+    comment: 'عالی بود! (Perfect!)', 
+    avatarBg: 'bg-purple-100', avatarText: 'text-purple-700' 
+  },
+  { 
+    id: 2, initial: 'M', name: 'Misha K', date: 'چهارشنبه، ۱ مرداد ۱۴۰۵ ساعت ۱۷:۳۷', rating: 5, 
+    comment: 'فوق‌العاده! (Top!)', 
+    avatarBg: 'bg-purple-100', avatarText: 'text-purple-700' 
+  },
+  { 
+    id: 3, initial: 'A', name: 'کاربر ناشناس (Anonymous)', date: 'چهارشنبه، ۲۵ تیر ۱۴۰۵ ساعت ۱۱:۳۰', rating: 5, 
+    comment: 'مرل موهای من رو با دقت و عالی کوتاه کرد! به شدت پیشنهاد می‌کنم برای وقت گرفتن باهاش اقدام کنید. من همیشه به این سالن میام...', 
+    readMore: true, avatarBg: 'bg-purple-100', avatarText: 'text-purple-700' 
+  },
+  { 
+    id: 4, initial: 'V', name: 'Victor A', date: 'سه‌شنبه، ۲۴ تیر ۱۴۰۵ ساعت ۱۸:۴۵', rating: 5, 
+    comment: 'مرل بهترینه 🤌', 
+    avatarBg: 'bg-purple-100', avatarText: 'text-purple-700' 
+  },
+  { 
+    id: 5, initial: 'Z', name: 'Zeny S', date: 'دوشنبه، ۲۳ تیر ۱۴۰۵ ساعت ۱۴:۴۸', rating: 5, 
+    comment: 'باز هم یک جلسه عالی، واقعا تجربه خوبی بود (Weer een top sessie...)', 
+    avatarBg: 'bg-[#004d40]', avatarText: 'text-white' // اعمال رنگ متفاوت بر اساس تصویر
+  },
+  { 
+    id: 6, initial: 'A', name: 'Alexander S', date: 'شنبه، ۲۱ تیر ۱۴۰۵ ساعت ۱۰:۴۴', rating: 5, 
+    comment: 'بی‌نظیر (Topper)', 
+    avatarBg: 'bg-purple-100', avatarText: 'text-purple-700' 
+  },
 ];
 
 export default function SalonDetailPage() {
@@ -112,11 +148,11 @@ export default function SalonDetailPage() {
         {/* ساختار دو ستونه اصلی */}
         <div className="flex flex-col lg:flex-row gap-12 relative items-start">
           
-          {/* ستون اصلی (خدمات و تیم) */}
+          {/* ستون اصلی (محتوای صفحه) */}
           <div className="flex-1 w-full lg:max-w-[calc(100%-380px)]">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">خدمات</h2>
             
-            {/* تب‌های دسته‌بندی */}
+            {/* ----------------- بخش خدمات ----------------- */}
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">خدمات</h2>
             <div className="flex flex-wrap items-center gap-2 mb-6">
               {['کوتاهی مو', 'اصلاح و مرتب‌سازی', 'سلامت و مراقبت', 'اشتراک'].map((tab, idx) => (
                 <button 
@@ -132,8 +168,8 @@ export default function SalonDetailPage() {
               ))}
             </div>
 
-            {/* لیست سرویس‌ها */}
             <div className="space-y-4 mb-6">
+              {/* سرویس ۱ */}
               <div className="border border-gray-200 rounded-2xl p-5 hover:border-gray-300 transition-colors">
                 <div className="flex justify-between items-center">
                   <div>
@@ -145,11 +181,11 @@ export default function SalonDetailPage() {
                     </div>
                   </div>
                   <button className="px-6 py-2 rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900 hover:bg-gray-50 transition-colors">
-                    Book
+                    رزرو
                   </button>
                 </div>
               </div>
-
+              {/* سرویس ۲ */}
               <div className="border border-gray-200 rounded-2xl p-5 hover:border-gray-300 transition-colors">
                 <div className="flex justify-between items-center">
                   <div>
@@ -161,62 +197,114 @@ export default function SalonDetailPage() {
                     </div>
                   </div>
                   <button className="px-6 py-2 rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900 hover:bg-gray-50 transition-colors">
-                    Book
+                    رزرو
                   </button>
                 </div>
               </div>
             </div>
 
             <button className="px-6 py-2 rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900 hover:bg-gray-50 transition-colors mb-12">
-              See all
+              مشاهده همه
             </button>
 
-            {/* بخش تیم کاملاً مشابه تصویر */}
+
+            {/* ----------------- بخش تیم ----------------- */}
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-2xl font-bold text-gray-900">تیم (Team)</h2>
-              <button className="text-[14px] font-medium text-purple-700 hover:underline">
-                See all
-              </button>
             </div>
             
-            {/* گرید اعضای تیم */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-y-10 gap-x-4 mb-20">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-y-10 gap-x-4 mb-16">
               {teamMembers.map((member) => (
                 <div key={member.id} className="flex flex-col items-center group cursor-pointer">
-                  {/* کانتینر تصویر و بج */}
                   <div className="relative mb-3">
                     <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-transparent group-hover:border-gray-200 transition-colors">
-                      <img 
-                        src={member.avatar} 
-                        alt={member.name}
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
                     </div>
-                    {/* بج امتیاز Absolute در پایین وسط */}
                     <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white px-2.5 py-0.5 rounded-full border border-gray-200 shadow-sm flex items-center justify-center gap-1 min-w-[50px] z-10">
                       <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
                       <span className="text-[13px] font-bold text-gray-900 pt-0.5">{member.rating}</span>
                     </div>
                   </div>
-                  {/* اطلاعات متنی عضو */}
                   <h4 className="text-[15px] font-semibold text-gray-900 mt-2">{member.name}</h4>
                   <p className="text-[13px] text-gray-500 mt-0.5">{member.role}</p>
                 </div>
               ))}
             </div>
 
+            <hr className="border-gray-100 mb-12" />
+
+
+            {/* ----------------- بخش نظرات (Reviews) ----------------- */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">نظرات (Reviews)</h2>
+              
+              {/* خلاصه امتیازات */}
+              <div className="flex flex-col mb-10">
+                <div className="flex items-center gap-1 text-yellow-400 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-6 h-6 fill-current" />
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 text-[15px]">
+                  <span className="font-bold text-lg text-gray-900">۵.۰</span>
+                  <span className="text-purple-600 hover:underline cursor-pointer">(۷۷۷)</span>
+                </div>
+              </div>
+
+              {/* گرید نظرات (دو ستون در دسکتاپ، یک ستون در موبایل) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 mb-8">
+                {reviewsData.map((review) => (
+                  <div key={review.id} className="flex flex-col text-right">
+                    
+                    {/* سربرگ نظر: آواتار، نام و تاریخ */}
+                    <div className="flex items-center gap-4 mb-3">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shrink-0 ${review.avatarBg} ${review.avatarText}`}>
+                        {review.initial}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[15px] font-semibold text-gray-900">{review.name}</span>
+                        <span className="text-[13px] text-gray-500 mt-0.5">{review.date}</span>
+                      </div>
+                    </div>
+
+                    {/* ستاره‌های اختصاصی نظر */}
+                    <div className="flex items-center gap-1 text-yellow-400 mb-3">
+                      {[...Array(review.rating)].map((_, i) => (
+                        <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                      ))}
+                    </div>
+
+                    {/* متن کامنت */}
+                    <p className="text-[15px] text-gray-800 leading-relaxed">
+                      {review.comment}
+                    </p>
+                    {review.readMore && (
+                      <button className="text-purple-700 text-[14px] font-medium hover:underline text-right mt-1 w-fit">
+                        مشاهده بیشتر (Read more)
+                      </button>
+                    )}
+
+                  </div>
+                ))}
+              </div>
+
+              {/* دکمه مشاهده همه نظرات */}
+              <button className="px-6 py-3 rounded-full border border-gray-300 text-[15px] font-semibold text-gray-900 hover:bg-gray-50 transition-colors mt-4">
+                مشاهده همه ۷۷۷ نظر
+              </button>
+            </div>
+
           </div>
-          {/* ویجت رزرو (Sticky Sidebar) - نسخه فارسی */}
+
+          {/* ----------------- ویجت رزرو (Sticky Sidebar) ----------------- */}
           <div className="w-full lg:w-[350px] shrink-0 sticky top-28 h-fit self-start transition-all duration-300 z-10 pb-10">
             <div className="bg-white border border-gray-200 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden transition-all duration-300">
               
               <div className="p-6">
-                {/* جزئیاتی که در صورت اسکرول نمایش داده می‌شوند */}
                 {isScrolled && (
                   <div className="mb-5 animate-in fade-in slide-in-from-top-4 duration-300">
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">آرایشگاه مردانه داریوس</h2>
                     
-                    {/* امتیاز */}
                     <div className="flex items-center gap-1.5 text-[15px] mb-4">
                       <span className="font-bold text-gray-900">۵.۰</span>
                       <div className="flex text-yellow-400">
@@ -227,7 +315,6 @@ export default function SalonDetailPage() {
                       <span className="text-purple-600 hover:underline cursor-pointer">(۷۷۷)</span>
                     </div>
 
-                    {/* بج‌ها (Badges) */}
                     <div className="flex items-center gap-2">
                       <span className="px-3 py-1 bg-purple-50 text-purple-700 text-[12px] font-semibold rounded-full">ویژه (Featured)</span>
                       <span className="px-3 py-1 bg-green-50 text-green-700 text-[12px] font-semibold rounded-full">تخفیف‌دار</span>
@@ -235,18 +322,15 @@ export default function SalonDetailPage() {
                   </div>
                 )}
 
-                {/* دکمه اصلی رزرو */}
                 <button className="w-full bg-black text-white rounded-xl py-3.5 text-[15px] font-semibold hover:bg-gray-800 transition-colors shadow-sm">
                   رزرو نوبت
                 </button>
               </div>
 
-              {/* بخش پایینی که فقط هنگام اسکرول نمایش داده می‌شود */}
               {isScrolled && (
                 <div className="animate-in fade-in duration-300">
                   <div className="h-px bg-gray-100 w-full" />
                   
-                  {/* اطلاعات وضعیت و آدرس */}
                   <div className="p-6 space-y-5">
                     <div className="flex items-start gap-3">
                       <Clock className="w-5 h-5 text-gray-800 shrink-0 mt-0.5" />
@@ -272,7 +356,6 @@ export default function SalonDetailPage() {
 
                   <div className="h-px bg-gray-100 w-full" />
 
-                  {/* بخش کارت هدیه */}
                   <div className="p-6 bg-white flex items-center justify-between gap-4">
                     <div className="flex flex-col text-right w-full">
                       <span className="text-[14px] font-semibold text-gray-900 mb-1">خرید کارت هدیه</span>
