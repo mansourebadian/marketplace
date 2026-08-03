@@ -3,8 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/shared/Header';
 import { Share, Heart, ChevronRight, Star, Clock, MapPin, ChevronDown } from 'lucide-react';
+import SalonAboutMap from '@/components/features/SalonAboutMap';
 
 // --- Mock Data ---
+ const salonData = {
+    description: 'از لحظه‌ای که قدم به داخل می‌گذارید، فضای آرام و اشتیاق به این حرفه را احساس می‌کنید. این مکان مهارت را با رویکردی شخصی ترکیب می‌کند، بنابراین شما نه تنها با یک کوتاهی موی عالی، بلکه با احساسی فوق‌العاده اینجا را ترک می‌کنید. هر بازدید بر محور استایل، راحتی و توجه به جزئیات است.',
+    location: {
+      address: 'Kruisweg 38, Oude Stad, Haarlem, Noord-holland',
+      lat: 52.387387,
+      lng: 4.646219,
+      rating: 5.0
+    }
+  };
 
 // داده‌های تستی اعضای تیم
 const teamMembers = [
@@ -351,6 +361,10 @@ export default function SalonDetailPage() {
                 })}
               </div>
             </div>
+ <SalonAboutMap 
+              description={salonData.description} 
+              location={salonData.location} 
+            />
 
           </div>
 
