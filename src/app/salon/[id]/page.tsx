@@ -4,14 +4,22 @@ import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/shared/Header';
 import { Share, Heart, ChevronRight, Star, Clock, MapPin, ChevronDown } from 'lucide-react';
 
+// داده‌های تستی اعضای تیم (بر اساس تصویر پیوست شده)
+const teamMembers = [
+  { id: 1, name: 'جرارد', role: 'آرایشگر ارشد', rating: '۵.۰', avatar: 'https://i.pravatar.cc/150?img=11' },
+  { id: 2, name: 'ملیح', role: 'آرایشگر', rating: '۴.۹', avatar: 'https://i.pravatar.cc/150?img=12' },
+  { id: 3, name: 'رایوانو', role: 'آرایشگر ارشد', rating: '۵.۰', avatar: 'https://i.pravatar.cc/150?img=13' },
+  { id: 4, name: 'مرل', role: 'آرایشگر ارشد', rating: '۵.۰', avatar: 'https://i.pravatar.cc/150?img=14' },
+  { id: 5, name: 'شلدون', role: 'آرایشگر ارشد', rating: '۵.۰', avatar: 'https://i.pravatar.cc/150?img=15' },
+  { id: 6, name: 'نادیا', role: 'آرایشگر ارشد', rating: '۵.۰', avatar: 'https://i.pravatar.cc/150?img=16' },
+  { id: 7, name: 'داریو', role: 'مدیر سالن', rating: '۵.۰', avatar: 'https://i.pravatar.cc/150?img=17' },
+];
+
 export default function SalonDetailPage() {
-  // استیت برای تشخیص وضعیت اسکرول
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // افکت برای رصد کردن میزان اسکرول صفحه
   useEffect(() => {
     const handleScroll = () => {
-      // اگر کاربر بیش از ۳۰۰ پیکسل اسکرول کند، کارت گسترده می‌شود
       if (window.scrollY > 100) {
         setIsScrolled(true);
       } else {
@@ -20,8 +28,6 @@ export default function SalonDetailPage() {
     };
 
     window.addEventListener('scroll', handleScroll);
-    
-    // پاکسازی event listener هنگام خروج از کامپوننت
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -37,7 +43,7 @@ export default function SalonDetailPage() {
           <ChevronRight className="w-3 h-3" />
           <span className="hover:underline cursor-pointer">آرایشگاه مردانه</span>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-gray-900 font-medium">آرایشگاه داریوس</span>
+          <span className="text-gray-900 font-medium">آرایشگاه داریوس (DARIOS Barbers)</span>
         </nav>
 
         {/* بخش عنوان و اطلاعات بالای صفحه */}
@@ -103,8 +109,8 @@ export default function SalonDetailPage() {
           </div>
         </div>
 
-        {/* ساختار دو ستونه */}
-        <div className="flex flex-col lg:flex-row gap-8 relative items-start">
+        {/* ساختار دو ستونه اصلی */}
+        <div className="flex flex-col lg:flex-row gap-12 relative items-start">
           
           {/* ستون اصلی (خدمات و تیم) */}
           <div className="flex-1 w-full lg:max-w-[calc(100%-380px)]">
@@ -128,79 +134,87 @@ export default function SalonDetailPage() {
 
             {/* لیست سرویس‌ها */}
             <div className="space-y-4 mb-6">
-              {/* سرویس ۱ */}
               <div className="border border-gray-200 rounded-2xl p-5 hover:border-gray-300 transition-colors">
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-center">
                   <div>
-                    <h3 className="text-[16px] font-medium text-gray-900">کوتاهی مو (Haircut)</h3>
-                    <p className="text-[14px] text-gray-500 mt-1">۴۰ دقیقه</p>
-                    <div className="flex items-center gap-2 mt-4 text-[14px]">
-                      <span className="font-semibold text-gray-900">از ۴۰۸,۰۰۰ تومان</span>
-                      <span className="text-green-600 font-medium">تا ۱۵٪ تخفیف</span>
-                    </div>
-                  </div>
-                  <button className="px-5 py-1.5 rounded-full border border-gray-300 text-[14px] font-medium text-gray-900 hover:bg-gray-50 transition-colors">
-                    رزرو
-                  </button>
-                </div>
-              </div>
-
-              {/* سرویس ۲ */}
-              <div className="border border-gray-200 rounded-2xl p-5 hover:border-gray-300 transition-colors">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-[16px] font-medium text-gray-900">ماشین کردن مو (Buzz Cut)</h3>
+                    <h3 className="text-[16px] font-medium text-gray-900">کوتاهی مو (Buzz Cut)</h3>
                     <p className="text-[14px] text-gray-500 mt-1">۳۰ دقیقه</p>
-                    <div className="flex items-center gap-2 mt-4 text-[14px]">
+                    <div className="flex items-center gap-2 mt-3 text-[14px]">
                       <span className="font-semibold text-gray-900">از ۳۰۶,۰۰۰ تومان</span>
                       <span className="text-green-600 font-medium">تا ۱۵٪ تخفیف</span>
                     </div>
                   </div>
-                  <button className="px-5 py-1.5 rounded-full border border-gray-300 text-[14px] font-medium text-gray-900 hover:bg-gray-50 transition-colors">
-                    رزرو
+                  <button className="px-6 py-2 rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900 hover:bg-gray-50 transition-colors">
+                    Book
+                  </button>
+                </div>
+              </div>
+
+              <div className="border border-gray-200 rounded-2xl p-5 hover:border-gray-300 transition-colors">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-[16px] font-medium text-gray-900">اصلاح کانتور (Contouren)</h3>
+                    <p className="text-[14px] text-gray-500 mt-1">۲۰ دقیقه</p>
+                    <div className="flex items-center gap-2 mt-3 text-[14px]">
+                      <span className="font-semibold text-gray-900">از ۲۰۴,۰۰۰ تومان</span>
+                      <span className="text-green-600 font-medium">تا ۱۵٪ تخفیف</span>
+                    </div>
+                  </div>
+                  <button className="px-6 py-2 rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900 hover:bg-gray-50 transition-colors">
+                    Book
                   </button>
                 </div>
               </div>
             </div>
 
-            <button className="px-6 py-2 rounded-full border border-gray-300 text-[14px] font-medium text-gray-900 hover:bg-gray-50 transition-colors mb-12">
-              مشاهده همه
+            <button className="px-6 py-2 rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900 hover:bg-gray-50 transition-colors mb-12">
+              See all
             </button>
 
-            {/* بخش تیم */}
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">تیم</h2>
+            {/* بخش تیم کاملاً مشابه تصویر */}
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-900">تیم (Team)</h2>
               <button className="text-[14px] font-medium text-purple-700 hover:underline">
-                مشاهده همه
+                See all
               </button>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-4 mb-20">
-              {[1, 2, 3, 4].map((item) => (
-                <div key={item} className="flex flex-col items-center gap-2 shrink-0">
-                  <div className="w-20 h-20 rounded-full bg-gray-200 overflow-hidden border border-gray-100">
-                    <img 
-                      src={`https://i.pravatar.cc/150?img=${item * 10}`} 
-                      alt={`عضو تیم ${item}`}
-                      className="w-full h-full object-cover"
-                    />
+            
+            {/* گرید اعضای تیم */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-y-10 gap-x-4 mb-20">
+              {teamMembers.map((member) => (
+                <div key={member.id} className="flex flex-col items-center group cursor-pointer">
+                  {/* کانتینر تصویر و بج */}
+                  <div className="relative mb-3">
+                    <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-transparent group-hover:border-gray-200 transition-colors">
+                      <img 
+                        src={member.avatar} 
+                        alt={member.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    {/* بج امتیاز Absolute در پایین وسط */}
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white px-2.5 py-0.5 rounded-full border border-gray-200 shadow-sm flex items-center justify-center gap-1 min-w-[50px] z-10">
+                      <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                      <span className="text-[13px] font-bold text-gray-900 pt-0.5">{member.rating}</span>
+                    </div>
                   </div>
+                  {/* اطلاعات متنی عضو */}
+                  <h4 className="text-[15px] font-semibold text-gray-900 mt-2">{member.name}</h4>
+                  <p className="text-[13px] text-gray-500 mt-0.5">{member.role}</p>
                 </div>
               ))}
             </div>
 
           </div>
-
-          {/* ویجت رزرو (Sticky Sidebar) با رفتار داینامیک */}
-          <div className="w-full lg:w-[350px] shrink-0 sticky top-28 transition-all duration-300">
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden transition-all duration-300">
+          {/* ویجت رزرو (Sticky Sidebar) - نسخه فارسی */}
+          <div className="w-full lg:w-[350px] shrink-0 sticky top-28 h-fit self-start transition-all duration-300 z-10 pb-10">
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden transition-all duration-300">
               
-              {/* بخش بالا: همیشه دکمه رزرو را دارد، اما در حالت اسکرول شده جزئیات هم اضافه می‌شود */}
               <div className="p-6">
-                
-                {/* جزئیات اضافی که فقط هنگام اسکرول نمایش داده می‌شوند */}
+                {/* جزئیاتی که در صورت اسکرول نمایش داده می‌شوند */}
                 {isScrolled && (
                   <div className="mb-5 animate-in fade-in slide-in-from-top-4 duration-300">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">آرایشگاه داریوس</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">آرایشگاه مردانه داریوس</h2>
                     
                     {/* امتیاز */}
                     <div className="flex items-center gap-1.5 text-[15px] mb-4">
@@ -215,15 +229,15 @@ export default function SalonDetailPage() {
 
                     {/* بج‌ها (Badges) */}
                     <div className="flex items-center gap-2">
-                      <span className="px-3 py-1 bg-purple-50 text-purple-700 text-[12px] font-semibold rounded-full">ویژه</span>
-                      <span className="px-3 py-1 bg-green-50 text-green-700 text-[12px] font-semibold rounded-full">تخفیف‌ها</span>
+                      <span className="px-3 py-1 bg-purple-50 text-purple-700 text-[12px] font-semibold rounded-full">ویژه (Featured)</span>
+                      <span className="px-3 py-1 bg-green-50 text-green-700 text-[12px] font-semibold rounded-full">تخفیف‌دار</span>
                     </div>
                   </div>
                 )}
 
-                {/* دکمه اصلی رزرو (همیشه ثابت) */}
-                <button className="w-full bg-black text-white rounded-xl py-3.5 text-[15px] font-semibold hover:bg-gray-800 transition-colors">
-                  همین حالا رزرو کنید
+                {/* دکمه اصلی رزرو */}
+                <button className="w-full bg-black text-white rounded-xl py-3.5 text-[15px] font-semibold hover:bg-gray-800 transition-colors shadow-sm">
+                  رزرو نوبت
                 </button>
               </div>
 
@@ -235,21 +249,21 @@ export default function SalonDetailPage() {
                   {/* اطلاعات وضعیت و آدرس */}
                   <div className="p-6 space-y-5">
                     <div className="flex items-start gap-3">
-                      <Clock className="w-5 h-5 text-gray-400 shrink-0 mt-0.5" />
+                      <Clock className="w-5 h-5 text-gray-800 shrink-0 mt-0.5" />
                       <div className="flex items-center gap-1 text-[14px] cursor-pointer group">
                         <span className="text-red-600 font-medium group-hover:underline">بسته است</span>
-                        <span className="text-gray-700">- ساعت ۱۲:۳۰ ظهر</span>
-                        <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-900 transition-colors" />
+                        <span className="text-gray-700">- ساعت ۱۲:۳۰ ظهر باز می‌شود</span>
+                        <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-900 transition-colors mr-1" />
                       </div>
                     </div>
 
                     <div className="flex items-start gap-3">
-                      <MapPin className="w-5 h-5 text-gray-400 shrink-0 mt-0.5" />
+                      <MapPin className="w-5 h-5 text-gray-800 shrink-0 mt-0.5" />
                       <div className="flex flex-col text-[14px]">
-                        <span className="text-gray-700 leading-relaxed mb-1">
-                          تهران، ولیعصر، خیابان مطهری، پلاک ۳۸
+                        <span className="text-gray-700 leading-relaxed mb-1 text-right">
+                          تهران، خیابان ولیعصر، بالاتر از میدان ونک، کوچه نگار، پلاک ۳۸
                         </span>
-                        <button className="text-purple-700 font-medium hover:underline text-right w-fit">
+                        <button className="text-purple-700 font-medium hover:underline w-fit text-right">
                           مسیریابی
                         </button>
                       </div>
@@ -259,12 +273,12 @@ export default function SalonDetailPage() {
                   <div className="h-px bg-gray-100 w-full" />
 
                   {/* بخش کارت هدیه */}
-                  <div className="p-6 bg-gray-50 flex items-center justify-between gap-4">
-                    <div className="flex flex-col">
+                  <div className="p-6 bg-white flex items-center justify-between gap-4">
+                    <div className="flex flex-col text-right w-full">
                       <span className="text-[14px] font-semibold text-gray-900 mb-1">خرید کارت هدیه</span>
-                      <span className="text-[13px] text-gray-500 line-clamp-1">برای خودتان یا دوستان.</span>
+                      <span className="text-[13px] text-gray-500">خود یا دوستانتان را برای مراجعات بعدی مهمان کنید.</span>
                     </div>
-                    <button className="px-4 py-2 bg-white border border-gray-200 rounded-full text-[13px] font-semibold text-gray-900 hover:border-gray-900 transition-colors shrink-0">
+                    <button className="px-5 py-2 bg-white border border-gray-200 rounded-full text-[13px] font-semibold text-gray-900 hover:border-gray-900 transition-colors shrink-0">
                       خرید
                     </button>
                   </div>
@@ -273,7 +287,6 @@ export default function SalonDetailPage() {
 
             </div>
           </div>
-
         </div>
       </div>
     </main>
