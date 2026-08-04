@@ -2,7 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/shared/Header';
-import { Share, Heart, ChevronRight, Star, Clock, MapPin, ChevronDown } from 'lucide-react';
+import { 
+  Share, Heart, ChevronRight, Star, Clock, MapPin, ChevronDown,
+  BadgeCheck, Check, CreditCard, Smile, Accessibility, Car 
+} from 'lucide-react';
 import SalonAboutMap from '@/components/features/SalonAboutMap';
 
 // --- Mock Data ---
@@ -15,6 +18,17 @@ import SalonAboutMap from '@/components/features/SalonAboutMap';
       rating: 5.0
     }
   };
+
+// داده‌های تستی ساعات کاری
+const openingTimes = [
+  { id: 1, day: 'دوشنبه (Monday)', time: '10:00 AM - 7:00 PM', isOpen: true, isToday: false },
+  { id: 2, day: 'سه‌شنبه (Tuesday)', time: '10:00 AM - 7:00 PM', isOpen: true, isToday: true }, // روز جاری
+  { id: 3, day: 'چهارشنبه (Wednesday)', time: '10:00 AM - 7:00 PM', isOpen: true, isToday: false },
+  { id: 4, day: 'پنجشنبه (Thursday)', time: '10:00 AM - 7:00 PM', isOpen: true, isToday: false },
+  { id: 5, day: 'جمعه (Friday)', time: '10:00 AM - 7:00 PM', isOpen: true, isToday: false },
+  { id: 6, day: 'شنبه (Saturday)', time: '10:00 AM - 7:00 PM', isOpen: true, isToday: false },
+  { id: 7, day: 'یکشنبه (Sunday)', time: 'بسته (Closed)', isOpen: false, isToday: false },
+];
 
 // داده‌های تستی اعضای تیم
 const teamMembers = [
@@ -63,9 +77,7 @@ const reviewsData = [
 
 // داده‌های تستی نمونه‌کارها (Portfolio)
 const portfolioItems = [
-  // آیتم اول (بزرگ و عمودی)
   { id: 1, src: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=600&auto=format&fit=crop', isTall: true },
-  // سایر آیتم‌ها
   { id: 2, src: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=400&auto=format&fit=crop' },
   { id: 3, src: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?q=80&w=400&auto=format&fit=crop' },
   { id: 4, src: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop' },
@@ -73,7 +85,6 @@ const portfolioItems = [
   { id: 6, src: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop' },
   { id: 7, src: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=400&auto=format&fit=crop' },
   { id: 8, src: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=400&auto=format&fit=crop' },
-  // آیتم آخر (حاوی overlay تعداد باقیمانده)
   { id: 9, src: 'https://images.unsplash.com/photo-1517832606709-0b5abf0e4b85?q=80&w=400&auto=format&fit=crop', remainingCount: 18 },
 ];
 
@@ -131,12 +142,12 @@ export default function SalonDetailPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+         <div className="flex items-center gap-3 shrink-0">
             <button className="p-2.5 bg-white rounded-full border border-gray-200 hover:border-gray-900 transition-colors">
-              <Share className="w-5 h-5 text-gray-900" />
+              <Share className="w-5 h-5 text-gray-700" />
             </button>
             <button className="p-2.5 bg-white rounded-full border border-gray-200 hover:border-gray-900 transition-colors">
-              <Heart className="w-5 h-5 text-gray-900" />
+              <Heart className="w-5 h-5 text-gray-700" />
             </button>
           </div>
         </div>
@@ -275,12 +286,11 @@ export default function SalonDetailPage() {
                 </div>
               </div>
 
-              {/* گرید نظرات (دو ستون در دسکتاپ، یک ستون در موبایل) */}
+              {/* گرید نظرات */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 mb-8">
                 {reviewsData.map((review) => (
                   <div key={review.id} className="flex flex-col text-right">
                     
-                    {/* سربرگ نظر: آواتار، نام و تاریخ */}
                     <div className="flex items-center gap-4 mb-3">
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shrink-0 ${review.avatarBg} ${review.avatarText}`}>
                         {review.initial}
@@ -291,14 +301,12 @@ export default function SalonDetailPage() {
                       </div>
                     </div>
 
-                    {/* ستاره‌های اختصاصی نظر */}
                     <div className="flex items-center gap-1 text-yellow-400 mb-3">
                       {[...Array(review.rating)].map((_, i) => (
                         <Star key={i} className="w-3.5 h-3.5 fill-current" />
                       ))}
                     </div>
 
-                    {/* متن کامنت */}
                     <p className="text-[15px] text-gray-800 leading-relaxed">
                       {review.comment}
                     </p>
@@ -312,7 +320,6 @@ export default function SalonDetailPage() {
                 ))}
               </div>
 
-              {/* دکمه مشاهده همه نظرات */}
               <button className="px-6 py-3 rounded-full border border-gray-300 text-[15px] font-semibold text-gray-900 hover:bg-gray-50 transition-colors mt-4">
                 مشاهده همه ۷۷۷ نظر
               </button>
@@ -320,9 +327,8 @@ export default function SalonDetailPage() {
 
             <hr className="border-gray-100 mb-12" />
 
-            {/* ----------------- بخش نمونه‌کارها (Portfolio) - پیاده‌سازی جدید ----------------- */}
+            {/* ----------------- بخش نمونه‌کارها (Portfolio) ----------------- */}
             <div className="mb-16">
-              {/* عنوان و Badge تعداد */}
               <div className="flex items-center gap-3 mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">نمونه‌کارها (Portfolio)</h2>
                 <span className="px-2.5 py-0.5 bg-gray-100 text-gray-700 text-[13px] font-semibold rounded-full border border-gray-200/60">
@@ -330,7 +336,6 @@ export default function SalonDetailPage() {
                 </span>
               </div>
 
-              {/* گرید نمونه‌کارها (مطابق تصویر) */}
               <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[160px] md:auto-rows-[170px] gap-3">
                 {portfolioItems.map((item) => {
                   return (
@@ -338,7 +343,7 @@ export default function SalonDetailPage() {
                       key={item.id} 
                       className={`relative rounded-2xl overflow-hidden bg-gray-100 cursor-pointer group select-none ${
                         item.isTall 
-                          ? 'col-span-2 row-span-2' // تصویر بزرگ سمت راست درlayout RTL
+                          ? 'col-span-2 row-span-2' 
                           : 'col-span-1 row-span-1'
                       }`}
                     >
@@ -348,7 +353,6 @@ export default function SalonDetailPage() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                       />
 
-                      {/* Overlay مخصوص آیتم پایانی (+18) */}
                       {item.remainingCount && (
                         <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center transition-colors group-hover:bg-black/60">
                           <span className="text-white font-extrabold text-2xl md:text-3xl tracking-wider" dir="ltr">
@@ -361,11 +365,73 @@ export default function SalonDetailPage() {
                 })}
               </div>
             </div>
- <SalonAboutMap 
+
+            {/* ----------------- نقشه و اطلاعات سالن ----------------- */}
+            <SalonAboutMap 
               description={salonData.description} 
               location={salonData.location} 
             />
 
+            {/* ----------------- بخش جدید: ساعات کاری و اطلاعات تکمیلی ----------------- */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10 mb-16">
+              
+              {/* ستون اول: ساعات کاری (Opening times) */}
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-6">ساعات کاری (Opening times)</h3>
+                <ul className="space-y-4">
+                  {openingTimes.map((item) => (
+                    <li 
+                      key={item.id} 
+                      className={`flex justify-between items-center text-[15px] ${item.isToday ? 'font-bold text-gray-900' : 'text-gray-700'}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-2.5 h-2.5 rounded-full ${item.isOpen ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                        <span>{item.day}</span>
+                      </div>
+                      <span className={!item.isOpen ? 'text-gray-500' : ''}>{item.time}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* ستون دوم: اطلاعات تکمیلی (Additional information) */}
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-6">اطلاعات تکمیلی (Additional info)</h3>
+                <ul className="space-y-4">
+                  <li className="flex items-center gap-3 text-[15px] text-gray-900">
+                    <BadgeCheck className="w-5 h-5 text-purple-600 shrink-0" />
+                    <span>کسب‌وکار تایید شده توسط Fresha</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-[15px] text-gray-900">
+                    <Check className="w-5 h-5 text-gray-500 shrink-0" />
+                    <span>تایید فوری (Instant confirmation)</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-[15px] text-gray-900">
+                    <CreditCard className="w-5 h-5 text-gray-500 shrink-0" />
+                    <span>پرداخت از طریق اپلیکیشن</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-[15px] text-gray-900">
+                    <Smile className="w-5 h-5 text-gray-500 shrink-0" />
+                    <span>مناسب برای کودکان (Kid-friendly)</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-[15px] text-gray-900">
+                    <Accessibility className="w-5 h-5 text-gray-500 shrink-0" />
+                    <span>دسترسی برای صندلی چرخدار</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-[15px] text-gray-900">
+                    <Car className="w-5 h-5 text-gray-500 shrink-0" />
+                    <span>دارای پارکینگ (Parking available)</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-[15px] text-gray-900 pl-8 md:pl-0 pr-8">
+                    <span>دوستدار محیط زیست (Environmentally friendly)</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-[15px] text-gray-900 pl-8 md:pl-0 pr-8">
+                    <span>مدیریت توسط بانوان (Woman-owned)</span>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
           </div>
 
           {/* ----------------- ویجت رزرو (Sticky Sidebar) ----------------- */}
