@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  phone     String    @unique
+  name      String?
+  role      String    @default("CUSTOMER") // CUSTOMER, OWNER, ADMIN
+  bookings  Booking[]
+  reviews   Review[]
+  createdAt DateTime  @default(now())
+}
+
+model Salon {
+  id           String           @id @default(uuid())
+  name         String
+  address      String
+  lat          Float?           // برای کامپوننت LocationPicker
+  lng          Float?
+  description  String?          // db.Text
+  imageUrl     String?
+  priceRange   String?          // مثل "$$"
+  services     Service[]
+  teamMembers  TeamMember[]
+  reviews      Review[]
+  bookings     Booking[]
+  portfolio    PortfolioItem[]
+  createdAt    DateTime         @default(now())
+}
+
+model Service {
+  id          String    @id @default(uuid())
+  name        String
+  price       Int
+  durationMin Int       // مدت زمان خدمت به دقیقه
+  salonId     String
+  salon       Salon     @relation(fields: [salonId], references: [id])
+  bookings    Booking[]
+}
+
+model TeamMember {
+  id       String    @id @default(uuid())
+  name     String
+  role     String
+  avatarUrl String?
+  salonId  String
+  salon    Salon     @relation(fields: [salonId], references: [id])
+  bookings Booking[]
+}
+
+model Booking {
+  id           String     @id @default(uuid())
+  date         DateTime   // تاریخ و زمان رزرو
+  status       String     @default("PENDING") // PENDING, CONFIRMED, CANCELLED
+  
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  salonId      String
+  salon        Salon      @relation(fields: [salonId], references: [id])
+  serviceId    String
+  service      Service    @relation(fields: [serviceId], references: [id])
+  teamMemberId String
+  teamMember   TeamMember @relation(fields: [teamMemberId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int
+  comment   String?
+  date      DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  salonId   String
+  salon     Salon    @relation(fields: [salonId], references: [id])
+}
+
+model PortfolioItem {
+  id       String  @id @default(uuid())
+  imageUrl String
+  order    Int     @default(0)
+  salonId  String
+  salon    Salon   @relation(fields: [salonId], references: [id])
+}
