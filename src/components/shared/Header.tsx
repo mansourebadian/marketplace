@@ -49,9 +49,12 @@ export const Header = ({ hasSearch = false }: HeaderProps) => {
             کسب‌وکارتان را اضافه کنید
           </button>
           
-          <button className="font-semibold text-[15px] bg-black text-white px-5 py-2.5 rounded-full hover:bg-gray-800 transition-colors shadow-sm">
+          <Link
+            href="/auth"
+            className="font-semibold text-[15px] bg-black text-white px-5 py-2.5 rounded-full hover:bg-gray-800 transition-colors shadow-sm"
+          >
             ورود / ثبت‌نام
-          </button>
+          </Link>
           
           {/* دکمه باز کردن منو */}
           <button 
@@ -68,10 +71,14 @@ export const Header = ({ hasSearch = false }: HeaderProps) => {
               {/* بخش مشتریان */}
               <div className="px-4 py-2">
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">مشتریان</h3>
-                <button className="w-full flex items-center gap-3 py-2.5 px-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors text-right text-[15px] font-medium">
+                <Link
+                  href="/auth"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-full flex items-center gap-3 py-2.5 px-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors text-right text-[15px] font-medium"
+                >
                   <LogIn className="w-5 h-5 text-gray-500" />
                   ورود یا ثبت‌نام
-                </button>
+                </Link>
                 <button className="w-full flex items-center gap-3 py-2.5 px-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors text-right text-[15px] font-medium">
                   <Smartphone className="w-5 h-5 text-gray-500" />
                   دانلود اپلیکیشن Fresha
