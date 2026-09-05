@@ -44,7 +44,19 @@ model Service {
   durationMin Int       // مدت زمان خدمت به دقیقه
   salonId     String
   salon       Salon     @relation(fields: [salonId], references: [id])
+  categoryId  String?
+  category    ServiceCategory? @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   bookings    Booking[]
+}
+
+model ServiceCategory {
+  id        String    @id @default(cuid())
+  name      String    // نام دسته‌بندی (مثلا: مو و آرایش مو)
+  slug      String    @unique
+  icon      String    // نام آیکون lucide (مثلا: Scissors)
+  order     Int       @default(0) // ترتیب نمایش در لیست
+  services  Service[]
+  createdAt DateTime  @default(now())
 }
 
 model TeamMember {
