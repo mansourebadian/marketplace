@@ -45,9 +45,12 @@ export const Header = ({ hasSearch = false }: HeaderProps) => {
         {/* نویگیشن دسکتاپ و دکمه‌ها */}
         <div className="hidden md:flex items-center gap-4 shrink-0 relative" ref={menuRef}>
           
-          <button className={`font-medium text-[15px] hover:underline transition-all ${hasSearch ? 'text-gray-700' : 'text-gray-800'}`}>
-            کسب‌وکارتان را اضافه کنید
-          </button>
+          <Link
+            href="/auth/business"
+            className={`font-medium text-[15px] hover:underline transition-all ${hasSearch ? 'text-gray-700' : 'text-gray-800'}`}
+          >
+            فرشا برای متخصصان
+          </Link>
           
           <Link
             href="/auth"
@@ -90,14 +93,22 @@ export const Header = ({ hasSearch = false }: HeaderProps) => {
               {/* بخش کسب‌وکارها */}
               <div className="px-4 py-2">
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">کسب‌وکارها</h3>
-                <button className="w-full flex items-center gap-3 py-2.5 px-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors text-right text-[15px] font-medium">
+                <Link
+                  href="/auth/business"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-full flex items-center gap-3 py-2.5 px-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors text-right text-[15px] font-medium"
+                >
                   <PlusCircle className="w-5 h-5 text-gray-500" />
                   ثبت کسب‌وکار جدید
-                </button>
-                <button className="w-full flex items-center gap-3 py-2.5 px-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors text-right text-[15px] font-medium">
+                </Link>
+                <Link
+                  href="/auth/business"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-full flex items-center gap-3 py-2.5 px-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors text-right text-[15px] font-medium"
+                >
                   <Briefcase className="w-5 h-5 text-gray-500" />
                   نرم‌افزار مدیریت Fresha
-                </button>
+                </Link>
               </div>
 
               <div className="h-[1px] bg-gray-100 my-1 mx-4"></div>
