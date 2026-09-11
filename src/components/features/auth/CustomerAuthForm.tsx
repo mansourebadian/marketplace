@@ -2,8 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import Link from 'next/link';
-import { ChevronDown, Mail, Search } from 'lucide-react';
+import { signIn } from 'next-auth/react';
+import { ChevronDown, CircleAlert, LoaderCircle, Mail, Search } from 'lucide-react';
 import { COUNTRIES, DEFAULT_COUNTRY, flagUrl, type Country } from './countries';
+
+interface CustomerAuthFormProps {
+  authError?: string | null;
+}
 
 interface LocationResponse {
   success: boolean;
@@ -14,12 +19,16 @@ interface LocationResponse {
   };
 }
 
-export const CustomerAuthForm = () => {
+export const CustomerAuthForm = ({
+  authError = null,
+}: CustomerAuthFormProps) => {
   const [selectedCountry, setSelectedCountry] =
     useState<Country>(DEFAULT_COUNTRY);
   const [isCountryOpen, setIsCountryOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [phone, setPhone] = useState('');
+  const [isGooglePending, setIsGooglePending] = useState(false);
+  const [googleError, setGoogleError] = useState<string | null>(authError);
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -119,6 +128,20 @@ export const CustomerAuthForm = () => {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+  };
+
+  const handleGoogleSignIn = async () => {
+    setGoogleError(null);
+    setIsGooglePending(true);
+
+    try {
+      await signIn('google', { redirectTo: '/' });
+    } catch {
+      setGoogleError(
+        'اتصال به گوگل انجام نشد. لطفاً اتصال اینترنت و تنظیمات حساب را بررسی کنید.'
+      );
+      setIsGooglePending(false);
+    }
   };
 
   return (
@@ -250,9 +273,19 @@ export const CustomerAuthForm = () => {
 
       <button
         type="button"
-        className="flex w-full items-center justify-center gap-3 rounded-2xl border border-gray-300 bg-white py-4 text-[15px] font-semibold text-gray-900 transition-colors hover:bg-gray-50"
+        onClick={handleGoogleSignIn}
+        disabled={isGooglePending}
+        aria-busy={isGooglePending}
+        aria-describedby={googleError ? 'google-auth-error' : undefined}
+        className="flex w-full items-center justify-center gap-3 rounded-2xl border border-gray-300 bg-white py-4 text-[15px] font-semibold text-gray-900 transition-colors hover:bg-gray-50 disabled:cursor-wait disabled:opacity-70"
       >
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5">
+        {isGooglePending ? (
+          <LoaderCircle
+            aria-hidden="true"
+            className="h-5 w-5 animate-spin text-indigo-600"
+          />
+        ) : (
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5">
           <path
             fill="#4285F4"
             d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82Z"
@@ -269,9 +302,21 @@ export const CustomerAuthForm = () => {
             fill="#EA4335"
             d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.69 1.29 6.62l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75Z"
           />
-        </svg>
-        ادامه با گوگل
+          </svg>
+        )}
+        {isGooglePending ? 'در حال اتصال به گوگل…' : 'ادامه با گوگل'}
       </button>
+
+      {googleError && (
+        <div
+          id="google-auth-error"
+          role="alert"
+          className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm leading-6 text-red-700"
+        >
+          <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{googleError}</span>
+        </div>
+      )}
 
       <button
         type="button"

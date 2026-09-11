@@ -20,7 +20,13 @@ const nextConfig: NextConfig = {
         hostname: "ui-avatars.com",
         port: "",
         pathname: "/**",
-      }
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
   allowedDevOrigins: ['10.0.74.42'], 

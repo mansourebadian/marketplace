@@ -4,7 +4,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import { redirect } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
+import { auth } from '@/auth';
 import { CustomerAuthForm } from '@/components/features/auth/CustomerAuthForm';
 import { AuthFooter } from '@/components/features/auth/AuthFooter';
 import { imageUrl } from '@/lib/image-server';
@@ -16,7 +18,38 @@ export const metadata: Metadata = {
 
 const SIDE_IMAGE_URL = imageUrl('auth-side.svg');
 
-export default function CustomerAuthPage() {
+interface CustomerAuthPageProps {
+  searchParams: Promise<{
+    error?: string | string[];
+  }>;
+}
+
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  AccessDenied:
+    'ورود با گوگل فقط برای حساب‌هایی که ایمیل تأییدشده دارند امکان‌پذیر است.',
+  OAuthAccountNotLinked:
+    'این ایمیل قبلاً با روش دیگری ثبت شده است. ابتدا با همان روش وارد شوید.',
+  Configuration:
+    'تنظیمات ورود با گوگل هنوز کامل نشده است. با پشتیبانی تماس بگیرید.',
+};
+
+export default async function CustomerAuthPage({
+  searchParams,
+}: CustomerAuthPageProps) {
+  const [session, params] = await Promise.all([auth(), searchParams]);
+
+  if (session?.user) {
+    redirect('/');
+  }
+
+  const errorCode = Array.isArray(params.error)
+    ? params.error[0]
+    : params.error;
+  const authError = errorCode
+    ? AUTH_ERROR_MESSAGES[errorCode] ||
+      'ورود با گوگل انجام نشد. لطفاً دوباره تلاش کنید.'
+    : null;
+
   return (
     <main className="min-h-screen flex">
       <section className="relative flex flex-col w-full lg:w-1/2 min-h-screen px-6 py-6">
@@ -39,7 +72,7 @@ export default function CustomerAuthPage() {
               </p>
             </div>
 
-            <CustomerAuthForm />
+            <CustomerAuthForm authError={authError} />
           </div>
         </div>
 

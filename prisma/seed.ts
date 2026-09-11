@@ -24,15 +24,26 @@ async function main() {
   console.log('Start seeding ...')
 
   // 1. ساخت یک کاربر تستی
-  const testUser = await prisma.user.upsert({
+  const existingTestUser = await prisma.user.findFirst({
     where: { phone: '09123456789' },
-    update: {},
-    create: {
-      phone: '09123456789',
-      name: 'کاربر تستی',
-      role: 'CUSTOMER',
-    },
   })
+  const testUser = existingTestUser
+    ? await prisma.user.update({
+        where: { id: existingTestUser.id },
+        data: {
+          email: 'customer@example.invalid',
+          name: 'کاربر تستی',
+          role: 'CUSTOMER',
+        },
+      })
+    : await prisma.user.create({
+        data: {
+          phone: '09123456789',
+          email: 'customer@example.invalid',
+          name: 'کاربر تستی',
+          role: 'CUSTOMER',
+        },
+      })
 
   // 2. ساخت/به‌روزرسانی دسته‌بندی‌های خدمات (upsert بر اساس slug - بدون حذف داده)
   const categoryMap: Record<string, string> = {}
