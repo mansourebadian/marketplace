@@ -4,6 +4,7 @@ import React from 'react';
 import { Search, Calendar as CalendarIcon, QrCode } from 'lucide-react';
 import DateTimePicker from './DateTimePicker';
 import LocationPicker from './LocationPicker'; // وارد کردن کامپوننت جدید
+import TreatmentsDropdown from '../shared/TreatmentsDropdown';
 
 export const Hero = () => {
   return (
@@ -30,14 +31,7 @@ export const Hero = () => {
       <div className="w-full max-w-[950px] mx-auto bg-white/90 md:bg-white/60 lg:bg-white backdrop-blur-md lg:backdrop-blur-none rounded-3xl lg:rounded-full shadow-[0_12px_40px_rgb(0,0,0,0.08)] lg:shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-4 md:p-5 lg:p-2.5 flex flex-col lg:flex-row items-center gap-3 lg:gap-0 z-10 border border-white/40 lg:border-none">
 
         {/* Treatment Input */}
-        <div className="flex items-center w-full lg:flex-1 px-4 py-3 lg:py-2 bg-white lg:bg-transparent border border-gray-200 lg:border-none lg:border-l lg:border-gray-100 rounded-xl lg:rounded-none group cursor-text transition-all hover:border-gray-400 lg:hover:border-transparent">
-          <Search className="w-5 h-5 text-gray-500 ml-3 stroke-[1.5]" />
-          <input
-            type="text"
-            placeholder="همه خدمات"
-            className="w-full bg-transparent border-none outline-none text-[15px] placeholder:text-gray-900/70 text-gray-900 font-medium"
-          />
-        </div>
+        <TreatmentsDropdown variant="hero" placeholder="همه خدمات" />
 
         {/* جایگزینی بخش Location استاتیک با کامپوننت تعاملی جدید */}
         <LocationPicker />

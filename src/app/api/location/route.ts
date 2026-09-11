@@ -1,18 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 
+function getClientIp(request: NextRequest): string | null {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0].trim() || null;
+  }
+
+  return (
+    request.headers.get("x-real-ip") ||
+    request.headers.get("cf-connecting-ip") ||
+    null
+  );
+}
+
 export async function GET(request: NextRequest) {
   try {
-    // گرفتن Public IP سیستم
-    const ipResponse = await fetch("https://api.ipify.org?format=json", {
-      cache: "no-store",
-    });
+    const clientIp = getClientIp(request);
+    const isPublicIp =
+      clientIp &&
+      !/^(10\.|127\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|::1$|fe80:)/.test(
+        clientIp
+      );
+    const lookupIp = isPublicIp ? clientIp : "";
+    const endpoint = lookupIp
+      ? `https://ipwho.is/${lookupIp}`
+      : "https://ipwho.is/";
 
-    const { ip } = await ipResponse.json();
-
-    console.log("Public IP:", ip);
-
-    // گرفتن Location بر اساس Public IP
-    const locationResponse = await fetch(`https://ipwho.is/${ip}`, {
+    // گرفتن Location بر اساس IP کاربر
+    const locationResponse = await fetch(endpoint, {
       cache: "no-store",
     });
 
@@ -23,7 +38,7 @@ export async function GET(request: NextRequest) {
         {
           success: false,
           message: "اطلاعات موقعیت برای IP پیدا نشد",
-          ip,
+          ip: data.ip ?? clientIp,
         },
         { status: 400 }
       );
@@ -35,11 +50,13 @@ export async function GET(request: NextRequest) {
         ip: data.ip,
         country: data.country,
         countryCode: data.country_code,
+        callingCode: data.calling_code,
         city: data.city,
         region: data.region,
         latitude: data.latitude,
         longitude: data.longitude,
         isp: data.connection?.isp,
+        flag: data.flag?.img ?? null,
       },
     });
   } catch (error) {
