@@ -8,6 +8,7 @@ import { COUNTRIES, DEFAULT_COUNTRY, flagUrl, type Country } from './countries';
 
 interface CustomerAuthFormProps {
   authError?: string | null;
+  callbackUrl?: string;
 }
 
 interface LocationResponse {
@@ -21,7 +22,12 @@ interface LocationResponse {
 
 export const CustomerAuthForm = ({
   authError = null,
+  callbackUrl = '/profile',
 }: CustomerAuthFormProps) => {
+  const safeCallbackUrl =
+    callbackUrl.startsWith('/') && !callbackUrl.startsWith('//')
+      ? callbackUrl
+      : '/profile';
   const [selectedCountry, setSelectedCountry] =
     useState<Country>(DEFAULT_COUNTRY);
   const [isCountryOpen, setIsCountryOpen] = useState(false);
@@ -135,7 +141,7 @@ export const CustomerAuthForm = ({
     setIsGooglePending(true);
 
     try {
-      await signIn('google', { redirectTo: '/' });
+      await signIn('google', { redirectTo: safeCallbackUrl });
     } catch {
       setGoogleError(
         'اتصال به گوگل انجام نشد. لطفاً اتصال اینترنت و تنظیمات حساب را بررسی کنید.'

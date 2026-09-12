@@ -11,15 +11,36 @@ model User {
   id            String    @id @default(uuid())
   phone         String?   @db.NVarChar(32)
   name          String?
+  firstName     String?   @db.NVarChar(100)
+  lastName      String?   @db.NVarChar(100)
   email         String    @unique @db.NVarChar(320)
   emailVerified DateTime?
   image         String?   @db.NVarChar(2048)
+  dateOfBirth   DateTime? @db.Date
+  gender        String?   @db.NVarChar(32)
   role          String    @default("CUSTOMER") // CUSTOMER, OWNER, ADMIN
   accounts      Account[]
   sessions      Session[]
+  addresses     CustomerAddress[]
   bookings      Booking[]
   reviews       Review[]
   createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model CustomerAddress {
+  id          String   @id @default(cuid()) @db.NVarChar(36)
+  label       String   @db.NVarChar(16) // HOME, WORK
+  addressLine String   @db.NVarChar(300)
+  city        String?  @db.NVarChar(100)
+  province    String?  @db.NVarChar(100)
+  postalCode  String?  @db.NVarChar(20)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, label])
 }
 
 model Account {

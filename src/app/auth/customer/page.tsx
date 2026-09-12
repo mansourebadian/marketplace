@@ -21,6 +21,7 @@ const SIDE_IMAGE_URL = imageUrl('auth-side.svg');
 interface CustomerAuthPageProps {
   searchParams: Promise<{
     error?: string | string[];
+    callbackUrl?: string | string[];
   }>;
 }
 
@@ -37,9 +38,16 @@ export default async function CustomerAuthPage({
   searchParams,
 }: CustomerAuthPageProps) {
   const [session, params] = await Promise.all([auth(), searchParams]);
+  const callbackUrlParam = Array.isArray(params.callbackUrl)
+    ? params.callbackUrl[0]
+    : params.callbackUrl;
+  const callbackUrl =
+    callbackUrlParam?.startsWith('/') && !callbackUrlParam.startsWith('//')
+      ? callbackUrlParam
+      : '/profile';
 
   if (session?.user) {
-    redirect('/');
+    redirect(callbackUrl);
   }
 
   const errorCode = Array.isArray(params.error)
@@ -72,7 +80,10 @@ export default async function CustomerAuthPage({
               </p>
             </div>
 
-            <CustomerAuthForm authError={authError} />
+            <CustomerAuthForm
+              authError={authError}
+              callbackUrl={callbackUrl}
+            />
           </div>
         </div>
 

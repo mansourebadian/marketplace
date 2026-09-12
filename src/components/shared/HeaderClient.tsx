@@ -37,7 +37,7 @@ interface HeaderClientProps {
 }
 
 const ACCOUNT_ITEMS = [
-  { label: 'پروفایل', icon: UserRound },
+  { label: 'پروفایل', icon: UserRound, href: '/profile' },
   { label: 'فعالیت‌ها', icon: CalendarDays },
   { label: 'کیف پول', icon: WalletCards },
   { label: 'پیام‌ها', icon: MessageCircle },
@@ -204,21 +204,40 @@ export const HeaderClient = ({
                 </div>
 
                 <div className="p-2">
-                  {ACCOUNT_ITEMS.map(({ label, icon: Icon }) => (
-                    <button
-                      key={label}
-                      type="button"
-                      role="menuitem"
-                      onClick={closeMenu}
-                      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium text-gray-800 transition-colors hover:bg-gray-50"
-                    >
-                      <Icon
-                        aria-hidden="true"
-                        className="h-[19px] w-[19px] shrink-0 stroke-[1.7]"
-                      />
-                      <span>{label}</span>
-                    </button>
-                  ))}
+                  {ACCOUNT_ITEMS.map((item) => {
+                    const { label, icon: Icon } = item;
+                    const content = (
+                      <>
+                        <Icon
+                          aria-hidden="true"
+                          className="h-[19px] w-[19px] shrink-0 stroke-[1.7]"
+                        />
+                        <span>{label}</span>
+                      </>
+                    );
+
+                    return 'href' in item ? (
+                      <Link
+                        key={label}
+                        href={item.href}
+                        role="menuitem"
+                        onClick={closeMenu}
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium text-gray-800 transition-colors hover:bg-gray-50"
+                      >
+                        {content}
+                      </Link>
+                    ) : (
+                      <button
+                        key={label}
+                        type="button"
+                        role="menuitem"
+                        onClick={closeMenu}
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium text-gray-800 transition-colors hover:bg-gray-50"
+                      >
+                        {content}
+                      </button>
+                    );
+                  })}
 
                   <button
                     type="button"
