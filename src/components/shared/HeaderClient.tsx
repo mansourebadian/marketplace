@@ -38,7 +38,7 @@ interface HeaderClientProps {
 
 const ACCOUNT_ITEMS = [
   { label: 'پروفایل', icon: UserRound, href: '/profile' },
-  { label: 'فعالیت‌ها', icon: CalendarDays },
+  { label: 'فعالیت‌ها', icon: CalendarDays, href: '/activities' },
   { label: 'کیف پول', icon: WalletCards },
   { label: 'پیام‌ها', icon: MessageCircle },
   { label: 'علاقه‌مندی‌ها', icon: Heart },

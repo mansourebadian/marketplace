@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useActionState, useEffect, useState } from 'react';
 import {
   BriefcaseBusiness,
@@ -59,7 +60,7 @@ const ADDRESS_INITIAL_STATE: AddressActionState = { status: 'idle' };
 
 const NAV_ITEMS = [
   { label: 'پروفایل', icon: UserRound, href: '/profile' },
-  { label: 'فعالیت‌ها', icon: CalendarDays },
+  { label: 'فعالیت‌ها', icon: CalendarDays, href: '/activities' },
   { label: 'کیف پول', icon: WalletCards },
   { label: 'پیام‌ها', icon: MessageCircle },
   { label: 'علاقه‌مندی‌ها', icon: Heart },
@@ -352,6 +353,7 @@ export function ProfilePageClient({ profile, addresses }: ProfilePageClientProps
   const [editingProfile, setEditingProfile] = useState(false);
   const [editingAddress, setEditingAddress] = useState<AddressLabel | null>(null);
   const [notice, setNotice] = useState('');
+  const pathname = usePathname();
   const avatarLetter = profile.displayName.trim().charAt(0) || 'ف';
   const addressByLabel = Object.fromEntries(addresses.map((item) => [item.label, item])) as Partial<Record<AddressLabel, CustomerAddressView>>;
 
@@ -373,17 +375,40 @@ export function ProfilePageClient({ profile, addresses }: ProfilePageClientProps
         <div className="sticky top-20 p-5">
           <p className="mb-4 truncate px-3 text-lg font-black text-gray-950" dir="auto">{profile.displayName}</p>
           <nav aria-label="منوی حساب کاربری" className="space-y-1">
-            {NAV_ITEMS.map(({ label, icon: Icon, ...item }) =>
-              'href' in item ? (
-                <Link key={label} href={item.href} aria-current="page" className="flex items-center gap-3 rounded-xl bg-indigo-50 px-3 py-3 text-sm font-bold text-indigo-700">
-                  <Icon className="h-5 w-5" />{label}
+            {NAV_ITEMS.map(({ label, icon: Icon, ...item }) => {
+              if (!('href' in item)) {
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    disabled
+                    title="به‌زودی"
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-gray-700 disabled:cursor-default"
+                  >
+                    <Icon className="h-5 w-5" />
+                    {label}
+                  </button>
+                );
+              }
+
+              const isActive = pathname === item.href;
+
+              return (
+                <Link
+                  key={label}
+                  href={item.href}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold ${
+                    isActive
+                      ? 'bg-indigo-50 text-indigo-700'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  {label}
                 </Link>
-              ) : (
-                <button key={label} type="button" disabled title="به‌زودی" className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-gray-700 disabled:cursor-default">
-                  <Icon className="h-5 w-5" />{label}
-                </button>
-              )
-            )}
+              );
+            })}
           </nav>
         </div>
       </aside>
