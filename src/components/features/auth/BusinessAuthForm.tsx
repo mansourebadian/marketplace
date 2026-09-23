@@ -2,7 +2,8 @@
 
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
-import { Smartphone } from 'lucide-react';
+import { signIn } from 'next-auth/react';
+import { LoaderCircle, Smartphone } from 'lucide-react';
 
 type Feedback = {
   tone: 'error' | 'info';
@@ -14,6 +15,8 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const BusinessAuthForm = () => {
   const [email, setEmail] = useState('');
   const [feedback, setFeedback] = useState<Feedback>(null);
+  const [isGooglePending, setIsGooglePending] = useState(false);
+  const [googleError, setGoogleError] = useState<string | null>(null);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,6 +42,20 @@ export const BusinessAuthForm = () => {
       tone: 'info',
       message: `${method} به‌زودی فعال می‌شود.`,
     });
+  };
+
+  const handleGoogleSignIn = async () => {
+    setGoogleError(null);
+    setIsGooglePending(true);
+
+    try {
+      await signIn('google', { redirectTo: '/auth/business/complete' });
+    } catch {
+      setGoogleError(
+        'اتصال به گوگل انجام نشد. لطفاً اتصال اینترنت و تنظیمات حساب را بررسی کنید.'
+      );
+      setIsGooglePending(false);
+    }
   };
 
   return (
@@ -97,29 +114,41 @@ export const BusinessAuthForm = () => {
 
       <button
         type="button"
-        onClick={() => showUnavailableMessage('ورود با گوگل')}
-        className="relative flex h-12 w-full items-center justify-center rounded-full border border-neutral-300 bg-white px-14 text-[15px] font-semibold text-neutral-950 transition hover:bg-neutral-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2"
+        onClick={handleGoogleSignIn}
+        disabled={isGooglePending}
+        aria-busy={isGooglePending}
+        className="relative flex h-12 w-full items-center justify-center rounded-full border border-neutral-300 bg-white px-14 text-[15px] font-semibold text-neutral-950 transition hover:bg-neutral-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-70"
       >
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="absolute right-5 h-5 w-5">
-          <path
-            fill="#4285F4"
-            d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82Z"
-          />
-          <path
-            fill="#34A853"
-            d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09A11.99 11.99 0 0 0 12 24Z"
-          />
-          <path
-            fill="#FBBC05"
-            d="M5.27 14.29A7.16 7.16 0 0 1 4.89 12c0-.8.14-1.57.38-2.29V6.62H1.29a11.99 11.99 0 0 0 0 10.76l3.98-3.09Z"
-          />
-          <path
-            fill="#EA4335"
-            d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.69 1.29 6.62l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75Z"
-          />
-        </svg>
-        ادامه با گوگل
+        {isGooglePending ? (
+          <LoaderCircle aria-hidden="true" className="absolute right-5 h-5 w-5 animate-spin text-neutral-700" />
+        ) : (
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="absolute right-5 h-5 w-5">
+            <path
+              fill="#4285F4"
+              d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82Z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09A11.99 11.99 0 0 0 12 24Z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.27 14.29A7.16 7.16 0 0 1 4.89 12c0-.8.14-1.57.38-2.29V6.62H1.29a11.99 11.99 0 0 0 0 10.76l3.98-3.09Z"
+            />
+            <path
+              fill="#EA4335"
+              d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.69 1.29 6.62l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75Z"
+            />
+          </svg>
+        )}
+        {isGooglePending ? 'در حال اتصال به گوگل…' : 'ادامه با گوگل'}
       </button>
+
+      {googleError && (
+        <p role="alert" className="text-center text-sm leading-6 text-red-600">
+          {googleError}
+        </p>
+      )}
 
       <button
         type="button"

@@ -16,6 +16,8 @@ model User {
   email         String    @unique @db.NVarChar(320)
   emailVerified DateTime?
   image         String?   @db.NVarChar(2048)
+  country       String?   @db.NVarChar(100)
+  passwordHash  String?   @db.NVarChar(255)
   dateOfBirth   DateTime? @db.Date
   gender        String?   @db.NVarChar(32)
   role          String    @default("CUSTOMER") // CUSTOMER, OWNER, ADMIN
