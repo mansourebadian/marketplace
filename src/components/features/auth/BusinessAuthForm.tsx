@@ -16,36 +16,28 @@ export const BusinessAuthForm = () => {
 
   const [email, setEmail]       = useState('');
   const [phone, setPhone]       = useState('');
-  const [dialCode, setDialCode] = useState(DEFAULT_COUNTRY.dialCode); // '+98' fallback
+  const [dialCode, setDialCode] = useState(DEFAULT_COUNTRY.dialCode);
 
   const [feedback, setFeedback]             = useState<Feedback>(null);
   const [isGooglePending, setIsGooglePending] = useState(false);
   const [googleError, setGoogleError]       = useState<string | null>(null);
 
-  /* ── Detect dial code from IP on mount ───────────────────── */
   useEffect(() => {
     fetch('/api/location')
       .then((r) => (r.ok ? r.json() : null))
       .then((data: { callingCode?: string } | null) => {
         if (!data?.callingCode) return;
-
-        // ipwho.is returns calling_code without '+', e.g. "98"
         const raw  = data.callingCode.replace(/\s/g, '');
         const code = raw.startsWith('+') ? raw : `+${raw}`;
-
-        // Only apply if it matches a known country in our list
         const match = COUNTRIES.find((c) => c.dialCode === code);
         if (match) setDialCode(match.dialCode);
       })
-      .catch(() => {
-        /* network error — keep DEFAULT_COUNTRY.dialCode */
-      });
+      .catch(() => {});
   }, []);
 
   const clearFeedback  = () => setFeedback(null);
   const switchMethod   = (method: AuthMethod) => { setFeedback(null); setAuthMethod(method); };
 
-  /* ── Email submit ─────────────────────────────────────────── */
   const handleEmailSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const normalized = email.trim();
@@ -59,7 +51,6 @@ export const BusinessAuthForm = () => {
     });
   };
 
-  /* ── Phone submit ─────────────────────────────────────────── */
   const handlePhoneSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const trimmed = phone.trim().replace(/[\s()-]/g, '');
@@ -77,18 +68,20 @@ export const BusinessAuthForm = () => {
     });
   };
 
-  /* ── Google ───────────────────────────────────────────────── */
-  const handleGoogleSignIn = async () => {
+  /* ── بخش ویرایش شده برای کوکی گوگل ── */
+ const handleGoogleSignIn = async () => {
     setGoogleError(null);
     setIsGooglePending(true);
     try {
-      await signIn('google', { redirectTo: '/auth/business/complete' });
+      await signIn('google', {
+        callbackUrl: '/auth/business/complete',
+        redirectTo: '/auth/business/complete',
+      });
     } catch {
       setGoogleError('اتصال به گوگل انجام نشد. لطفاً اتصال اینترنت و تنظیمات حساب را بررسی کنید.');
       setIsGooglePending(false);
     }
   };
-
   const showUnavailableMessage = (method: string) =>
     setFeedback({ tone: 'info', message: `${method} به‌زودی فعال می‌شود.` });
 
@@ -101,7 +94,6 @@ export const BusinessAuthForm = () => {
       className="flex flex-col gap-5"
       noValidate
     >
-      {/* ── Input area ── */}
       {authMethod === 'email' ? (
         <div className="flex flex-col gap-2">
           <label htmlFor="business-email" className="text-[15px] font-semibold text-neutral-950">
@@ -163,7 +155,6 @@ export const BusinessAuthForm = () => {
         </div>
       )}
 
-      {/* ── Primary CTA ── */}
       <button
         type="submit"
         className="h-12 w-full rounded-full bg-neutral-950 px-5 text-[15px] font-bold text-white transition hover:bg-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2"
@@ -177,7 +168,6 @@ export const BusinessAuthForm = () => {
         <span className="h-px flex-1 bg-neutral-200" />
       </div>
 
-      {/* ── Toggle method ── */}
       {authMethod === 'email' ? (
         <button type="button" onClick={() => switchMethod('phone')} className={altBtn}>
           <Smartphone aria-hidden="true" className="absolute right-5 h-5 w-5" strokeWidth={1.8} />
@@ -190,7 +180,6 @@ export const BusinessAuthForm = () => {
         </button>
       )}
 
-      {/* ── Google ── */}
       <button
         type="button"
         onClick={handleGoogleSignIn}
@@ -210,13 +199,11 @@ export const BusinessAuthForm = () => {
         <p role="alert" className="text-center text-sm leading-6 text-red-600">{googleError}</p>
       )}
 
-      {/* ── Apple ── */}
       <button type="button" onClick={() => showUnavailableMessage('ورود با اپل')} className={altBtn}>
         <AppleIcon />
         ادامه با اپل
       </button>
 
-      {/* ── Feedback ── */}
       <div
         id="biz-auth-feedback"
         aria-live="polite"
@@ -227,7 +214,6 @@ export const BusinessAuthForm = () => {
         {feedback?.message}
       </div>
 
-      {/* ── Customer link ── */}
       <div className="border-t border-neutral-200 pt-5 text-center">
         <p className="text-sm font-semibold text-neutral-950">
           برای رزرو نوبت به‌عنوان مشتری وارد می‌شوید؟
