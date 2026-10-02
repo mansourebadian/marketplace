@@ -1,0 +1,66 @@
+.page { min-height: 100vh; background: #fff; color: #172033; font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 1.85; }
+.page a { text-decoration: none; }
+.page a:hover { text-decoration: underline; }
+.page a:focus-visible, .page summary:focus-visible { outline: 2px solid #1479e8; outline-offset: 5px; border-radius: 2px; }
+.header { position: sticky; top: 0; z-index: 30; height: 72px; background: #fff; box-shadow: 0 5px 22px #17203308; }
+.headerInner { max-width: 1328px; height: 100%; margin: auto; padding: 0 24px; display: flex; align-items: center; gap: 32px; }
+.logo { color: #111827; font-size: 32px; font-weight: 800; letter-spacing: -2px; line-height: 1; }
+.search { width: 360px; max-width: 32vw; display: flex; align-items: center; gap: 10px; padding: 7px 12px; color: #818997; border: 1px solid #d5d7dc; border-radius: 3px; font-size: 14px; }
+.headerLinks { display: flex; align-items: center; gap: 32px; margin-inline-start: auto; white-space: nowrap; }
+.headerLinks a { color: #172033; font-size: 16px; }
+.menu { position: relative; }
+.menu summary { cursor: pointer; list-style: none; padding: 6px; }
+.menu summary::-webkit-details-marker { display: none; }
+.menu nav { position: absolute; inset-inline-end: 0; top: 45px; width: 220px; padding: 12px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 8px 24px #17203315; }
+.menu nav a { display: block; padding: 8px; color: #172033; }
+.legalNav { border-bottom: 1px solid #d5d7dc; }
+.legalNav > div { max-width: 1328px; margin: auto; padding: 0 24px; display: flex; gap: 28px; overflow-x: auto; }
+.legalNav a { flex-shrink: 0; color: #858995; padding: 13px 0; font-size: 15px; white-space: nowrap; border-bottom: 3px solid transparent; }
+.legalNav a[aria-current] { color: #172033; border-bottom-color: #172033; }
+.main { max-width: 1328px; margin: 40px auto 0; padding: 0 24px; display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 32px; align-items: start; }
+.sidebar { position: sticky; top: 100px; border-inline-end: 1px solid #d5d7dc; padding-inline-end: 28px; max-height: calc(100vh - 124px); overflow-y: auto; }
+.sidebar nav { display: flex; flex-direction: column; gap: 2px; padding-bottom: 16px; }
+.sidebar a, .article a, .footer nav a, .moreInfo { color: #1683ff; }
+.sidebar a { line-height: 1.85; font-size: 14px; }
+.article { min-width: 0; color: #4e5563; overflow-wrap: anywhere; }
+.article h1 { color: #131b29; font-size: 32px; font-weight: 400; line-height: 1.6; margin: -5px 0 36px; }
+.article section, .article { scroll-margin-top: 100px; }
+.article section { margin-bottom: 32px; }
+.article h2 { color: #172033; font-size: 24px; font-weight: 400; line-height: 1.65; margin: 0 0 12px; }
+.article h3 { color: #3f4857; font-size: 17px; font-weight: 600; margin: 26px 0 12px; }
+.article p { margin: 0 0 18px; }
+.article ul { list-style: disc; padding-inline-start: 30px; margin: 22px 0; }
+.article li { margin: 4px 0; padding-inline-start: 3px; }
+.footer { max-width: 1328px; margin: 64px auto 0; padding: 0 24px 24px; }
+.footerColumns { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 30px; padding-bottom: 46px; }
+.footerLogo { display: inline-flex; align-items: center; gap: 7px; direction: ltr; color: #111827; font-size: 29px; letter-spacing: -1.5px; line-height: 1.5; }
+.footerLogo > span { width: 21px; height: 21px; background: #8161ff; border-radius: 50%; box-shadow: -3px -4px 6px #bdb0ff; }
+.socials { display: flex; gap: 22px; margin-top: 28px; direction: ltr; justify-content: flex-end; }
+.socials a { color: #d7d9e0; }
+.socials a:hover { color: #687084; }
+.footer h2 { font-size: 19px; font-weight: 600; margin: 0 0 14px; color: #1683ff; }
+.footer nav a { display: block; margin-bottom: 13px; font-size: 14px; }
+.mobileApp h2 { color: #53535e; }
+.footerBottom { border-top: 1px solid #e1e3e8; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; gap: 16px; color: #858995; font-size: 14px; }
+.footerBottom > span { display: inline-flex; align-items: center; gap: 7px; }
+.skipLink { position: fixed; top: -100px; inset-inline-start: 16px; background: white; z-index: 60; padding: 12px; color: #1479e8; }
+.skipLink:focus { top: 10px; }
+@media (min-width: 1100px) { .legalNav > div { justify-content: space-between; gap: 20px; } }
+@media (max-width: 1000px) { .main { grid-template-columns: 240px minmax(0, 1fr); gap: 24px; } .search { display: none; } .footerColumns { gap: 20px; } .socials { gap: 13px; } }
+@media (max-width: 720px) {
+  .headerInner { gap: 14px; padding: 0 20px; } .header { height: 64px; } .logo { font-size: 28px; } .headerLinks { gap: 18px; } .headerLinks a { font-size: 14px; } .headerLinks a:first-child { display: none; }
+  .legalNav > div { padding: 0 20px; gap: 24px; }
+  .main { display: block; padding: 0 20px; margin-top: 24px; }
+  .sidebar { position: static; max-height: none; border-inline-end: 0; border-bottom: 1px solid #d5d7dc; padding-inline-end: 0; margin-bottom: 28px; }
+  .sidebar nav { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; gap: 18px; padding: 0 0 14px; }
+  .sidebar a { flex: 0 0 auto; max-width: 230px; font-size: 13px; }
+  .article h1 { font-size: 27px; margin-bottom: 28px; } .article h2 { font-size: 22px; } .article section, .article { scroll-margin-top: 84px; }
+  .footer { margin-top: 44px; padding: 0 20px 20px; } .footerColumns { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; padding-bottom: 30px; } .footerColumns > div:first-child { grid-column: 1 / -1; } .socials { justify-content: flex-end; width: fit-content; gap: 24px; margin-top: 18px; } .footer h2 { font-size: 17px; } .footerBottom { flex-wrap: wrap; font-size: 12px; }
+}
+@media print { .header, .legalNav, .sidebar, .footer, .skipLink { display: none; } .main { display: block; margin: 0; } .article { color: black; } }
+
+.terms .article h1 { font-weight: 700; color: #4e5563; margin-bottom: 42px; }
+.terms .article h2 { font-weight: 600; color: #4e5563; font-size: 21px; }
+.terms .article section { margin-bottom: 42px; }
+.terms .article ul ul { list-style-type: circle; margin: 0; }
+@media (max-width: 720px) { .terms .article h1 { font-size: 26px; margin-bottom: 28px; } }

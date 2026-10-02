@@ -189,7 +189,7 @@ export const BusinessSignUpForm = ({
         >
           {COUNTRIES.map((item) => (
             <option key={item.code} value={item.code}>
-              {item.nameEn}
+              {item.nameFa}
             </option>
           ))}
         </select>
@@ -207,11 +207,11 @@ export const BusinessSignUpForm = ({
         />
         <span>
           من با{' '}
-          <a href="#" className="font-semibold text-neutral-950 underline">
+          <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="font-semibold text-neutral-950 underline">
             سیاست حفظ حریم خصوصی
           </a>
           ,{' '}
-          <a href="#" className="font-semibold text-neutral-950 underline">
+          <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" className="font-semibold text-neutral-950 underline">
             شرایط استفاده از خدمات
           </a>{' '}
           and{' '}
