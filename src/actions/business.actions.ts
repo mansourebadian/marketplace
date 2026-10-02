@@ -165,5 +165,5 @@ export async function completeBusinessSignUp(
     };
   }
 
-  redirect('/');
+  redirect('/onboarding/business-name');
 }
