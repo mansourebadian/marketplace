@@ -1,0 +1,31 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+CREATE TABLE [dbo].[Business] (
+    [id] NVARCHAR(36) NOT NULL,
+    [name] NVARCHAR(100) NOT NULL,
+    [website] NVARCHAR(255),
+    [ownerId] NVARCHAR(1000) NOT NULL,
+    [createdAt] DATETIME2 NOT NULL CONSTRAINT [Business_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
+    [updatedAt] DATETIME2 NOT NULL,
+    CONSTRAINT [Business_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [Business_ownerId_key] UNIQUE NONCLUSTERED ([ownerId])
+);
+
+ALTER TABLE [dbo].[Business] ADD CONSTRAINT [Business_ownerId_fkey]
+    FOREIGN KEY ([ownerId]) REFERENCES [dbo].[User]([id])
+    ON DELETE CASCADE ON UPDATE NO ACTION;
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW;
+
+END CATCH

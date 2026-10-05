@@ -1,13 +1,18 @@
 // src/components/features/onboarding/BusinessNameForm.tsx
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { saveBusinessName, type OnboardingBusinessNameState } from '@/actions/onboarding.actions';
 
 const initialState: OnboardingBusinessNameState = { status: 'idle' };
 
-export function BusinessNameForm() {
+export function BusinessNameForm({ initialName = '', initialWebsite = '' }: {
+  initialName?: string;
+  initialWebsite?: string;
+}) {
+  const [businessName, setBusinessName] = useState(initialName);
+  const [website, setWebsite] = useState(initialWebsite);
   const [state, formAction, isPending] = useActionState(saveBusinessName, initialState);
   const hasNameError = !!state.fieldErrors?.businessName;
 
@@ -48,6 +53,8 @@ export function BusinessNameForm() {
             <input
               id="businessName"
               name="businessName"
+              value={businessName}
+              onChange={(event) => setBusinessName(event.target.value)}
               type="text"
               autoFocus
               className={`w-full rounded-lg border px-4 py-3 text-sm transition-colors focus:outline-none focus:ring-2 ${
@@ -75,14 +82,22 @@ export function BusinessNameForm() {
             <input
               id="website"
               name="website"
+              value={website}
+              onChange={(event) => setWebsite(event.target.value)}
               type="text"
               placeholder="www.yoursite.com"
               className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-400 placeholder:text-gray-300 transition-colors focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
+            {state.fieldErrors?.website && (
+              <p className="mt-1.5 text-sm text-red-500">{state.fieldErrors.website}</p>
+            )}
           </div>
 
-          {state.status === 'error' && state.message && (
-            <p className="text-sm text-red-500">{state.message}</p>
+          {state.message && (
+            <p role={state.status === 'error' ? 'alert' : 'status'}
+              className={`text-sm ${state.status === 'success' ? 'text-green-700' : 'text-red-500'}`}>
+              {state.message}
+            </p>
           )}
         </form>
       </div>

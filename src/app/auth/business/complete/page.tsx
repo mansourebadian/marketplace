@@ -41,6 +41,10 @@ export default async function BusinessCompletePage() {
     redirect('/auth/business');
   }
 
+  if (user.role === 'OWNER') {
+    redirect('/onboarding/business-name');
+  }
+
   if (user.role !== 'CUSTOMER') {
     redirect('/');
   }

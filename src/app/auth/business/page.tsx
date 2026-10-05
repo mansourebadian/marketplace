@@ -9,7 +9,19 @@ export const metadata: Metadata = {
   description: 'ورود یا ساخت حساب کسب‌وکار برای مدیریت و رشد مجموعه در فرشا',
 };
 
-export default function BusinessAuthPage() {
+export default async function BusinessAuthPage({ searchParams }: {
+  searchParams: Promise<{ error?: string | string[] }>;
+}) {
+  const params = await searchParams;
+  const errorCode = Array.isArray(params.error) ? params.error[0] : params.error;
+  const messages: Record<string, string> = {
+    AccessDenied: 'ورود با گوگل فقط برای حساب‌هایی که ایمیل تأییدشده دارند امکان‌پذیر است.',
+    OAuthAccountNotLinked: 'این ایمیل قبلاً با روش دیگری ثبت شده است. ابتدا با همان روش وارد شوید.',
+    Configuration: 'تنظیمات ورود با گوگل هنوز کامل نشده است. با پشتیبانی تماس بگیرید.',
+  };
+  const authError = errorCode
+    ? messages[errorCode] ?? 'ورود با گوگل انجام نشد. لطفاً دوباره تلاش کنید.'
+    : null;
   return (
     <main
       dir="ltr"
@@ -38,7 +50,7 @@ export default function BusinessAuthPage() {
               </p>
             </header>
 
-            <BusinessAuthForm />
+            <BusinessAuthForm authError={authError} />
           </div>
         </div>
 

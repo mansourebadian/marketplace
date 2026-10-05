@@ -2,8 +2,11 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
 import { prisma } from '@/lib/prisma';
+import { getAuthPage } from '@/lib/auth-flow';
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth(async (request) => {
+  const authPage = await getAuthPage(request);
+  return {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'database',
@@ -23,8 +26,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   pages: {
-    signIn: '/auth/customer',
-    error: '/auth/customer',
+    signIn: authPage,
+    error: authPage,
   },
   callbacks: {
     async signIn({ account, profile }) {
@@ -75,4 +78,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
     },
   },
+  };
 });

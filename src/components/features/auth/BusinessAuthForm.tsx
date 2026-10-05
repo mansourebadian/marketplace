@@ -11,7 +11,7 @@ type Feedback = { tone: 'error' | 'info'; message: string } | null;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export const BusinessAuthForm = () => {
+export const BusinessAuthForm = ({ authError = null }: { authError?: string | null }) => {
   const [authMethod, setAuthMethod] = useState<AuthMethod>('email');
 
   const [email, setEmail]       = useState('');
@@ -20,7 +20,7 @@ export const BusinessAuthForm = () => {
 
   const [feedback, setFeedback]             = useState<Feedback>(null);
   const [isGooglePending, setIsGooglePending] = useState(false);
-  const [googleError, setGoogleError]       = useState<string | null>(null);
+  const [googleError, setGoogleError]       = useState<string | null>(authError);
 
   useEffect(() => {
     fetch('/api/location')
@@ -68,13 +68,11 @@ export const BusinessAuthForm = () => {
     });
   };
 
-  /* ── بخش ویرایش شده برای کوکی گوگل ── */
- const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = async () => {
     setGoogleError(null);
     setIsGooglePending(true);
     try {
       await signIn('google', {
-        callbackUrl: '/auth/business/complete',
         redirectTo: '/auth/business/complete',
       });
     } catch {

@@ -3,7 +3,6 @@
 
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 const BusinessNameSchema = z.object({
@@ -32,7 +31,7 @@ const BusinessNameSchema = z.object({
 });
 
 export interface OnboardingBusinessNameState {
-  status: 'idle' | 'error';
+  status: 'idle' | 'error' | 'success';
   message?: string;
   fieldErrors?: {
     businessName?: string;
@@ -44,7 +43,6 @@ export async function saveBusinessName(
   _prev: OnboardingBusinessNameState,
   formData: FormData
 ): Promise<OnboardingBusinessNameState> {
-  // ← await اضافه شد
   const session = await auth();
 
   if (!session?.user?.id || session.user.role !== 'OWNER') {
@@ -68,7 +66,6 @@ export async function saveBusinessName(
   }
 
   try {
-    // ← await اضافه شد
     await prisma.business.upsert({
       where: { ownerId: session.user.id },
       create: {
@@ -81,12 +78,14 @@ export async function saveBusinessName(
         website: parsed.data.website || null,
       },
     });
-  } catch {
+  } catch (error) {
+    console.error('Failed to save business name:', error);
     return {
       status: 'error',
       message: 'خطا در ذخیره اطلاعات. لطفاً دوباره تلاش کنید.',
     };
   }
 
-  redirect('/onboarding/business-category');
+  // The next onboarding step has not been implemented yet.
+  return { status: 'success', message: 'اطلاعات کسب‌وکار شما با موفقیت ذخیره شد.' };
 }
