@@ -6,8 +6,8 @@ import { usePathname } from 'next/navigation';
 const STEPS = [
   '/onboarding/business-name',
   '/onboarding/business-category',
-  '/onboarding/business-location',
   '/onboarding/team',
+  '/onboarding/business-location',
   '/onboarding/complete',
 ];
 

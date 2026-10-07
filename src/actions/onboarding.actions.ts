@@ -4,6 +4,10 @@
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
+import { BUSINESS_CATEGORIES } from '@/lib/business-categories';
+import { TEAM_SIZES } from '@/lib/team-sizes';
 
 const BusinessNameSchema = z.object({
   businessName: z
@@ -86,6 +90,98 @@ export async function saveBusinessName(
     };
   }
 
-  // The next onboarding step has not been implemented yet.
-  return { status: 'success', message: 'اطلاعات کسب‌وکار شما با موفقیت ذخیره شد.' };
+  redirect('/onboarding/business-category');
+}
+
+export interface OnboardingCategoriesState {
+  status: 'idle' | 'error' | 'success';
+  message?: string;
+  otherServiceError?: string;
+}
+
+const CategoriesSchema = z.array(z.string().refine(
+  (slug) => BUSINESS_CATEGORIES.some((category) => category.slug === slug),
+  'دسته‌بندی انتخاب‌شده معتبر نیست.'
+)).min(1, 'حداقل یک دسته‌بندی انتخاب کنید.').max(4, 'حداکثر چهار دسته‌بندی انتخاب کنید.')
+  .refine((slugs) => new Set(slugs).size === slugs.length, 'دسته‌بندی تکراری مجاز نیست.');
+
+export async function saveBusinessCategories(
+  _prev: OnboardingCategoriesState,
+  formData: FormData,
+): Promise<OnboardingCategoriesState> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== 'OWNER') {
+    return { status: 'error', message: 'دسترسی غیرمجاز' };
+  }
+  const parsed = CategoriesSchema.safeParse(formData.getAll('categories'));
+  if (!parsed.success) {
+    return { status: 'error', message: parsed.error.issues[0].message };
+  }
+  const otherService = parsed.data.includes('other')
+    ? z.string().trim().min(1, 'نام سرویس دیگر را وارد کنید.')
+      .max(100, 'نام سرویس نباید بیش از ۱۰۰ کاراکتر باشد.')
+      .regex(/^[^\x00-\x1F\x7F]+$/, 'نام سرویس شامل کاراکترهای غیرمجاز است.')
+      .safeParse(formData.get('otherServiceName'))
+    : null;
+  if (otherService && !otherService.success) {
+    return { status: 'error', otherServiceError: otherService.error.issues[0].message };
+  }
+  try {
+    const business = await prisma.business.findUnique({
+      where: { ownerId: session.user.id }, select: { id: true },
+    });
+    if (!business) return { status: 'error', message: 'ابتدا نام کسب‌وکار را ثبت کنید.' };
+    await prisma.business.update({
+      where: { id: business.id },
+      data: { categories: {
+        deleteMany: {},
+        create: parsed.data.map((slug, position) => ({
+          slug, position,
+          customName: slug === 'other' && otherService?.success ? otherService.data : null,
+        })),
+      } },
+    });
+  } catch (error) {
+    console.error('Failed to save business categories:', error);
+    return { status: 'error', message: 'ذخیره دسته‌بندی‌ها انجام نشد. دوباره تلاش کنید.' };
+  }
+  revalidatePath('/onboarding/business-category');
+  redirect('/onboarding/team');
+}
+
+export interface OnboardingTeamState {
+  status: 'idle' | 'error' | 'success';
+  message?: string;
+}
+
+export async function saveTeamSize(
+  _prev: OnboardingTeamState,
+  formData: FormData,
+): Promise<OnboardingTeamState> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== 'OWNER') {
+    return { status: 'error', message: 'دسترسی غیرمجاز' };
+  }
+  const parsed = z.string().refine(
+    (value) => TEAM_SIZES.some((size) => size.value === value),
+    'اندازه تیم خود را انتخاب کنید.',
+  ).safeParse(formData.get('teamSize'));
+  if (!parsed.success) return { status: 'error', message: 'اندازه تیم خود را انتخاب کنید.' };
+  try {
+    const business = await prisma.business.findUnique({
+      where: { ownerId: session.user.id },
+      select: { id: true, categories: { select: { id: true }, take: 1 } },
+    });
+    if (!business || business.categories.length === 0) {
+      return { status: 'error', message: 'ابتدا دسته‌بندی کسب‌وکار خود را ثبت کنید.' };
+    }
+    await prisma.business.update({
+      where: { id: business.id }, data: { teamSize: parsed.data },
+    });
+  } catch (error) {
+    console.error('Failed to save team size:', error);
+    return { status: 'error', message: 'ذخیره اندازه تیم انجام نشد. دوباره تلاش کنید.' };
+  }
+  revalidatePath('/onboarding/team');
+  return { status: 'success', message: 'اندازه تیم شما ذخیره شد.' };
 }

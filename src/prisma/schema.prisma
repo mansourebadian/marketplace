@@ -176,6 +176,8 @@ model Portfolio {
   updatedAt DateTime @updatedAt
 }
 model Business {
+  teamSize  String?  @db.NVarChar(32)
+  categories BusinessCategorySelection[]
   id        String   @id @default(cuid()) @db.NVarChar(36)
   name      String   @db.NVarChar(100)
   website   String?  @db.NVarChar(255)
@@ -183,4 +185,16 @@ model Business {
   owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model BusinessCategorySelection {
+  id         String   @id @default(cuid()) @db.NVarChar(36)
+  businessId String   @db.NVarChar(36)
+  slug       String   @db.NVarChar(64)
+  customName String?  @db.NVarChar(100)
+  position   Int
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([businessId, slug])
+  @@unique([businessId, position])
 }
