@@ -8,6 +8,7 @@ const STEPS = [
   '/onboarding/business-category',
   '/onboarding/team',
   '/onboarding/business-location',
+  '/onboarding/business-address',
   '/onboarding/complete',
 ];
 

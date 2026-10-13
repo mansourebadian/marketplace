@@ -183,5 +183,53 @@ export async function saveTeamSize(
     return { status: 'error', message: 'ذخیره اندازه تیم انجام نشد. دوباره تلاش کنید.' };
   }
   revalidatePath('/onboarding/team');
-  return { status: 'success', message: 'اندازه تیم شما ذخیره شد.' };
+  redirect('/onboarding/business-location');
+}
+
+export interface OnboardingServiceLocationState { status: 'idle' | 'error' | 'success'; message?: string; }
+const SERVICE_LOCATIONS = ['PHYSICAL_LOCATION', 'MOBILE_OPERATOR', 'VIRTUAL_ONLINE'] as const;
+
+export async function saveServiceLocation(_prev: OnboardingServiceLocationState, formData: FormData): Promise<OnboardingServiceLocationState> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== 'OWNER') return { status: 'error', message: 'دسترسی غیرمجاز' };
+  const locations = formData.getAll('serviceLocation').map((value) => value.toString());
+  if (!locations.length || locations.some((location) => !SERVICE_LOCATIONS.includes(location as (typeof SERVICE_LOCATIONS)[number]))) return { status: 'error', message: 'حداقل یک محل ارائه خدمات را انتخاب کنید.' };
+  try {
+    await prisma.business.update({ where: { ownerId: session.user.id }, data: { serviceLocation: JSON.stringify(locations) } });
+  } catch (error) {
+    console.error('Failed to save service location:', error);
+    return { status: 'error', message: 'ذخیره محل ارائه خدمات انجام نشد. دوباره تلاش کنید.' };
+  }
+  revalidatePath('/onboarding/business-location');
+  if (locations.includes('PHYSICAL_LOCATION')) redirect('/onboarding/business-address');
+  return { status: 'success', message: 'محل ارائه خدمات ذخیره شد.' };
+}
+
+export async function saveBusinessLocation(_prev: OnboardingServiceLocationState, formData: FormData): Promise<OnboardingServiceLocationState> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== 'OWNER') return { status: 'error', message: 'دسترسی غیرمجاز' };
+  const location = formData.get('businessLocation')?.toString().trim() ?? '';
+  const addressDetails = formData.get('addressDetails')?.toString() ?? '';
+  let validatedAddress: string;
+  try {
+    const details = z.object({
+      address: z.string().max(300), unit: z.string().max(100), district: z.string().max(100),
+      postalCode: z.string().max(20), directions: z.string().max(200),
+      province: z.string().max(100).optional(), country: z.string().max(100).optional(),
+      point: z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) }),
+    }).parse(JSON.parse(addressDetails));
+    validatedAddress = JSON.stringify(details);
+    if (validatedAddress.length > 1200) throw new Error('Address too long');
+  } catch {
+    return { status: 'error', message: 'موقعیت دقیق را روی نقشه انتخاب کنید و طول جزئیات آدرس را بررسی کنید.' };
+  }
+  if (location.length < 2) return { status: 'error', message: 'لطفاً شهر محل کسب‌وکار را انتخاب کنید.' };
+  try {
+    await prisma.business.update({ where: { ownerId: session.user.id }, data: { businessLocation: location, businessAddress: validatedAddress } });
+  } catch (error) {
+    console.error('Failed to save business location:', error);
+    return { status: 'error', message: 'ذخیره آدرس کسب‌وکار انجام نشد. دوباره تلاش کنید.' };
+  }
+  revalidatePath('/onboarding/business-address');
+  return { status: 'success', message: 'آدرس کسب‌وکار ذخیره شد.' };
 }
