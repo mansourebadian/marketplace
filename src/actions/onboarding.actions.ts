@@ -202,7 +202,21 @@ export async function saveServiceLocation(_prev: OnboardingServiceLocationState,
   }
   revalidatePath('/onboarding/business-location');
   if (locations.includes('PHYSICAL_LOCATION')) redirect('/onboarding/business-address');
-  return { status: 'success', message: 'محل ارائه خدمات ذخیره شد.' };
+  redirect('/onboarding/previous-software');
+}
+
+export interface PreviousSoftwareState { status: 'idle' | 'error' | 'success'; message?: string; }
+const PREVIOUS_SOFTWARE = ['ACUITY', 'BOOKSY', 'CALENDLY', 'GOLDIE', 'JANEAPP', 'MINDBODY', 'SALON_IRIS', 'SETMORE', 'SHORTCUTS', 'SQUARE', 'STYLESEAT', 'TIMELY', 'TREATWELL', 'VAGARO', 'ZENOTI', 'NONE', 'OTHER'] as const;
+
+export async function savePreviousSoftware(_prev: PreviousSoftwareState, formData: FormData): Promise<PreviousSoftwareState> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== 'OWNER') return { status: 'error', message: 'دسترسی غیرمجاز' };
+  const software = formData.get('previousSoftware')?.toString() ?? '';
+  if (!PREVIOUS_SOFTWARE.includes(software as (typeof PREVIOUS_SOFTWARE)[number])) return { status: 'error', message: 'لطفاً یک گزینه را انتخاب کنید.' };
+  try { await prisma.business.update({ where: { ownerId: session.user.id }, data: { previousSoftware: software } }); }
+  catch (error) { console.error('Failed to save previous software:', error); return { status: 'error', message: 'ذخیره انتخاب انجام نشد. دوباره تلاش کنید.' }; }
+  revalidatePath('/onboarding/previous-software');
+  redirect('/profile');
 }
 
 export async function saveBusinessLocation(_prev: OnboardingServiceLocationState, formData: FormData): Promise<OnboardingServiceLocationState> {

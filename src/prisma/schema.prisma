@@ -178,6 +178,7 @@ model Portfolio {
 model Business {
   teamSize  String?  @db.NVarChar(32)
   serviceLocation String? @db.NVarChar(256)
+  previousSoftware String? @db.NVarChar(64)
   businessLocation String? @db.NVarChar(300)
   businessAddress String? @db.NVarChar(1200)
   categories BusinessCategorySelection[]

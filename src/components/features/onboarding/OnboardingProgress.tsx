@@ -16,7 +16,10 @@ const TOTAL = STEPS.length; // 5 قسمت
 
 export function OnboardingProgress() {
   const pathname = usePathname();
-  const idx = STEPS.findIndex((s) => pathname.startsWith(s));
+  const currentStep = pathname.startsWith('/onboarding/previous-software')
+    ? '/onboarding/business-address'
+    : pathname;
+  const idx = STEPS.findIndex((s) => currentStep.startsWith(s));
   const filledCount = idx >= 0 ? idx + 1 : 0;
 
   return (
