@@ -1,0 +1,33 @@
+{
+  "runId": "a8bab2628bc9ac0657b1",
+  "startedAt": "2026-10-17T18:40:15.093Z",
+  "mode": "http",
+  "requested": 128,
+  "configuredConcurrency": 64,
+  "scope": "Real HTTP server-action login with independent synthetic challenges; no SMS or code-issuance step.",
+  "machine": {
+    "logicalCpus": 8,
+    "memoryGiB": 15.945724487304688,
+    "freeMemoryGiBAtStart": 6.074371337890625,
+    "node": "v24.21.0"
+  },
+  "completed": 128,
+  "expectedRejections": 0,
+  "authenticated": 128,
+  "wrongResult": 0,
+  "exceptions": 0,
+  "peakInFlight": 64,
+  "sessionRows": 128,
+  "userRows": 128,
+  "persistedAttemptRows": 128,
+  "durationSeconds": 3.8885222999999995,
+  "requestsPerSecond": 32.91738869544351,
+  "p50Ms": 1466,
+  "p95Ms": 2577,
+  "p99Ms": 2605,
+  "maxMs": 2635.1963,
+  "exceptionCodes": {},
+  "outcome": "passed",
+  "cleanedUp": true,
+  "verifierSha256": "d9251eb1427028863028522ff58ebd638da8f1dfc13607ed1f40fd347a887db1"
+}

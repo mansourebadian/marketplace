@@ -34,6 +34,7 @@ export default async function BusinessCompletePage() {
       lastName: true,
       phone: true,
       country: true,
+      accounts: { where: { provider: 'phone' }, select: { providerAccountId: true } },
     },
   });
 
@@ -71,7 +72,8 @@ export default async function BusinessCompletePage() {
         <BusinessSignUpForm
           initialFirstName={firstName}
           initialLastName={lastName}
-          initialPhone={user.phone ?? ''}
+          initialPhone={user.accounts[0]?.providerAccountId ?? user.phone ?? ''}
+          phoneVerified={user.accounts.length > 0}
           initialCountryCode={user.country ?? DEFAULT_COUNTRY.code}
         />
       </div>

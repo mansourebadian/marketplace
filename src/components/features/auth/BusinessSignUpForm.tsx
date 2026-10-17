@@ -19,6 +19,7 @@ interface BusinessSignUpFormProps {
   initialLastName: string;
   initialPhone: string;
   initialCountryCode: string;
+  phoneVerified?: boolean;
 }
 
 const inputClass =
@@ -38,6 +39,7 @@ export const BusinessSignUpForm = ({
   initialLastName,
   initialPhone,
   initialCountryCode,
+  phoneVerified = false,
 }: BusinessSignUpFormProps) => {
   const [state, action, pending] = useActionState(
     completeBusinessSignUp,
@@ -49,7 +51,7 @@ export const BusinessSignUpForm = ({
   const [country, setCountry] = useState<Country>(initialCountry);
   const [showPassword, setShowPassword] = useState(false);
 
-  const localPhone = initialPhone.startsWith(country.dialCode)
+  const localPhone = !phoneVerified && initialPhone.startsWith(country.dialCode)
     ? initialPhone.slice(country.dialCode.length)
     : initialPhone;
 
@@ -108,9 +110,9 @@ export const BusinessSignUpForm = ({
           تلفن همراه
         </label>
         <div className="flex items-stretch overflow-hidden rounded-xl border border-neutral-300 bg-white transition focus-within:border-neutral-900 focus-within:ring-2 focus-within:ring-neutral-900/10">
-          <span className="flex items-center border-r border-neutral-200 bg-neutral-50 px-4 text-[15px] text-neutral-600">
+          {!phoneVerified && <span className="flex items-center border-r border-neutral-200 bg-neutral-50 px-4 text-[15px] text-neutral-600">
             {country.dialCode}
-          </span>
+          </span>}
           <input
             id="business-mobile"
             name="phone"
@@ -120,6 +122,7 @@ export const BusinessSignUpForm = ({
             required
             dir="ltr"
             defaultValue={localPhone}
+            readOnly={phoneVerified}
             aria-describedby="business-mobile-error"
             className="h-12 min-w-0 flex-1 bg-white px-4 text-left text-base text-neutral-950 outline-none"
           />

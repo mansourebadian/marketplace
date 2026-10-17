@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function BusinessAuthPage({ searchParams }: {
-  searchParams: Promise<{ error?: string | string[] }>;
+  searchParams: Promise<{ error?: string | string[]; method?: string }>;
 }) {
   const params = await searchParams;
   const errorCode = Array.isArray(params.error) ? params.error[0] : params.error;
@@ -50,7 +50,7 @@ export default async function BusinessAuthPage({ searchParams }: {
               </p>
             </header>
 
-            <BusinessAuthForm authError={authError} />
+            <BusinessAuthForm authError={authError} initialMethod={params.method === 'phone' ? 'phone' : 'email'} />
           </div>
         </div>
 

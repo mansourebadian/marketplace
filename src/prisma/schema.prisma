@@ -83,6 +83,23 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model PhoneChallenge {
+  id           String    @id @db.NVarChar(64)
+  phone        String    @db.NVarChar(32)
+  codeHash     String    @db.NVarChar(64)
+  requestKey   String    @db.NVarChar(64)
+  flow         String    @db.NVarChar(16)
+  callbackUrl  String    @db.NVarChar(2048)
+  attempts     Int       @default(0)
+  delivered    Boolean   @default(false)
+  consumedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  expiresAt    DateTime
+
+  @@index([phone, createdAt])
+  @@index([requestKey, createdAt])
+}
+
 model Salon {
   id           String   @id @default(cuid())
   name         String

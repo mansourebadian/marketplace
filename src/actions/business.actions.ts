@@ -6,6 +6,7 @@ import { Prisma } from '@prisma/client';
 import { auth } from '@/auth';
 import prisma from '@/lib/prisma';
 import { COUNTRIES } from '@/components/features/auth/countries';
+import { normalizePhone } from '@/lib/phone';
 
 export type BusinessSignUpField =
   | 'firstName'
@@ -51,7 +52,7 @@ export async function completeBusinessSignUp(
 
   const currentUser = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { role: true },
+    select: { role: true, accounts: { where: { provider: 'phone' }, select: { providerAccountId: true } } },
   });
 
   if (currentUser?.role !== 'CUSTOMER') {
@@ -86,13 +87,15 @@ export async function completeBusinessSignUp(
     fieldErrors.country = 'Select your country.';
   }
 
-  const dialCode = country?.dialCode.replace('+', '') ?? '';
-  const fullPhone = country ? `+${dialCode}${localPhone}` : localPhone;
+  const fullPhone = country ? normalizePhone(localPhone, country.dialCode) : null;
+  const verifiedPhone = currentUser.accounts[0]?.providerAccountId;
 
   if (!localPhone) {
     fieldErrors.phone = 'Enter your mobile number.';
-  } else if (!/^\+?\d{7,15}$/.test(fullPhone)) {
+  } else if (!fullPhone) {
     fieldErrors.phone = 'Enter a valid mobile number.';
+  } else if (verifiedPhone && fullPhone !== verifiedPhone) {
+    fieldErrors.phone = 'شماره موبایل باید همان شمارهٔ تأییدشده باشد.';
   }
 
   if (!passwordValue) {
@@ -109,7 +112,7 @@ export async function completeBusinessSignUp(
     fieldErrors.agreement = 'You must agree to continue.';
   }
 
-  if (Object.keys(fieldErrors).length > 0) {
+  if (Object.keys(fieldErrors).length > 0 || !fullPhone) {
     return {
       status: 'error',
       message: 'Please fix the errors in the form.',

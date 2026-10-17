@@ -8,18 +8,15 @@ const STEPS = [
   '/onboarding/business-category',
   '/onboarding/team',
   '/onboarding/business-location',
+  '/onboarding/previous-software',
   '/onboarding/business-address',
-  '/onboarding/complete',
 ];
 
 const TOTAL = STEPS.length; // 5 قسمت
 
 export function OnboardingProgress() {
   const pathname = usePathname();
-  const currentStep = pathname.startsWith('/onboarding/previous-software')
-    ? '/onboarding/business-address'
-    : pathname;
-  const idx = STEPS.findIndex((s) => currentStep.startsWith(s));
+  const idx = STEPS.findIndex((s) => pathname.startsWith(s));
   const filledCount = idx >= 0 ? idx + 1 : 0;
 
   return (

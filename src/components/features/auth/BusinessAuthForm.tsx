@@ -5,14 +5,16 @@ import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { LoaderCircle, Smartphone, Mail } from 'lucide-react';
 import { COUNTRIES, DEFAULT_COUNTRY } from '@/components/features/auth/countries';
+import { requestPhoneOtp } from '@/actions/phone-auth.actions';
 
 type AuthMethod = 'email' | 'phone';
 type Feedback = { tone: 'error' | 'info'; message: string } | null;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export const BusinessAuthForm = ({ authError = null }: { authError?: string | null }) => {
-  const [authMethod, setAuthMethod] = useState<AuthMethod>('email');
+export const BusinessAuthForm = ({ authError = null, initialMethod = 'email' }: { authError?: string | null; initialMethod?: AuthMethod }) => {
+  const [authMethod, setAuthMethod] = useState<AuthMethod>(initialMethod);
+  const [phonePending, setPhonePending] = useState(false);
 
   const [email, setEmail]       = useState('');
   const [phone, setPhone]       = useState('');
@@ -51,21 +53,24 @@ export const BusinessAuthForm = ({ authError = null }: { authError?: string | nu
     });
   };
 
-  const handlePhoneSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handlePhoneSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const trimmed = phone.trim().replace(/[\s()-]/g, '');
-    if (!trimmed) {
-      setFeedback({ tone: 'error', message: 'شماره موبایل را وارد کنید.' });
-      return;
+    if (phonePending) return;
+    setPhonePending(true);
+    setFeedback(null);
+    const data = new FormData();
+    data.set('phone', phone);
+    data.set('dialCode', dialCode);
+    data.set('flow', 'business');
+    try {
+      const result = await requestPhoneOtp(data);
+      if (result.error) setFeedback({ tone: 'error', message: result.error });
+      if (result.sent) window.location.assign('/auth/phone');
+    } catch {
+      setFeedback({ tone: 'error', message: 'درخواست کد انجام نشد. دوباره تلاش کنید.' });
+    } finally {
+      setPhonePending(false);
     }
-    if (!/^\d{7,15}$/.test(trimmed)) {
-      setFeedback({ tone: 'error', message: 'شماره موبایل معتبر نیست.' });
-      return;
-    }
-    setFeedback({
-      tone: 'info',
-      message: 'ارسال کد تأیید پس از اتصال سرویس ورود فعال می‌شود.',
-    });
   };
 
   const handleGoogleSignIn = async () => {
@@ -155,9 +160,10 @@ export const BusinessAuthForm = ({ authError = null }: { authError?: string | nu
 
       <button
         type="submit"
-        className="h-12 w-full rounded-full bg-neutral-950 px-5 text-[15px] font-bold text-white transition hover:bg-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2"
+        disabled={phonePending}
+        className="h-12 w-full rounded-full bg-neutral-950 px-5 text-[15px] font-bold text-white transition hover:bg-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2 disabled:opacity-50"
       >
-        ادامه
+        {phonePending ? 'در حال ارسال کد…' : 'ادامه'}
       </button>
 
       <div className="flex items-center gap-4" aria-hidden="true">

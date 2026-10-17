@@ -1,0 +1,33 @@
+{
+  "runId": "73132105ec2eda27cc54",
+  "startedAt": "2026-10-17T18:37:37.803Z",
+  "mode": "swapped",
+  "requested": 2000,
+  "configuredConcurrency": 16,
+  "scope": "Production verifyPhoneCode with real SQL Server transactions; no HTTP, SMS, or sending limits. Distinct codes swapped between pairs.",
+  "machine": {
+    "logicalCpus": 8,
+    "memoryGiB": 15.945724487304688,
+    "freeMemoryGiBAtStart": 6.148342132568359,
+    "node": "v24.21.0"
+  },
+  "completed": 2000,
+  "expectedRejections": 2000,
+  "authenticated": 0,
+  "wrongResult": 0,
+  "exceptions": 0,
+  "peakInFlight": 16,
+  "sessionRows": 0,
+  "userRows": 0,
+  "persistedAttemptRows": 2000,
+  "durationSeconds": 4.5376685000000005,
+  "requestsPerSecond": 440.7549824320573,
+  "p50Ms": 17,
+  "p95Ms": 31,
+  "p99Ms": 205,
+  "maxMs": 309.1260000000002,
+  "exceptionCodes": {},
+  "outcome": "passed",
+  "cleanedUp": true,
+  "verifierSha256": "acde2c5ffa74f36469fdec079ae8a14ba317eca66dbea5859a59ab8b9ac444ae"
+}

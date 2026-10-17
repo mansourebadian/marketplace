@@ -1,0 +1,36 @@
+{
+  "checkedAt": "2026-10-17T19:01:08.214Z",
+  "scope": "Only completed OTP load runs listed in reports; real accounts and reports preserved",
+  "runs": [
+    "19f92f0afa0686ea9693",
+    "1e0cce338b5e6c90e4ba",
+    "4ad833565e3d7a3eb642",
+    "73132105ec2eda27cc54",
+    "8c7f55dd1c94acf78d29",
+    "a8bab2628bc9ac0657b1",
+    "f9b1e7a7b3da1f7103d8"
+  ],
+  "before": {
+    "challenges": 0,
+    "users": 0,
+    "sessions": 0
+  },
+  "removed": {
+    "challenges": 0,
+    "users": 0
+  },
+  "after": {
+    "challenges": 0,
+    "users": 0,
+    "sessions": 0
+  },
+  "postRegressionCheck": {
+    "checkedAt": "2026-10-17T19:01:25.534Z",
+    "counts": {
+      "loadChallenges": 0,
+      "syntheticOtpChallenges": 0,
+      "syntheticUsers": 0,
+      "syntheticSessions": 0
+    }
+  }
+}

@@ -3,11 +3,13 @@ import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
 import { prisma } from '@/lib/prisma';
 import { getAuthPage } from '@/lib/auth-flow';
+import { sessionCookie } from '@/lib/session-cookie';
 
 export const { handlers, auth, signIn, signOut } = NextAuth(async (request) => {
   const authPage = await getAuthPage(request);
   return {
   adapter: PrismaAdapter(prisma),
+  cookies: { sessionToken: sessionCookie() },
   session: {
     strategy: 'database',
   },
@@ -52,7 +54,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth(async (request) => {
         user: {
           id: user.id,
           name: user.name,
-          email: user.email,
+          email: user.email?.endsWith('@phone.invalid') ? null : user.email,
           image: user.image,
           role,
         },

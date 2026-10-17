@@ -216,7 +216,7 @@ export async function savePreviousSoftware(_prev: PreviousSoftwareState, formDat
   try { await prisma.business.update({ where: { ownerId: session.user.id }, data: { previousSoftware: software } }); }
   catch (error) { console.error('Failed to save previous software:', error); return { status: 'error', message: 'ذخیره انتخاب انجام نشد. دوباره تلاش کنید.' }; }
   revalidatePath('/onboarding/previous-software');
-  redirect('/profile');
+  redirect('/onboarding/business-address');
 }
 
 export async function saveBusinessLocation(_prev: OnboardingServiceLocationState, formData: FormData): Promise<OnboardingServiceLocationState> {
@@ -245,5 +245,5 @@ export async function saveBusinessLocation(_prev: OnboardingServiceLocationState
     return { status: 'error', message: 'ذخیره آدرس کسب‌وکار انجام نشد. دوباره تلاش کنید.' };
   }
   revalidatePath('/onboarding/business-address');
-  return { status: 'success', message: 'آدرس کسب‌وکار ذخیره شد.' };
+  redirect('/');
 }

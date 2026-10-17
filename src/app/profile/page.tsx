@@ -61,8 +61,9 @@ export default async function ProfilePage() {
   const legacyName = splitDisplayName(user.name);
   const firstName = user.firstName?.trim() || legacyName.firstName;
   const lastName = user.lastName?.trim() || legacyName.lastName;
+  const email = user.email.endsWith('@phone.invalid') ? '' : user.email;
   const displayName =
-    [firstName, lastName].filter(Boolean).join(' ') || user.email;
+    [firstName, lastName].filter(Boolean).join(' ') || user.phone || email;
 
   return (
     <div className="min-h-screen bg-white text-gray-950">
@@ -72,7 +73,7 @@ export default async function ProfilePage() {
           firstName,
           lastName,
           displayName,
-          email: user.email,
+          email,
           phone: user.phone ?? '',
           image: user.image ?? '',
           dateOfBirth: user.dateOfBirth?.toISOString().slice(0, 10) ?? '',

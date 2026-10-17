@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { ChevronDown, CircleAlert, LoaderCircle, Mail, Search } from 'lucide-react';
 import { COUNTRIES, DEFAULT_COUNTRY, flagUrl, type Country } from './countries';
+import { requestPhoneOtp } from '@/actions/phone-auth.actions';
 
 interface CustomerAuthFormProps {
   authError?: string | null;
@@ -33,6 +34,8 @@ export const CustomerAuthForm = ({
   const [isCountryOpen, setIsCountryOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [phone, setPhone] = useState('');
+  const [phonePending, setPhonePending] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
   const [isGooglePending, setIsGooglePending] = useState(false);
   const [googleError, setGoogleError] = useState<string | null>(authError);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -132,8 +135,22 @@ export const CustomerAuthForm = ({
     }
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (phonePending) return;
+    setPhonePending(true);
+    setPhoneError('');
+    const data = new FormData();
+    data.set('phone', phone);
+    data.set('dialCode', selectedCountry.dialCode);
+    data.set('flow', 'customer');
+    data.set('callbackUrl', safeCallbackUrl);
+    try {
+      const result = await requestPhoneOtp(data);
+      if (result.error) setPhoneError(result.error);
+      if (result.sent) window.location.assign('/auth/phone');
+    } catch { setPhoneError('درخواست کد انجام نشد. دوباره تلاش کنید.'); }
+    finally { setPhonePending(false); }
   };
 
   const handleGoogleSignIn = async () => {
@@ -258,10 +275,12 @@ export const CustomerAuthForm = ({
 
       <button
         type="submit"
-        className="w-full rounded-2xl bg-indigo-600 py-4 text-[15px] font-bold text-white transition-colors hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+        disabled={phonePending}
+        className="w-full rounded-2xl bg-indigo-600 py-4 text-[15px] font-bold text-white transition-colors hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:opacity-50"
       >
-        ادامه
+        {phonePending ? 'در حال ارسال کد…' : 'ادامه'}
       </button>
+      {phoneError && <p role="alert" className="text-center text-sm text-red-600">{phoneError}</p>}
 
       <div className="flex items-center gap-4">
         <span className="h-px flex-1 bg-gray-200" />
