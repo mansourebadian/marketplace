@@ -245,5 +245,5 @@ export async function saveBusinessLocation(_prev: OnboardingServiceLocationState
     return { status: 'error', message: 'ذخیره آدرس کسب‌وکار انجام نشد. دوباره تلاش کنید.' };
   }
   revalidatePath('/onboarding/business-address');
-  redirect('/');
+  redirect('/onboarding/complete');
 }
