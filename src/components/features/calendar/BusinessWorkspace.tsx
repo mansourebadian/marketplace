@@ -1,7 +1,10 @@
-import type { ReactNode } from 'react';
+'use client';
+
+import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { Bell, BookOpen, CalendarDays, ChartNoAxesColumnIncreasing, ChevronLeft, CircleHelp, ContactRound, Grid2X2Plus, House, Megaphone, MessageCircle, Rocket, Search, Settings, Smile, Tag, TrendingUp, UsersRound, Wallet } from 'lucide-react';
 import styles from './BusinessCalendar.module.css';
+import { SetupGuide } from './SetupGuide';
 
 const navigation = [
   { icon: House, label: 'خانه' },
@@ -23,13 +26,15 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
   label: string;
   children: ReactNode;
 }) {
+  const [setupOpen, setSetupOpen] = useState(false);
   const initials = ownerName.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+  useEffect(() => { if (!setupOpen) return; const close = (event: KeyboardEvent) => event.key === 'Escape' && setSetupOpen(false); document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close); }, [setupOpen]);
 
   return <main dir="rtl" className={styles.shell} aria-label={label}>
     <header className={styles.header}>
       <span className={styles.logo}>فرشا</span>
       <div className={styles.headerActions}>
-        <Link href="/setup" className={styles.setup}><Rocket size={19} /> ادامهٔ راه‌اندازی <ChevronLeft size={18} /></Link>
+        <button type="button" className={styles.setup} onClick={() => setSetupOpen(true)}><Rocket size={19} /> ادامهٔ راه‌اندازی <ChevronLeft size={18} /></button>
         {[Search, ChartNoAxesColumnIncreasing, Bell, MessageCircle, Wallet].map((Icon, index) => <span className={styles.headerIcon} key={index}><Icon size={23} strokeWidth={1.7} /></span>)}
         <span className={styles.avatar} title={ownerName}>{initials}</span>
       </div>
@@ -41,5 +46,7 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
       <span className={styles.help} title="راهنما"><CircleHelp size={24} /></span>
     </aside>
     {children}
+    {setupOpen && <SetupGuide onClose={() => setSetupOpen(false)} />}
+
   </main>;
 }

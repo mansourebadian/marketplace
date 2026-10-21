@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { ArrowLeft, CalendarDays, CreditCard, FileText, Landmark, Smile, Store, Tag, UsersRound, type LucideIcon } from 'lucide-react';
 import { BusinessWorkspace } from '../calendar/BusinessWorkspace';
 import styles from './WorkspaceSettings.module.css';
@@ -67,7 +68,7 @@ export function WorkspaceSettings({ ownerName, businessName }: { ownerName: stri
           <div className={styles.cards}>
             {section.cards.map(({ icon: Icon, title, description }) => <article key={title} className={`${styles.card} ${index > 0 ? styles.optionCard : ''}`}>
               {Icon && <Icon size={22} strokeWidth={1.65} aria-hidden="true" />}
-              <h3>{title}</h3>
+              <h3>{index === 0 && title === 'راه‌اندازی کسب‌وکار' ? <Link className={styles.cardLink} href="/setup/business-setup/business-details">{title}</Link> : title}</h3>
               <p>{description}</p>
               {index > 0 && <span className={styles.viewLabel}>مشاهده <ArrowLeft size={18} strokeWidth={1.5} aria-hidden="true" /></span>}
             </article>)}
