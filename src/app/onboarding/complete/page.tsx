@@ -36,7 +36,7 @@ export default async function OnboardingCompletePage() {
           همه‌چیز برای شروع مدیریت کسب‌وکار شما آماده است.
         </p>
         <Link
-          href="/"
+          href="/calendar"
           replace
           className="mt-6 inline-flex min-h-12 min-w-20 items-center justify-center rounded-full bg-neutral-950 px-6 py-3 font-semibold text-white transition-colors hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-600"
         >
