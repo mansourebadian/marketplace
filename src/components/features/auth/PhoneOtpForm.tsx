@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useActionState, useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
@@ -11,7 +11,7 @@ export function PhoneOtpForm({ phone, resendAt, backHref }: { phone: string; res
   const [state, action, pending] = useActionState(confirmPhoneOtp, {});
   const [resending, startResending] = useTransition();
   const [resendError, setResendError] = useState('');
-  const [remaining, setRemaining] = useState(() => Math.max(0, Math.ceil((resendAt - Date.now()) / 1000)));
+  const [remaining, setRemaining] = useState(0);
   useEffect(() => {
     const timer = window.setInterval(() => setRemaining(Math.max(0, Math.ceil((resendAt - Date.now()) / 1000))), 1000);
     return () => window.clearInterval(timer);
@@ -80,3 +80,4 @@ export function PhoneOtpForm({ phone, resendAt, backHref }: { phone: string; res
     </div>
   </div>;
 }
+

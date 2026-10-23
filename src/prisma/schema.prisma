@@ -8,27 +8,27 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  phone         String?   @db.NVarChar(32)
+  id            String            @id @default(uuid())
+  phone         String?           @db.NVarChar(32)
   name          String?
-  firstName     String?   @db.NVarChar(100)
-  lastName      String?   @db.NVarChar(100)
-  email         String    @unique @db.NVarChar(320)
+  firstName     String?           @db.NVarChar(100)
+  lastName      String?           @db.NVarChar(100)
+  email         String            @unique @db.NVarChar(320)
   emailVerified DateTime?
-  image         String?   @db.NVarChar(2048)
-  country       String?   @db.NVarChar(100)
-  passwordHash  String?   @db.NVarChar(255)
-  dateOfBirth   DateTime? @db.Date
-  gender        String?   @db.NVarChar(32)
-  role          String    @default("CUSTOMER") // CUSTOMER, OWNER, ADMIN
+  image         String?           @db.NVarChar(2048)
+  country       String?           @db.NVarChar(100)
+  passwordHash  String?           @db.NVarChar(255)
+  dateOfBirth   DateTime?         @db.Date
+  gender        String?           @db.NVarChar(32)
+  role          String            @default("CUSTOMER") // CUSTOMER, OWNER, ADMIN
   accounts      Account[]
   sessions      Session[]
   addresses     CustomerAddress[]
   bookings      Booking[]
   reviews       Review[]
-  business      Business? 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  business      Business?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 }
 
 model CustomerAddress {
@@ -84,17 +84,17 @@ model VerificationToken {
 }
 
 model PhoneChallenge {
-  id           String    @id @db.NVarChar(64)
-  phone        String    @db.NVarChar(32)
-  codeHash     String    @db.NVarChar(64)
-  requestKey   String    @db.NVarChar(64)
-  flow         String    @db.NVarChar(16)
-  callbackUrl  String    @db.NVarChar(2048)
-  attempts     Int       @default(0)
-  delivered    Boolean   @default(false)
-  consumedAt   DateTime?
-  createdAt    DateTime  @default(now())
-  expiresAt    DateTime
+  id          String    @id @db.NVarChar(64)
+  phone       String    @db.NVarChar(32)
+  codeHash    String    @db.NVarChar(64)
+  requestKey  String    @db.NVarChar(64)
+  flow        String    @db.NVarChar(16)
+  callbackUrl String    @db.NVarChar(2048)
+  attempts    Int       @default(0)
+  delivered   Boolean   @default(false)
+  consumedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime
 
   @@index([phone, createdAt])
   @@index([requestKey, createdAt])
@@ -109,8 +109,8 @@ model Salon {
   description  String?
   imageUrl     String?
   priceRange   String?
-  rating       Float?   @default(0) // این فیلد جا افتاده است
-  reviewsCount Int?     @default(0) // این فیلد جا افتاده است
+  rating       Float?   @default(0)
+  reviewsCount Int?     @default(0)
   createdAt    DateTime @default(now())
 
   // Relations
@@ -125,7 +125,7 @@ model Service {
   id          String           @id @default(uuid())
   name        String
   price       Int
-  durationMin Int // مدت زمان خدمت به دقیقه
+  durationMin Int
   salonId     String
   salon       Salon            @relation(fields: [salonId], references: [id])
   categoryId  String?
@@ -135,10 +135,10 @@ model Service {
 
 model ServiceCategory {
   id        String    @id @default(cuid())
-  name      String // نام دسته‌بندی (مثلا: مو و آرایش مو)
+  name      String
   slug      String    @unique
-  icon      String // نام آیکون lucide (مثلا: Scissors)
-  order     Int       @default(0) // ترتیب نمایش در لیست
+  icon      String
+  order     Int       @default(0)
   services  Service[]
   createdAt DateTime  @default(now())
 }
@@ -155,7 +155,7 @@ model TeamMember {
 
 model Booking {
   id     String   @id @default(uuid())
-  date   DateTime // تاریخ و زمان رزرو
+  date   DateTime
   status String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED
 
   userId       String
@@ -183,7 +183,7 @@ model Portfolio {
   id       String  @id @default(cuid())
   imageUrl String
   caption  String?
-  order    Int     @default(0) // این فیلد اضافه شد
+  order    Int     @default(0)
 
   // Relation to Salon
   salonId String
@@ -192,26 +192,28 @@ model Portfolio {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
 model Business {
-  teamSize  String?  @db.NVarChar(32)
-  serviceLocation String? @db.NVarChar(256)
-  previousSoftware String? @db.NVarChar(64)
-  businessLocation String? @db.NVarChar(300)
-  businessAddress String? @db.NVarChar(1200)
-  categories BusinessCategorySelection[]
-  id        String   @id @default(cuid()) @db.NVarChar(36)
-  name      String   @db.NVarChar(100)
-  website   String?  @db.NVarChar(255)
-  taxMode String? @default("include") @db.NVarChar(16)
-  teamLanguage String? @db.NVarChar(32)
-  clientLanguage String? @db.NVarChar(32)
-  rubika String? @db.NVarChar(255)
-  instagram String? @db.NVarChar(255)
-  bale String? @db.NVarChar(255)
-  ownerId   String   @unique
-  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  teamSize         String?                     @db.NVarChar(32)
+  serviceLocation  String?                     @db.NVarChar(256)
+  previousSoftware String?                     @db.NVarChar(64)
+  businessLocation String?                     @db.NVarChar(300)
+  businessAddress  String?                     @db.NVarChar(1200)
+  categories       BusinessCategorySelection[]
+  locations        BusinessLocation[]
+  id               String                      @id @default(cuid()) @db.NVarChar(36)
+  name             String                      @db.NVarChar(100)
+  website          String?                     @db.NVarChar(255)
+  taxMode          String?                     @default("include") @db.NVarChar(16)
+  teamLanguage     String?                     @db.NVarChar(32)
+  clientLanguage   String?                     @db.NVarChar(32)
+  rubika           String?                     @db.NVarChar(255)
+  instagram        String?                     @db.NVarChar(255)
+  bale             String?                     @db.NVarChar(255)
+  ownerId          String                      @unique
+  owner            User                        @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  createdAt        DateTime                    @default(now())
+  updatedAt        DateTime                    @updatedAt
 }
 
 model BusinessCategorySelection {
@@ -226,3 +228,31 @@ model BusinessCategorySelection {
   @@unique([businessId, position])
 }
 
+model BusinessLocation {
+  id             String                @id @default(cuid()) @db.NVarChar(36)
+  businessId     String                @db.NVarChar(36)
+  name           String                @db.NVarChar(60)
+  internalName   String?               @db.NVarChar(60)
+  phone          String?               @db.NVarChar(32)
+  email          String?               @db.NVarChar(320)
+  address        String?               @db.NVarChar(300)
+  noFixedAddress Boolean               @default(false)
+  business       Business              @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  openingHours   LocationOpeningHour[]
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  @@index([businessId])
+}
+
+model LocationOpeningHour {
+  id         String           @id @default(cuid()) @db.NVarChar(36)
+  locationId String           @db.NVarChar(36)
+  day        Int
+  enabled    Boolean          @default(true)
+  opensAt    String           @db.NVarChar(5)
+  closesAt   String           @db.NVarChar(5)
+  location   BusinessLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([locationId, day])
+}

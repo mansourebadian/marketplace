@@ -1,0 +1,13 @@
+﻿'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import styles from './AddLocationPage.module.css';
+function Field({ label, hint, value, setValue, max=60 }: { label:string; hint?:string; value:string; setValue:(v:string)=>void; max?:number }) { return <label className={styles.field}><span className={styles.labelRow}><strong>{label}</strong><span>{value.length}/{max}</span></span><input maxLength={max} value={value} onChange={e=>setValue(e.target.value)} /><small>{hint}</small></label>; }
+export function AddLocationPage({ initialValues = { name: '', internalName: '', phone: '', email: '' } }: { initialValues?: { name: string; internalName: string; phone: string; email: string } }) { const router = useRouter(); const [error,setError] = useState(''); const [name,setName]=useState(initialValues.name); const [internal,setInternal]=useState(initialValues.internalName); const [phone,setPhone]=useState(initialValues.phone); const [email,setEmail]=useState(initialValues.email); const continueNext = async () => { if (!name.trim()) { setError('لطفاً نام موقعیت را وارد کنید.'); return; } const response = await fetch('/api/business/location', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ name, internalName: internal, phone, email }) }); if (!response.ok) { setError('ذخیرهٔ اطلاعات انجام نشد.'); return; } router.push('/setup/location/new/business-type'); }; return <main className={styles.page} dir="rtl"><div className={styles.progress}><span/><i/><i/><i/></div><header><Link href="/setup/business-setup/locations" className={styles.close}>بستن</Link><button type="button" className={styles.continue} onClick={continueNext}>ادامه</button></header><section className={styles.form}><p className={styles.eyebrow}>افزودن موقعیت جدید</p><h1>جزئیات کسب‌وکار خود را اضافه کنید</h1><Field label="نام موقعیت" value={name} setValue={setName} hint="نام عمومی که در اعلان‌ها و هنگام رزرو آنلاین به مشتریان نمایش داده می‌شود. برای مثال: سالن زیبایی ترندی"/><Field label="نام داخلی موقعیت (اختیاری)" value={internal} setValue={setInternal} hint="نام داخلی که فقط اعضای تیم شما می‌بینند. برای مثال: شعبهٔ مرکزی"/><label className={styles.field}><strong>شماره تلفن موقعیت</strong><div className={styles.phone}><select defaultValue="+98" aria-label="کد کشور"><option>+98</option><option>+44</option><option>+1</option></select><input value={phone} onChange={e=>setPhone(e.target.value)} /></div></label><label className={styles.field}><strong>آدرس ایمیل موقعیت</strong><input type="email" value={email} onChange={e=>setEmail(e.target.value)} /></label></section></main>; }
+
+
+
+
+
+
