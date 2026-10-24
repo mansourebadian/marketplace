@@ -239,11 +239,20 @@ export async function saveBusinessLocation(_prev: OnboardingServiceLocationState
   }
   if (location.length < 2) return { status: 'error', message: 'لطفاً شهر محل کسب‌وکار را انتخاب کنید.' };
   try {
-    await prisma.business.update({ where: { ownerId: session.user.id }, data: { businessLocation: location, businessAddress: validatedAddress } });
+    if (formData.get('targetLocation') === 'true') {
+      const business = await prisma.business.findUnique({ where: { ownerId: session.user.id }, select: { id: true } });
+      const target = business ? await prisma.businessLocation.findFirst({ where: { businessId: business.id }, orderBy: { createdAt: 'desc' } }) : null;
+      if (!target) return { status: 'error', message: 'موقعیت جدید پیدا نشد.' };
+      const parsed = JSON.parse(validatedAddress) as { address?: string; noFixedAddress?: boolean };
+      await prisma.businessLocation.update({ where: { id: target.id }, data: { address: parsed.address || null, noFixedAddress: parsed.noFixedAddress === true } });
+    } else {
+      await prisma.business.update({ where: { ownerId: session.user.id }, data: { businessLocation: location, businessAddress: validatedAddress } });
+    }
   } catch (error) {
     console.error('Failed to save business location:', error);
     return { status: 'error', message: 'ذخیره آدرس کسب‌وکار انجام نشد. دوباره تلاش کنید.' };
   }
   revalidatePath('/onboarding/business-address');
+  if (formData.get('targetLocation') === 'true') redirect('/setup/location/new/working-hours');
   redirect('/onboarding/complete');
 }

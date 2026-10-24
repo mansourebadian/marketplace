@@ -11,9 +11,9 @@ export default async function LocationsRoute() {
   if (!session?.user?.id || session.user.role !== 'OWNER') redirect('/auth/business');
   const business = await prisma.business.findUnique({
     where: { ownerId: session.user.id },
-    select: { name: true, businessAddress: true, businessLocation: true },
+    select: { name: true, businessAddress: true, businessLocation: true, locations: { orderBy: { createdAt: 'asc' } } },
   });
   if (!business) redirect('/onboarding/business-name');
   if (!business.businessAddress) redirect('/onboarding/business-address');
-  return <LocationsPage ownerName={session.user.name || business.name} businessName={business.name} address={business.businessAddress} location={business.businessLocation} />;
+  return <LocationsPage ownerName={session.user.name || business.name} businessName={business.name} address={business.businessAddress} location={business.businessLocation} locations={business.locations} />;
 }
