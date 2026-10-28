@@ -43,7 +43,7 @@ export default async function BusinessCompletePage() {
   }
 
   if (user.role === 'OWNER') {
-    redirect('/onboarding/business-name');
+    redirect('/calendar');
   }
 
   if (user.role !== 'CUSTOMER') {

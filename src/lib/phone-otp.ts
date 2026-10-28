@@ -116,7 +116,7 @@ export async function verifyPhoneCode(db: PrismaClient, id: string, code: string
     await tx.session.create({ data: { sessionToken, userId: user.id, expires } });
     let destination = safePhoneCallback(challenge.callbackUrl);
     if (user.role === 'OWNER') {
-      destination = user.business?.businessAddress ? '/' : '/onboarding/business-name';
+      destination = user.business?.businessAddress ? '/calendar' : '/onboarding/business-name';
     } else if (user.role !== 'CUSTOMER') {
       destination = '/';
     } else if (challenge.flow === 'business') {

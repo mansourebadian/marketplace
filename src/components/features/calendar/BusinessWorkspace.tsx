@@ -27,6 +27,7 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
   children: ReactNode;
 }) {
   const [setupOpen, setSetupOpen] = useState(false);
+  const [catalogOpen, setCatalogOpen] = useState(false);
   const initials = ownerName.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
   useEffect(() => { if (!setupOpen) return; const close = (event: KeyboardEvent) => event.key === 'Escape' && setSetupOpen(false); document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close); }, [setupOpen]);
 
@@ -42,10 +43,23 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
     <aside className={styles.sidebar} aria-label="منوی مدیریت کسب‌وکار">
       {navigation.map(({ icon: Icon, label: title, href }) => href
         ? <Link key={title} href={href} title={title} aria-label={title} aria-current={activePage === href ? 'page' : undefined} className={activePage === href ? styles.activeNav : styles.navIcon}><Icon size={25} strokeWidth={1.65} /></Link>
-        : <span key={title} title={title} aria-label={title} className={styles.navIcon}><Icon size={25} strokeWidth={1.65} /></span>)}
+        : Icon === BookOpen
+          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={catalogOpen} aria-controls="business-catalog-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${catalogOpen ? styles.catalogTriggerOpen : ''}`} onClick={() => setCatalogOpen(open => !open)}><Icon size={25} strokeWidth={1.65} /></button>
+          : <span key={title} title={title} aria-label={title} className={styles.navIcon}><Icon size={25} strokeWidth={1.65} /></span>)}
       <span className={styles.help} title="راهنما"><CircleHelp size={24} /></span>
     </aside>
-    {children}
+    <div className={styles.workspaceBody}>
+      {catalogOpen && <aside id="business-catalog-panel" className={styles.catalogPanel} aria-label="کاتالوگ و مدیریت موجودی">
+        <button type="button" className={styles.catalogCollapse} onClick={() => setCatalogOpen(false)} aria-label="بستن منوی کاتالوگ"><ChevronLeft size={18} /></button>
+        <div className={styles.catalogSections}>
+        {[{ title: 'کاتالوگ', items: ['فهرست خدمات', 'بسته‌ها', 'عضویت‌ها', 'محصولات'] }, { title: 'مدیریت موجودی', items: ['انبارگردانی', 'سفارش‌های موجودی', 'تأمین‌کنندگان'] }].map(group => <section key={group.title} className={styles.catalogGroup} aria-label={group.title}>
+          <h2>{group.title}</h2>
+          <ul>{group.items.map(item => <li key={item}>{item}</li>)}</ul>
+        </section>)}
+        </div>
+      </aside>}
+      <div className={styles.workspacePage}>{children}</div>
+    </div>
     {setupOpen && <SetupGuide onClose={() => setSetupOpen(false)} />}
 
   </main>;

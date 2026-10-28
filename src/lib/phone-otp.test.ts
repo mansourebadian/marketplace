@@ -7,6 +7,36 @@ import 'dotenv/config';
 import { issuePhoneCode, verifyPhoneCode, otpDigest, OTP_LIFETIME, OTP_COOLDOWN } from './phone-otp';
 import { sendPhoneCode } from './sms';
 
+for (const flow of ['business', 'customer']) {
+  test('existing business owner signing in by phone through ' + flow + ' is sent to the business panel', async () => {
+    const previousSecret = process.env.AUTH_SECRET;
+    process.env.AUTH_SECRET = 'isolated-routing-test-secret';
+    const now = new Date();
+    const user = { id: 'existing-owner', role: 'OWNER', business: { businessAddress: '{}' } };
+    let sessionUserId: string | undefined;
+    const transaction = {
+      phoneChallenge: {
+        updateMany: async () => ({ count: 1 }),
+        findUnique: async () => ({ id: 'routing-challenge', phone: '+989123456789', flow, callbackUrl: '/profile', attempts: 1, expiresAt: new Date(now.getTime() + OTP_LIFETIME), codeHash: otpDigest('routing-challenge', '123456') }),
+        update: async () => ({}),
+      },
+      account: { findUnique: async () => ({ user }) },
+      session: { create: async ({ data }: { data: { userId: string } }) => { sessionUserId = data.userId; } },
+    };
+    const db = { $transaction: async (operation: (tx: typeof transaction) => Promise<unknown>) => operation(transaction) } as unknown as PrismaClient;
+    try {
+      const result = await verifyPhoneCode(db, 'routing-challenge', '123456', now);
+      assert.ok('sessionToken' in result);
+      assert.equal(result.destination, '/calendar');
+      assert.equal(sessionUserId, user.id);
+    } finally {
+      if (previousSecret === undefined) delete process.env.AUTH_SECRET;
+      else process.env.AUTH_SECRET = previousSecret;
+    }
+  });
+}
+
+
 // Explicit opt-in: exercises real database transactions with synthetic, isolated records.
 test('phone OTP database lifecycle', { skip: process.env.OTP_DB_TEST !== '1' }, async t => {
   const db = new PrismaClient();
@@ -137,7 +167,7 @@ test('phone OTP database lifecycle', { skip: process.env.OTP_DB_TEST !== '1' }, 
       await db.user.update({ where: { id: user.id }, data: { role: 'OWNER', business: { create: { name: 'OTP isolated test', businessAddress: '{}' } } } });
       const later = new Date(first.createdAt.getTime() + OTP_COOLDOWN + 1);
       const second = await issuePhoneCode(db, args, async (_, value) => { code = value; }, later);
-      assert.equal((await verifyPhoneCode(db, second.id, code, later)).destination, '/');
+      assert.equal((await verifyPhoneCode(db, second.id, code, later)).destination, '/calendar');
       assert.equal(await db.user.count({ where: { phone: args.phone } }), 1);
     });
   } finally {
