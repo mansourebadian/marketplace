@@ -200,6 +200,7 @@ model Business {
   businessLocation String?                     @db.NVarChar(300)
   businessAddress  String?                     @db.NVarChar(1200)
   categories       BusinessCategorySelection[]
+  serviceCategories BusinessServiceCategory[]
   locations        BusinessLocation[]
   id               String                      @id @default(cuid()) @db.NVarChar(36)
   name             String                      @db.NVarChar(100)
@@ -216,11 +217,26 @@ model Business {
   updatedAt        DateTime                    @updatedAt
 }
 
+model BusinessServiceCategory {
+  id          String   @id @default(cuid()) @db.NVarChar(36)
+  businessId  String   @db.NVarChar(36)
+  name        String   @db.NVarChar(100)
+  color       String   @db.NVarChar(20)
+  description String?  @db.NVarChar(255)
+  createdAt   DateTime @default(now())
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([businessId])
+}
+
 model BusinessCategorySelection {
   id         String   @id @default(cuid()) @db.NVarChar(36)
   businessId String   @db.NVarChar(36)
   slug       String   @db.NVarChar(64)
   customName String?  @db.NVarChar(100)
+  displayName String? @db.NVarChar(100)
+  color      String   @default("blue") @db.NVarChar(20)
+  description String? @db.NVarChar(255)
   position   Int
   business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 

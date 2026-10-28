@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
@@ -20,9 +20,11 @@ const navigation = [
   { icon: Settings, label: 'تنظیمات', href: '/setup' },
 ];
 
+const catalogGroups = [{ title: 'کاتالوگ', items: ['فهرست خدمات', 'بسته‌ها', 'عضویت‌ها', 'محصولات'] }, { title: 'مدیریت موجودی', items: ['انبارگردانی', 'سفارش‌های موجودی', 'تأمین‌کنندگان'] }];
+
 export function BusinessWorkspace({ ownerName, activePage, label, children }: {
   ownerName: string;
-  activePage: '/calendar' | '/setup';
+  activePage: '/calendar' | '/setup' | '/catalogue/services';
   label: string;
   children: ReactNode;
 }) {
@@ -44,7 +46,7 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
       {navigation.map(({ icon: Icon, label: title, href }) => href
         ? <Link key={title} href={href} title={title} aria-label={title} aria-current={activePage === href ? 'page' : undefined} className={activePage === href ? styles.activeNav : styles.navIcon}><Icon size={25} strokeWidth={1.65} /></Link>
         : Icon === BookOpen
-          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={catalogOpen} aria-controls="business-catalog-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${catalogOpen ? styles.catalogTriggerOpen : ''}`} onClick={() => setCatalogOpen(open => !open)}><Icon size={25} strokeWidth={1.65} /></button>
+          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={catalogOpen} aria-controls="business-catalog-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${catalogOpen || activePage === '/catalogue/services' ? styles.activeNav : ''}`} onClick={() => setCatalogOpen(open => !open)}><Icon size={25} strokeWidth={1.65} /></button>
           : <span key={title} title={title} aria-label={title} className={styles.navIcon}><Icon size={25} strokeWidth={1.65} /></span>)}
       <span className={styles.help} title="راهنما"><CircleHelp size={24} /></span>
     </aside>
@@ -52,9 +54,9 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
       {catalogOpen && <aside id="business-catalog-panel" className={styles.catalogPanel} aria-label="کاتالوگ و مدیریت موجودی">
         <button type="button" className={styles.catalogCollapse} onClick={() => setCatalogOpen(false)} aria-label="بستن منوی کاتالوگ"><ChevronLeft size={18} /></button>
         <div className={styles.catalogSections}>
-        {[{ title: 'کاتالوگ', items: ['فهرست خدمات', 'بسته‌ها', 'عضویت‌ها', 'محصولات'] }, { title: 'مدیریت موجودی', items: ['انبارگردانی', 'سفارش‌های موجودی', 'تأمین‌کنندگان'] }].map(group => <section key={group.title} className={styles.catalogGroup} aria-label={group.title}>
+        {catalogGroups.map(group => <section key={group.title} className={styles.catalogGroup} aria-label={group.title}>
           <h2>{group.title}</h2>
-          <ul>{group.items.map(item => <li key={item}>{item}</li>)}</ul>
+          <ul>{group.items.map(item => <li key={item}>{item === group.items[0] && group === catalogGroups[0] ? <Link href="/catalogue/services" aria-current={activePage === '/catalogue/services' ? 'page' : undefined} className={styles.catalogLink}>{item}</Link> : item}</li>)}</ul>
         </section>)}
         </div>
       </aside>}
@@ -64,3 +66,4 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
 
   </main>;
 }
+

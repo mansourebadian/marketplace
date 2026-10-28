@@ -1,0 +1,77 @@
+﻿.page { overflow-y: auto; background: #f4f4f4; padding: 36px 32px 64px; }
+.page { font-family: var(--font-iransans), system-ui, sans-serif; }
+.container { width: min(1024px, 100%); margin: 0 auto; }
+.heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+.heading h1 { margin: 0 0 5px; font-size: 28px; line-height: 1.3; }
+.heading p { margin: 0; color: #777; font-size: 14px; }
+.toolbar { display: flex; align-items: center; min-height: 68px; padding: 15px; border: 1px solid #e1e1e1; border-radius: 12px; background: white; margin-bottom: 32px; }
+.search { display: flex; align-items: center; gap: 8px; width: 240px; max-width: 100%; padding: 8px 13px; border: 1px solid #d5d5d5; border-radius: 24px; color: #888; }
+.search:focus-within { outline: 2px solid #6950fa; outline-offset: 2px; }
+.search input { min-width: 0; width: 100%; border: 0; outline: 0; background: transparent; font-size: 14px; }
+.layout { display: grid; grid-template-columns: 296px minmax(0, 1fr); gap: 32px; align-items: start; }
+.categories { background: white; border: 1px solid #e1e1e1; border-radius: 16px; padding: 20px 15px; }
+.categories h2 { margin: 3px 15px 12px; font-size: 19px; }
+.categories button { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; min-height: 44px; padding: 10px 15px; text-align: start; border: 0; border-radius: 8px; background: transparent; cursor: pointer; font-size: 14px; }
+.categories button:hover, .categories .selected { background: #efedff; }
+.categories button:focus-visible { outline: 2px solid #6950fa; }
+.count { flex: none; display: grid; place-items: center; min-width: 21px; height: 21px; border-radius: 50%; background: #f1f1f1; color: #666; font-size: 12px; }
+.group + .group { margin-top: 32px; }
+.groupHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.group h2 { margin: 0; font-size: 19px; }
+.groupHeading p { margin: 2px 0 0; color: #777; font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.actions { position: relative; flex: none; }
+.actionsTrigger { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 36px; padding: 6px 16px; border: 1px solid #d4d4d4; border-radius: 24px; background: white; color: #111; font-size: 14px; cursor: pointer; }
+.actionsTrigger:hover { background: #f8f8f8; }
+.actionsTrigger:focus-visible { outline: 2px solid #6950fa; outline-offset: 2px; }
+.actionsMenu { position: absolute; z-index: 4; inset-inline-end: 0; top: calc(100% + 8px); width: 200px; padding: 8px; border: 1px solid #e7e7e7; border-radius: 12px; background: white; box-shadow: 0 4px 16px #0002; }
+.actionsMenu button { display: block; width: 100%; min-height: 40px; padding: 8px 12px; border: 0; border-radius: 8px; background: transparent; color: #555; font-size: 14px; text-align: start; }
+.actionsMenu button:disabled { cursor: not-allowed; }
+.actionsMenu button:not(:disabled) { color: #111; cursor: pointer; }
+.actionsMenu button:not(:disabled):hover { background: #f4f4f4; }
+.actionsMenu button:focus-visible { outline: 2px solid #6950fa; outline-offset: -2px; }
+.actionsMenu .deleteAction:not(:disabled) { color: #df1034; }
+.emptyCategory { padding: 18px 22px; border: 1px dashed #d2d2d2; border-radius: 12px; color: #777; font-size: 14px; }
+.card, .empty { background: white; border: 1px solid #e1e1e1; border-radius: 12px; padding: 22px; }
+.card { display: flex; justify-content: space-between; align-items: center; gap: 16px; border-inline-start: 8px solid #a4e5fa; margin-bottom: 12px; }
+.card h3 { margin: 0 0 4px; font-size: 16px; }
+.card p, .empty { color: #777; font-size: 14px; }
+.card p { margin: 0; }
+@media (max-width: 700px) { .page { padding: 24px 16px 48px; } .layout { grid-template-columns: 1fr; gap: 24px; } .heading h1 { font-size: 24px; } .toolbar { margin-bottom: 24px; } }
+.categories .addCategory { color: #6950fa; }
+.dialog { position: fixed; margin: auto; width: min(720px, calc(100% - 32px)); max-height: calc(100% - 32px); overflow: visible; border: 0; border-radius: 16px; padding: 72px 48px 32px; color: #111; background: white; box-shadow: 0 8px 24px #0003; font-family: var(--font-iransans), system-ui, sans-serif; }
+.dialog::backdrop { background: #0006; }
+.deleteDialog { position: fixed; margin: auto; width: min(512px, calc(100% - 32px)); border: 0; border-radius: 16px; padding: 32px 48px; color: #111; background: white; box-shadow: 0 8px 24px #0003; font-family: var(--font-iransans), system-ui, sans-serif; }
+.deleteDialog::backdrop { background: #0006; }
+.deleteDialog h2 { margin: 0 0 32px; padding-inline-end: 35px; font-size: 20px; }
+.deleteDialog p { margin: 0; font-size: 14px; line-height: 1.8; overflow-wrap: anywhere; }
+.deleteDialog .error { margin-top: 12px; color: #b42318; }
+.deleteActions { display: flex; gap: 12px; margin-top: 100px; }
+.deleteActions button { flex: 1; min-height: 48px; border: 1px solid #d4d4d4; border-radius: 24px; background: white; color: #111; font-weight: 600; cursor: pointer; }
+.deleteActions button:last-child { border-color: #d90f35; background: #d90f35; color: white; }
+.deleteActions button:disabled { opacity: .5; cursor: wait; }
+.deleteActions button:focus-visible, .deleteDialog .close:focus-visible { outline: 2px solid #6950fa; outline-offset: 3px; }
+@media (max-width: 600px) { .deleteDialog { padding: 32px 24px; } .deleteActions { margin-top: 64px; } }
+.dialog h2 { margin: 0 0 34px; font-size: 26px; }
+.close { position: absolute; top: 28px; inset-inline-end: 36px; display: grid; place-items: center; border: 0; background: none; cursor: pointer; }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.fields label, .colorField, .description { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; }
+.fields input:not([type='hidden']), .description textarea { width: 100%; border: 1px solid #d4d4d4; border-radius: 8px; background: white; color: #111; font-size: 14px; font-weight: 400; }
+.fields input:not([type='hidden']) { height: 48px; padding: 0 14px; }
+.colorField { position: relative; min-width: 0; }
+.colorTrigger { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid #d4d4d4; border-radius: 8px; background: white; color: #111; font-size: 14px; font-weight: 400; text-align: start; cursor: pointer; }
+.colorName { display: inline-flex; align-items: center; gap: 12px; }
+.colorSwatch { flex: none; width: 19px; height: 19px; border-radius: 50%; }
+.colorOptions { position: absolute; z-index: 5; top: calc(100% + 8px); inset-inline: 0; max-height: min(490px, 45vh); overflow-y: auto; padding: 8px; border: 1px solid #e1e1e1; border-radius: 12px; background: white; box-shadow: 0 4px 16px #0002; }
+.colorOption { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 40px; padding: 8px 12px; border: 0; border-radius: 8px; background: white; font-size: 14px; font-weight: 400; text-align: start; cursor: pointer; }
+.colorOption:hover, .colorOption:focus-visible { background: #f3f3f3; }
+.colorTrigger:focus-visible, .colorOption:focus-visible { outline: 2px solid #6950fa; outline-offset: -2px; }
+.description { margin-top: 24px; }
+.description > span { display: flex; justify-content: space-between; }
+.description small { color: #888; font-weight: 400; }
+.description textarea { min-height: 120px; resize: vertical; padding: 12px; }
+.dialogActions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; }
+.dialogActions button { min-height: 48px; border: 1px solid #d4d4d4; border-radius: 24px; padding: 0 20px; background: white; cursor: pointer; }
+.dialogActions button[type='submit'] { background: #111; border-color: #111; color: white; }
+.dialogActions button:disabled, .close:disabled { opacity: .5; cursor: wait; }
+.error { color: #b42318; font-size: 14px; }
+@media (max-width: 600px) { .dialog { padding: 64px 24px 24px; overflow-y: auto; } .fields { grid-template-columns: 1fr; } }

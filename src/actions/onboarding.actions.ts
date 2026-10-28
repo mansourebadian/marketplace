@@ -138,6 +138,7 @@ export async function saveBusinessCategories(
         create: parsed.data.map((slug, position) => ({
           slug, position,
           customName: slug === 'other' && otherService?.success ? otherService.data : null,
+          displayName: slug === 'other' && otherService?.success ? otherService.data : BUSINESS_CATEGORIES.find(category => category.slug === slug)?.label ?? slug,
         })),
       } },
     });

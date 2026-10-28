@@ -96,3 +96,6 @@
 .currentTime span { position: absolute; top: -10px; inset-inline-start: 1px; border: 2px solid #f52c50; border-radius: 20px; background: white; color: #ed1740; width: 46px; text-align: center; font-size: 12px; line-height: 17px; direction: ltr; }
 @media (max-width: 850px) { .headerActions { gap: 14px; } .headerIcon { display: none; } .toolbar { flex-wrap: wrap; } .toolbarGroup { flex-wrap: wrap; } .dateLabel { padding-inline: 12px; } }
 @media (max-width: 520px) { .shell { grid-template-columns: 56px minmax(0, 1fr); } .header { padding: 0 12px; } .setup { font-size: 12px; padding: 9px; } .headerActions { gap: 10px; } .toolbar { padding: 10px; } .toolbar button { padding: 8px 11px; } .select select { max-width: 160px; } }
+
+.catalogLink { display: block; margin: -10px -4px; padding: 10px 4px; border-radius: 8px; }
+.catalogLink:hover, .catalogLink[aria-current="page"] { background: #f0edff; }
