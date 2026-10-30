@@ -2,19 +2,23 @@
 
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Check, ChevronDown, Search, X } from 'lucide-react';
 import { addServiceCategory, deleteServiceCategory, getServiceCategory, updateServiceCategory } from '@/actions/service-categories.actions';
 import { APPOINTMENT_COLORS } from '@/lib/appointment-colors';
 import styles from './ServiceMenu.module.css';
 
-type Category = { slug: string; name: string; description?: string | null };
-type Suggestion = { name: string; durationMin: number; price: number };
+type Category = { slug: string; name: string; description?: string | null; color: string };
+type Suggestion = { name: string; durationMin: number; price: number; priceType?: string };
+type SavedService = Suggestion & { id: string; categoryKey: string };
+
+const categoryKey = (slug: string) => slug.startsWith('custom:') ? slug : `default:${slug}`;
 
 const suggestions: Record<string, Suggestion[]> = {
   'eyebrows-lashes': [{ name: 'ترمیم مژه', durationMin: 60, price: 3_500_000 }],
 };
 
-export function ServiceMenu({ categories }: { categories: Category[] }) {
+export function ServiceMenu({ categories, services }: { categories: Category[]; services: SavedService[] }) {
   const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const deleteDialogRef = useRef<HTMLDialogElement>(null);
@@ -37,7 +41,7 @@ export function ServiceMenu({ categories }: { categories: Category[] }) {
   const [search, setSearch] = useState('');
   const query = search.trim().toLocaleLowerCase('fa');
   const visible = categories.filter(category => selected === 'all' || selected === category.slug);
-  const count = (slug: string) => (suggestions[slug] || []).length;
+  const count = (slug: string) => (suggestions[slug] || []).length + services.filter(service => service.categoryKey === categoryKey(slug)).length;
   const total = categories.reduce((sum, category) => sum + count(category.slug), 0);
   const selectedColor = APPOINTMENT_COLORS.find(option => option.value === color) ?? APPOINTMENT_COLORS[0];
   useEffect(() => {
@@ -145,7 +149,8 @@ export function ServiceMenu({ categories }: { categories: Category[] }) {
         </aside>
         <section className={styles.list} aria-label="پیشنهادهای خدمات">
           {visible.length === 0 ? <div className={styles.empty}>هنوز تخصصی برای کسب‌وکار شما ثبت نشده است.</div> : visible.map(category => {
-            const items = (suggestions[category.slug] || []).filter(item => item.name.toLocaleLowerCase('fa').includes(query));
+            const items = [...(suggestions[category.slug] || []).map((item, index) => ({ ...item, id: `suggestion:${index}` })), ...services.filter(service => service.categoryKey === categoryKey(category.slug))].filter(item => item.name.toLocaleLowerCase('fa').includes(query));
+            const categoryColor = APPOINTMENT_COLORS.find(color => color.value === category.color)?.hex || APPOINTMENT_COLORS[0].hex;
             return <section className={styles.group} key={category.slug}>
               <header className={styles.groupHeading}>
                 <div><h2>{category.name}</h2>{category.description && <p>{category.description}</p>}</div>
@@ -153,12 +158,13 @@ export function ServiceMenu({ categories }: { categories: Category[] }) {
                   <button type="button" className={styles.actionsTrigger} aria-label={`عملیات ${category.name}`} aria-expanded={openActions === category.slug} onClick={() => setOpenActions(current => current === category.slug ? null : category.slug)}>عملیات <ChevronDown size={16} /></button>
                   {openActions === category.slug && <div className={styles.actionsMenu} aria-label={`عملیات ${category.name}`}>
                     <button type="button" onClick={() => openEditCategory(category.slug.startsWith('custom:') ? category.slug : `default:${category.slug}`)}>ویرایش</button>
-                    {['افزودن خدمت', 'افزودن بسته', 'بایگانی'].map(label => <button type="button" key={label} disabled title="این قابلیت هنوز آماده نیست">{label}</button>)}
+                    <Link href={`/catalogue/services/service/add/new?category=${encodeURIComponent(categoryKey(category.slug))}`}>افزودن خدمت</Link>
+                    {['افزودن بسته', 'بایگانی'].map(label => <button type="button" key={label} disabled title="این قابلیت هنوز آماده نیست">{label}</button>)}
                     <button type="button" className={styles.deleteAction} onClick={() => { setOpenActions(null); setDeleteError(''); setDeleteCategory(category); }}>حذف دائمی</button>
                   </div>}
                 </div>
               </header>
-              {items.length ? items.map(item => <article className={styles.card} key={item.name}><div><h3>{item.name}</h3><p>{item.durationMin.toLocaleString('fa-IR')} دقیقه</p></div><span>{item.price.toLocaleString('fa-IR')} تومان</span></article>) : <div className={category.slug.startsWith('custom:') && !query ? styles.emptyCategory : styles.empty}>{query ? 'خدمتی با این نام پیدا نشد.' : category.slug.startsWith('custom:') ? 'خدمتی وجود ندارد' : 'پیشنهادهای این تخصص هنوز اضافه نشده‌اند.'}</div>}
+              {items.length ? items.map(item => <article className={styles.card} key={item.id} style={{ borderInlineStartColor: categoryColor }}><div><h3>{item.name}</h3><p>{item.durationMin.toLocaleString('fa-IR')} دقیقه</p></div><span>{item.priceType === 'FREE' ? 'رایگان' : `${item.priceType === 'STARTS_AT' ? 'از ' : ''}${item.price.toLocaleString('fa-IR')} تومان`}</span></article>) : <div className={category.slug.startsWith('custom:') && !query ? styles.emptyCategory : styles.empty}>{query ? 'خدمتی با این نام پیدا نشد.' : category.slug.startsWith('custom:') ? 'خدمتی وجود ندارد' : 'پیشنهادهای این تخصص هنوز اضافه نشده‌اند.'}</div>}
             </section>;
           })}
         </section>
@@ -190,7 +196,7 @@ export function ServiceMenu({ categories }: { categories: Category[] }) {
     <dialog ref={deleteDialogRef} className={styles.deleteDialog} aria-labelledby="delete-category-title" aria-describedby="delete-category-description" onClose={() => setDeleteCategory(null)} onCancel={event => { if (deleting) event.preventDefault(); }}>
       <button type="button" className={styles.close} onClick={() => setDeleteCategory(null)} disabled={deleting} aria-label="بستن"><X size={22} /></button>
       <h2 id="delete-category-title">حذف دائمی دسته‌بندی</h2>
-      <p id="delete-category-description">آیا از حذف دائمی «{deleteCategory?.name}» مطمئن هستید؟</p>
+      <p id="delete-category-description">آیا از حذف دائمی «{deleteCategory?.name}» و خدمات ثبت‌شده در آن مطمئن هستید؟</p>
       {deleteError && <p className={styles.error} role="alert">{deleteError}</p>}
       <div className={styles.deleteActions}><button type="button" onClick={() => setDeleteCategory(null)} disabled={deleting}>انصراف</button><button type="button" onClick={confirmDelete} disabled={deleting}>{deleting ? 'در حال حذف…' : 'پاک کردن همه'}</button></div>
     </dialog>

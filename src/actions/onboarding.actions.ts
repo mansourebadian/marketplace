@@ -131,17 +131,23 @@ export async function saveBusinessCategories(
       where: { ownerId: session.user.id }, select: { id: true },
     });
     if (!business) return { status: 'error', message: 'ابتدا نام کسب‌وکار را ثبت کنید.' };
-    await prisma.business.update({
-      where: { id: business.id },
-      data: { categories: {
-        deleteMany: {},
-        create: parsed.data.map((slug, position) => ({
-          slug, position,
-          customName: slug === 'other' && otherService?.success ? otherService.data : null,
-          displayName: slug === 'other' && otherService?.success ? otherService.data : BUSINESS_CATEGORIES.find(category => category.slug === slug)?.label ?? slug,
-        })),
-      } },
-    });
+    const saved = await prisma.$transaction(async tx => {
+      const removedWithServices = await tx.businessService.findFirst({ where: { businessId: business.id, categoryKey: { startsWith: 'default:', notIn: parsed.data.map(slug => `default:${slug}`) } }, select: { id: true } });
+      if (removedWithServices) return false;
+      await tx.business.update({
+        where: { id: business.id },
+        data: { categories: {
+          deleteMany: {},
+          create: parsed.data.map((slug, position) => ({
+            slug, position,
+            customName: slug === 'other' && otherService?.success ? otherService.data : null,
+            displayName: slug === 'other' && otherService?.success ? otherService.data : BUSINESS_CATEGORIES.find(category => category.slug === slug)?.label ?? slug,
+          })),
+        } },
+      });
+      return true;
+    }, { isolationLevel: 'Serializable' });
+    if (!saved) return { status: 'error', message: 'ابتدا خدمات دسته‌بندی‌هایی را که حذف می‌کنید مدیریت کنید.' };
   } catch (error) {
     console.error('Failed to save business categories:', error);
     return { status: 'error', message: 'ذخیره دسته‌بندی‌ها انجام نشد. دوباره تلاش کنید.' };

@@ -79,12 +79,21 @@ export async function deleteServiceCategory(id: string): Promise<{ error?: strin
   if (!session?.user?.id || session.user.role !== 'OWNER') return { error: 'دسترسی غیرمجاز است.' };
   if (!z.string().min(1).max(72).safeParse(id).success) return { error: 'دسته‌بندی معتبر نیست.' };
   try {
-    const result = id.startsWith('default:')
-      ? await prisma.businessCategorySelection.deleteMany({ where: { slug: id.slice('default:'.length), business: { ownerId: session.user.id } } })
-      : id.startsWith('custom:')
-        ? await prisma.businessServiceCategory.deleteMany({ where: { id: id.slice('custom:'.length), business: { ownerId: session.user.id } } })
-        : null;
-    if (!result?.count) return { error: 'دسته‌بندی پیدا نشد.' };
+    const deleted = await prisma.$transaction(async tx => {
+      const business = await tx.business.findUnique({ where: { ownerId: session.user.id }, select: { id: true } });
+      if (!business) return false;
+      const category = id.startsWith('default:')
+        ? await tx.businessCategorySelection.findFirst({ where: { slug: id.slice(8), businessId: business.id }, select: { id: true } })
+        : id.startsWith('custom:')
+          ? await tx.businessServiceCategory.findFirst({ where: { id: id.slice(7), businessId: business.id }, select: { id: true } })
+          : null;
+      if (!category) return false;
+      await tx.businessService.deleteMany({ where: { businessId: business.id, categoryKey: id } });
+      if (id.startsWith('default:')) await tx.businessCategorySelection.delete({ where: { id: category.id } });
+      else await tx.businessServiceCategory.delete({ where: { id: category.id } });
+      return true;
+    }, { isolationLevel: 'Serializable' });
+    if (!deleted) return { error: 'دسته‌بندی پیدا نشد.' };
   } catch (error) {
     console.error('Failed to delete service category', error);
     return { error: 'حذف دسته‌بندی انجام نشد. دوباره تلاش کنید.' };

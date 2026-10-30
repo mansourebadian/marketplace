@@ -201,6 +201,7 @@ model Business {
   businessAddress  String?                     @db.NVarChar(1200)
   categories       BusinessCategorySelection[]
   serviceCategories BusinessServiceCategory[]
+  services         BusinessService[]
   locations        BusinessLocation[]
   id               String                      @id @default(cuid()) @db.NVarChar(36)
   name             String                      @db.NVarChar(100)
@@ -215,6 +216,38 @@ model Business {
   owner            User                        @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   createdAt        DateTime                    @default(now())
   updatedAt        DateTime                    @updatedAt
+}
+
+model BusinessService {
+  id          String   @id @default(cuid()) @db.NVarChar(36)
+  businessId  String   @db.NVarChar(36)
+  categoryKey String   @db.NVarChar(72)
+  name        String   @db.NVarChar(255)
+  description String?  @db.NVarChar(1000)
+  treatmentId String?  @db.NVarChar(36)
+  treatmentTypeId String? @db.NVarChar(120)
+  priceType   String   @default("FIXED") @db.NVarChar(16)
+  price       Int
+  durationMin Int
+  extraTimes  String   @default("[]") @db.NVarChar(Max)
+  variants    String   @default("[]") @db.NVarChar(Max)
+  advancedPricing String @default("[]") @db.NVarChar(Max)
+  createdAt   DateTime @default(now())
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  treatmentType TreatmentType? @relation(fields: [treatmentTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([businessId, categoryKey])
+}
+
+model TreatmentType {
+  id         String @id @db.NVarChar(120)
+  groupSlug  String @db.NVarChar(64)
+  groupName  String @db.NVarChar(100)
+  name       String @db.NVarChar(255)
+  sortOrder  Int
+  services   BusinessService[]
+
+  @@index([groupSlug, sortOrder])
 }
 
 model BusinessServiceCategory {
