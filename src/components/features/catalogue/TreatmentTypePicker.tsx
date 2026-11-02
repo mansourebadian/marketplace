@@ -6,14 +6,14 @@ import styles from './TreatmentTypePicker.module.css';
 
 type Treatment = { id: string; groupSlug: string; groupName: string; name: string };
 
-export function TreatmentTypePicker() {
+export function TreatmentTypePicker({ initial }: { initial?: Treatment | null }) {
   const id = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const controllerRef = useRef<AbortController | null>(null);
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<Treatment[]>([]);
-  const [selected, setSelected] = useState<Treatment | null>(null);
+  const [selected, setSelected] = useState<Treatment | null>(initial ?? null);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

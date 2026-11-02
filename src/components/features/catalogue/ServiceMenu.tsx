@@ -18,7 +18,7 @@ const suggestions: Record<string, Suggestion[]> = {
   'eyebrows-lashes': [{ name: 'ترمیم مژه', durationMin: 60, price: 3_500_000 }],
 };
 
-export function ServiceMenu({ categories, services }: { categories: Category[]; services: SavedService[] }) {
+export function ServiceMenu({ categories, services, bundles }: { categories: Category[]; services: SavedService[]; bundles: SavedService[] }) {
   const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const deleteDialogRef = useRef<HTMLDialogElement>(null);
@@ -41,7 +41,7 @@ export function ServiceMenu({ categories, services }: { categories: Category[]; 
   const [search, setSearch] = useState('');
   const query = search.trim().toLocaleLowerCase('fa');
   const visible = categories.filter(category => selected === 'all' || selected === category.slug);
-  const count = (slug: string) => (suggestions[slug] || []).length + services.filter(service => service.categoryKey === categoryKey(slug)).length;
+  const count = (slug: string) => (suggestions[slug] || []).length + [...services, ...bundles].filter(service => service.categoryKey === categoryKey(slug)).length;
   const total = categories.reduce((sum, category) => sum + count(category.slug), 0);
   const selectedColor = APPOINTMENT_COLORS.find(option => option.value === color) ?? APPOINTMENT_COLORS[0];
   useEffect(() => {
@@ -149,7 +149,7 @@ export function ServiceMenu({ categories, services }: { categories: Category[]; 
         </aside>
         <section className={styles.list} aria-label="پیشنهادهای خدمات">
           {visible.length === 0 ? <div className={styles.empty}>هنوز تخصصی برای کسب‌وکار شما ثبت نشده است.</div> : visible.map(category => {
-            const items = [...(suggestions[category.slug] || []).map((item, index) => ({ ...item, id: `suggestion:${index}` })), ...services.filter(service => service.categoryKey === categoryKey(category.slug))].filter(item => item.name.toLocaleLowerCase('fa').includes(query));
+            const items = [...(suggestions[category.slug] || []).map((item, index) => ({ ...item, id: `suggestion:${index}`, href: null as string | null })), ...services.filter(service => service.categoryKey === categoryKey(category.slug)).map(service => ({ ...service, href: `/catalogue/services/service/${encodeURIComponent(service.id)}/edit` })), ...bundles.filter(bundle => bundle.categoryKey === categoryKey(category.slug)).map(bundle => ({ ...bundle, name: `${bundle.name} (بسته)`, href: `/catalogue/services/package/${encodeURIComponent(bundle.id)}/edit` }))].filter(item => item.name.toLocaleLowerCase('fa').includes(query));
             const categoryColor = APPOINTMENT_COLORS.find(color => color.value === category.color)?.hex || APPOINTMENT_COLORS[0].hex;
             return <section className={styles.group} key={category.slug}>
               <header className={styles.groupHeading}>
@@ -159,12 +159,13 @@ export function ServiceMenu({ categories, services }: { categories: Category[]; 
                   {openActions === category.slug && <div className={styles.actionsMenu} aria-label={`عملیات ${category.name}`}>
                     <button type="button" onClick={() => openEditCategory(category.slug.startsWith('custom:') ? category.slug : `default:${category.slug}`)}>ویرایش</button>
                     <Link href={`/catalogue/services/service/add/new?category=${encodeURIComponent(categoryKey(category.slug))}`}>افزودن خدمت</Link>
-                    {['افزودن بسته', 'بایگانی'].map(label => <button type="button" key={label} disabled title="این قابلیت هنوز آماده نیست">{label}</button>)}
+                    <Link href={`/catalogue/services/package/add/new?category=${encodeURIComponent(categoryKey(category.slug))}`}>افزودن بسته</Link>
+                    <button type="button" disabled title="این قابلیت هنوز آماده نیست">بایگانی</button>
                     <button type="button" className={styles.deleteAction} onClick={() => { setOpenActions(null); setDeleteError(''); setDeleteCategory(category); }}>حذف دائمی</button>
                   </div>}
                 </div>
               </header>
-              {items.length ? items.map(item => <article className={styles.card} key={item.id} style={{ borderInlineStartColor: categoryColor }}><div><h3>{item.name}</h3><p>{item.durationMin.toLocaleString('fa-IR')} دقیقه</p></div><span>{item.priceType === 'FREE' ? 'رایگان' : `${item.priceType === 'STARTS_AT' ? 'از ' : ''}${item.price.toLocaleString('fa-IR')} تومان`}</span></article>) : <div className={category.slug.startsWith('custom:') && !query ? styles.emptyCategory : styles.empty}>{query ? 'خدمتی با این نام پیدا نشد.' : category.slug.startsWith('custom:') ? 'خدمتی وجود ندارد' : 'پیشنهادهای این تخصص هنوز اضافه نشده‌اند.'}</div>}
+              {items.length ? items.map(item => item.href ? <Link href={item.href} className={`${styles.card} ${styles.cardLink}`} key={item.href} style={{ borderInlineStartColor: categoryColor }}><div><h3>{item.name}</h3><p>{item.durationMin.toLocaleString('fa-IR')} دقیقه</p></div><span>{item.priceType === 'FREE' ? 'رایگان' : `${item.priceType === 'STARTS_AT' ? 'از ' : ''}${item.price.toLocaleString('fa-IR')} تومان`}</span></Link> : <article className={styles.card} key={item.id} style={{ borderInlineStartColor: categoryColor }}><div><h3>{item.name}</h3><p>{item.durationMin.toLocaleString('fa-IR')} دقیقه</p></div><span>{item.priceType === 'FREE' ? 'رایگان' : `${item.priceType === 'STARTS_AT' ? 'از ' : ''}${item.price.toLocaleString('fa-IR')} تومان`}</span></article>) : <div className={category.slug.startsWith('custom:') && !query ? styles.emptyCategory : styles.empty}>{query ? 'خدمتی با این نام پیدا نشد.' : category.slug.startsWith('custom:') ? 'خدمتی وجود ندارد' : 'پیشنهادهای این تخصص هنوز اضافه نشده‌اند.'}</div>}
             </section>;
           })}
         </section>

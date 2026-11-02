@@ -202,6 +202,7 @@ model Business {
   categories       BusinessCategorySelection[]
   serviceCategories BusinessServiceCategory[]
   services         BusinessService[]
+  bundles          BusinessBundle[]
   locations        BusinessLocation[]
   id               String                      @id @default(cuid()) @db.NVarChar(36)
   name             String                      @db.NVarChar(100)
@@ -234,9 +235,52 @@ model BusinessService {
   advancedPricing String @default("[]") @db.NVarChar(Max)
   createdAt   DateTime @default(now())
   business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  bundleItems BusinessBundleItem[]
   treatmentType TreatmentType? @relation(fields: [treatmentTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([businessId, categoryKey])
+}
+
+model BusinessBundle {
+  id            String               @id @default(cuid()) @db.NVarChar(36)
+  businessId    String               @db.NVarChar(36)
+  categoryKey   String               @db.NVarChar(72)
+  name          String               @db.NVarChar(255)
+  description   String?              @db.NVarChar(1000)
+  scheduleType  String               @db.NVarChar(16)
+  priceType     String               @db.NVarChar(16)
+  price         Int
+  discount      Int?
+  onlineBooking Boolean              @default(true)
+  availability  String               @db.NVarChar(16)
+  createdAt     DateTime             @default(now())
+  business      Business             @relation(fields: [businessId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  items         BusinessBundleItem[]
+  images        BusinessBundleImage[]
+
+  @@index([businessId, categoryKey])
+}
+
+model BusinessBundleItem {
+  id        String          @id @default(cuid()) @db.NVarChar(36)
+  bundleId  String          @db.NVarChar(36)
+  serviceId String          @db.NVarChar(36)
+  position  Int
+  bundle    BusinessBundle  @relation(fields: [bundleId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  service   BusinessService @relation(fields: [serviceId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([bundleId, serviceId])
+  @@unique([bundleId, position])
+}
+
+model BusinessBundleImage {
+  id       String         @id @default(cuid()) @db.NVarChar(36)
+  bundleId String         @db.NVarChar(36)
+  url      String         @db.NVarChar(2048)
+  position Int
+  bundle   BusinessBundle @relation(fields: [bundleId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([bundleId, position])
 }
 
 model TreatmentType {

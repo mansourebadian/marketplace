@@ -88,6 +88,7 @@ export async function deleteServiceCategory(id: string): Promise<{ error?: strin
           ? await tx.businessServiceCategory.findFirst({ where: { id: id.slice(7), businessId: business.id }, select: { id: true } })
           : null;
       if (!category) return false;
+      await tx.businessBundle.deleteMany({ where: { businessId: business.id, categoryKey: id } });
       await tx.businessService.deleteMany({ where: { businessId: business.id, categoryKey: id } });
       if (id.startsWith('default:')) await tx.businessCategorySelection.delete({ where: { id: category.id } });
       else await tx.businessServiceCategory.delete({ where: { id: category.id } });

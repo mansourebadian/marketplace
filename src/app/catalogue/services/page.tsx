@@ -13,7 +13,7 @@ export default async function ServiceMenuPage() {
   if (!session?.user?.id || session.user.role !== 'OWNER') redirect('/auth/business');
   const business = await prisma.business.findUnique({
     where: { ownerId: session.user.id },
-    select: { name: true, businessAddress: true, categories: { orderBy: { position: 'asc' }, select: { slug: true, customName: true, displayName: true, description: true, color: true } }, serviceCategories: { orderBy: { createdAt: 'desc' }, select: { id: true, name: true, description: true, color: true } }, services: { orderBy: { createdAt: 'asc' }, select: { id: true, categoryKey: true, name: true, price: true, priceType: true, durationMin: true, extraTimes: true } } },
+    select: { name: true, businessAddress: true, categories: { orderBy: { position: 'asc' }, select: { slug: true, customName: true, displayName: true, description: true, color: true } }, serviceCategories: { orderBy: { createdAt: 'desc' }, select: { id: true, name: true, description: true, color: true } }, services: { orderBy: { createdAt: 'asc' }, select: { id: true, categoryKey: true, name: true, price: true, priceType: true, durationMin: true, extraTimes: true } }, bundles: { orderBy: { createdAt: 'asc' }, select: { id: true, categoryKey: true, name: true, price: true, priceType: true, scheduleType: true, items: { select: { service: { select: { durationMin: true } } } } } } },
   });
   if (!business) redirect('/onboarding/business-name');
   if (!business.businessAddress) redirect('/onboarding/business-address');
@@ -40,6 +40,6 @@ export default async function ServiceMenuPage() {
   });
 
   return <BusinessWorkspace ownerName={session.user.name || business.name} activePage="/catalogue/services" label="فهرست خدمات کسب‌وکار">
-    <ServiceMenu categories={categories} services={services} />
+    <ServiceMenu categories={categories} services={services} bundles={business.bundles.map(bundle => ({ id: bundle.id, categoryKey: bundle.categoryKey, name: bundle.name, price: bundle.price, priceType: bundle.priceType === 'free' ? 'FREE' : 'FIXED', durationMin: bundle.scheduleType === 'parallel' ? Math.max(0, ...bundle.items.map(item => item.service.durationMin)) : bundle.items.reduce((sum, item) => sum + item.service.durationMin, 0) }))} />
   </BusinessWorkspace>;
 }

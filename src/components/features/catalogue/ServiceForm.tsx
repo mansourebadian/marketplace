@@ -23,6 +23,7 @@ const extraTimeTypes = [
 type ExtraTimeType = (typeof extraTimeTypes)[number]['value'];
 type ExtraTime = { id: number; type: ExtraTimeType; minutes: number };
 type DurationRow = ExtraTime | { id: 'service'; type: 'SERVICE' };
+export type InitialService = { id: string; name: string; description: string | null; price: number; priceType: string; durationMin: number; extraTimes: { type: ExtraTimeType | 'SERVICE'; minutes?: number }[]; variants: Variant[]; advancedPricing: AdvancedPricing[]; treatmentType: { id: string; groupSlug: string; groupName: string; name: string } | null };
 
 function formatDuration(minutes: number) {
   const hours = Math.floor(minutes / 60);
@@ -33,22 +34,28 @@ function formatDuration(minutes: number) {
   ].filter(Boolean).join(' و ');
 }
 
-export function ServiceForm({ categoryKey, categoryName, locations }: { categoryKey: string; categoryName: string; locations: { id: string; name: string }[] }) {
+export function ServiceForm({ categoryKey, categoryName, locations, initial }: { categoryKey: string; categoryName: string; locations: { id: string; name: string }[]; initial?: InitialService }) {
   const [state, action, pending] = useActionState(createBusinessService, {});
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [priceType, setPriceType] = useState('FIXED');
+  const [name, setName] = useState(initial?.name ?? '');
+  const [description, setDescription] = useState(initial?.description ?? '');
+  const [price, setPrice] = useState(initial ? String(initial.price) : '');
+  const [priceType, setPriceType] = useState(initial?.priceType ?? 'FIXED');
   const [priceError, setPriceError] = useState('');
   const [variantOpen, setVariantOpen] = useState(false);
-  const [variants, setVariants] = useState<Variant[]>([]);
+  const [variants, setVariants] = useState<Variant[]>(initial?.variants ?? []);
   const [advancedOpen, setAdvancedOpen] = useState(false);
-  const [advancedPricing, setAdvancedPricing] = useState<AdvancedPricing[]>([]);
+  const [advancedPricing, setAdvancedPricing] = useState<AdvancedPricing[]>(initial?.advancedPricing ?? []);
   const priceRef = useRef<HTMLInputElement>(null);
-  const [duration, setDuration] = useState('60');
-  const [rows, setRows] = useState<DurationRow[]>([{ id: 'service', type: 'SERVICE' }]);
+  const [duration, setDuration] = useState(String(initial?.durationMin ?? 60));
+  const [rows, setRows] = useState<DurationRow[]>(() => {
+    const saved = initial?.extraTimes ?? [];
+    const result: DurationRow[] = [];
+    saved.forEach((row, index) => { if (row.type === 'SERVICE') result.push({ id: 'service', type: 'SERVICE' }); else if (row.minutes) result.push({ id: index, type: row.type, minutes: row.minutes }); });
+    if (!result.some(row => row.type === 'SERVICE')) result.unshift({ id: 'service', type: 'SERVICE' });
+    return result;
+  });
   const [openRowMenu, setOpenRowMenu] = useState<DurationRow['id'] | null>(null);
-  const nextExtraTimeId = useRef(0);
+  const nextExtraTimeId = useRef(initial?.extraTimes.length ?? 0);
   const extraTimeRef = useRef<HTMLDetailsElement>(null);
   const pricingOptionsRef = useRef<HTMLDetailsElement>(null);
 
@@ -74,6 +81,7 @@ export function ServiceForm({ categoryKey, categoryName, locations }: { category
     return () => { document.removeEventListener('pointerdown', closeOutside); document.removeEventListener('keydown', closeOnEscape); };
   }, []);
   const hasExtraTimes = rows.length > 1;
+  const durationChoices = [...new Set([...durations, Number(duration), ...rows.flatMap(row => row.type === 'SERVICE' ? [] : [row.minutes])])].sort((a, b) => a - b);
   const totalDuration = Number(duration) + rows.reduce((sum, item) => sum + (item.type === 'SERVICE' ? 0 : item.minutes), 0);
   function moveRow(index: number, direction: -1 | 1) {
     setRows(current => {
@@ -98,9 +106,10 @@ export function ServiceForm({ categoryKey, categoryName, locations }: { category
   }
   return <main className={styles.page} dir="rtl">
     <form action={action}>
-      <header className={styles.topbar}><span>افزودن خدمت جدید</span><div><Link href="/catalogue/services" className={styles.close}>بستن</Link><button className={styles.save} disabled={pending}>{pending ? 'در حال ذخیره…' : 'ذخیره'}</button></div></header>
+      {initial && <input type="hidden" name="serviceId" value={initial.id} />}
+      <header className={styles.topbar}><span>{initial ? 'ویرایش خدمت' : 'افزودن خدمت جدید'}</span><div><Link href="/catalogue/services" className={styles.close}>بستن</Link><button className={styles.save} disabled={pending}>{pending ? 'در حال ذخیره…' : 'ذخیره'}</button></div></header>
       <div className={styles.container}>
-        <h1>افزودن خدمت جدید</h1>
+        <h1>{initial ? 'ویرایش خدمت' : 'افزودن خدمت جدید'}</h1>
         <div className={styles.layout}>
           <nav className={styles.sidebar} aria-label="بخش‌های خدمت"><a href="#details">اطلاعات اصلی</a><a href="#pricing">قیمت و مدت زمان</a></nav>
           <div className={styles.content}>
@@ -109,7 +118,7 @@ export function ServiceForm({ categoryKey, categoryName, locations }: { category
               <label className={styles.field}><span>نام خدمت <small>{name.length.toLocaleString('fa-IR')} / ۲۵۵</small></span><input name="name" value={name} onChange={event => setName(event.target.value)} maxLength={255} required placeholder="نام خدمت را وارد کنید" /></label>
               <div className={styles.twoColumns}>
                 <label className={styles.field}><span>دسته‌بندی فهرست</span><input value={categoryName} readOnly /><input type="hidden" name="categoryKey" value={categoryKey} /><small>این خدمت در دسته‌بندی انتخاب‌شده نمایش داده می‌شود.</small></label>
-                <TreatmentTypePicker />
+                <TreatmentTypePicker initial={initial?.treatmentType} />
               </div>
               <label className={styles.field}><span>توضیحات <small>(اختیاری) · {description.length.toLocaleString('fa-IR')} / ۱۰۰۰</small></span><textarea name="description" maxLength={1000} value={description} onChange={event => setDescription(event.target.value)} placeholder="توضیح کوتاهی وارد کنید" /></label>
             </section>
@@ -118,12 +127,12 @@ export function ServiceForm({ categoryKey, categoryName, locations }: { category
               <div className={hasExtraTimes ? styles.twoColumns : styles.threeColumns}>
                 <label className={styles.field}><span>نوع قیمت</span><select name="priceType" value={priceType} onChange={event => { setPriceType(event.target.value); setPriceError(''); }}><option value="FREE">رایگان</option><option value="STARTS_AT">از</option><option value="FIXED">ثابت</option></select></label>
                 <label className={styles.field}><span>قیمت (تومان)</span><input ref={priceRef} name="price" type="text" inputMode="numeric" required={priceType !== 'FREE'} disabled={priceType === 'FREE'} value={priceType === 'FREE' ? '۰' : price} onChange={event => { setPrice(event.target.value); setPriceError(''); }} placeholder="مثلاً ۳۵۰۰۰۰" aria-invalid={!!priceError} aria-describedby={priceError ? 'service-price-error' : undefined} />{priceError && <small id="service-price-error" className={styles.fieldError} role="alert">{priceError}</small>}</label>
-                {!hasExtraTimes && <label className={styles.field}><span>مدت زمان</span><select name="durationMin" value={duration} onChange={event => setDuration(event.target.value)}>{durations.map(minutes => <option key={minutes} value={minutes}>{formatDuration(minutes)}</option>)}</select></label>}
+                {!hasExtraTimes && <label className={styles.field}><span>مدت زمان</span><select name="durationMin" value={duration} onChange={event => setDuration(event.target.value)}>{durationChoices.map(minutes => <option key={minutes} value={minutes}>{formatDuration(minutes)}</option>)}</select></label>}
               </div>
               {hasExtraTimes && <div className={styles.durationRows}>
                 {rows.map((item, index) => <div className={styles.durationRow} key={item.id}>
                   <label className={styles.field}><span className={index === 0 ? '' : styles.srOnly}>نوع مدت زمان {index === 0 ? '' : index + 1}</span><select value={item.type} disabled={item.type === 'SERVICE'} onChange={event => setRows(current => current.map(row => row.id === item.id && row.type !== 'SERVICE' ? { ...row, type: event.target.value as ExtraTimeType } : row))}>{item.type === 'SERVICE' ? <option value="SERVICE">زمان خدمت</option> : extraTimeTypes.map(type => <option key={type.value} value={type.value}>{type.label}</option>)}</select></label>
-                  <label className={styles.field}><span className={index === 0 ? '' : styles.srOnly}>مدت زمان {index === 0 ? '' : index + 1}</span><select name={item.type === 'SERVICE' ? 'durationMin' : undefined} value={item.type === 'SERVICE' ? duration : item.minutes} onChange={event => { if (item.type === 'SERVICE') setDuration(event.target.value); else setRows(current => current.map(row => row.id === item.id ? { ...row, minutes: Number(event.target.value) } : row)); }}>{durations.map(minutes => <option key={minutes} value={minutes}>{formatDuration(minutes)}</option>)}</select></label>
+                  <label className={styles.field}><span className={index === 0 ? '' : styles.srOnly}>مدت زمان {index === 0 ? '' : index + 1}</span><select name={item.type === 'SERVICE' ? 'durationMin' : undefined} value={item.type === 'SERVICE' ? duration : item.minutes} onChange={event => { if (item.type === 'SERVICE') setDuration(event.target.value); else setRows(current => current.map(row => row.id === item.id ? { ...row, minutes: Number(event.target.value) } : row)); }}>{durationChoices.map(minutes => <option key={minutes} value={minutes}>{formatDuration(minutes)}</option>)}</select></label>
                   <div className={styles.rowActions} data-duration-actions>
                     <button type="button" className={styles.rowActionsTrigger} aria-label={`عملیات ردیف ${index + 1}`} aria-expanded={openRowMenu === item.id} onClick={() => setOpenRowMenu(current => current === item.id ? null : item.id)}><MoreVertical size={20} /></button>
                     {openRowMenu === item.id && <div className={styles.rowActionsMenu}>

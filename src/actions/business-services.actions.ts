@@ -28,6 +28,8 @@ const advancedPricingSchema = z.array(z.object({
 export async function createBusinessService(_previous: ServiceFormState, formData: FormData): Promise<ServiceFormState> {
   const session = await auth();
   if (!session?.user?.id || session.user.role !== 'OWNER') return { error: 'دسترسی غیرمجاز است.' };
+  const serviceId = formData.get('serviceId');
+  if (serviceId !== null && (typeof serviceId !== 'string' || !serviceId || serviceId.length > 36)) return { error: 'خدمت معتبر نیست.' };
   let extraTimes: unknown;
   let variants: unknown;
   let advancedPricing: unknown;
@@ -70,7 +72,11 @@ export async function createBusinessService(_previous: ServiceFormState, formDat
       if (!category) return false;
       if (treatmentTypeId && !(await tx.treatmentType.findUnique({ where: { id: treatmentTypeId }, select: { id: true } }))) return false;
       if (parsed.data.advancedPricing.length && await tx.businessLocation.count({ where: { businessId: business.id, id: { in: parsed.data.advancedPricing.map(row => row.locationId) } } }) !== parsed.data.advancedPricing.length) return false;
-      await tx.businessService.create({ data: { businessId: business.id, categoryKey, name, description: description || null, treatmentTypeId: treatmentTypeId || null, priceType, price, durationMin, extraTimes: JSON.stringify(parsed.data.extraTimes), variants: JSON.stringify(parsed.data.variants), advancedPricing: JSON.stringify(parsed.data.advancedPricing) } });
+      const values = { categoryKey, name, description: description || null, treatmentTypeId: treatmentTypeId || null, priceType, price, durationMin, extraTimes: JSON.stringify(parsed.data.extraTimes), variants: JSON.stringify(parsed.data.variants), advancedPricing: JSON.stringify(parsed.data.advancedPricing) };
+      if (typeof serviceId === 'string') {
+        const updated = await tx.businessService.updateMany({ where: { id: serviceId, businessId: business.id, categoryKey }, data: values });
+        if (!updated.count) return false;
+      } else await tx.businessService.create({ data: { businessId: business.id, ...values } });
       return true;
     }, { isolationLevel: 'Serializable' });
     if (!created) return { error: 'دسته‌بندی یا نوع خدمت پیدا نشد. لطفاً دوباره تلاش کنید.' };
