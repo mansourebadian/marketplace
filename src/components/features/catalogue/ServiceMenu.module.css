@@ -39,6 +39,19 @@
 .cardLink { color: inherit; text-decoration: none; }
 .cardLink:hover { background: #fafafa; }
 .cardLink:focus-visible { outline: 2px solid #6950fa; outline-offset: 2px; }
+.orderSlot { margin-bottom: 12px; }
+.orderRow { position: relative; display: flex; align-items: stretch; gap: 4px; transition: transform 200ms ease; }
+.orderRow .card { flex: 1; min-width: 0; margin-bottom: 0; }
+.dragHandle { display: grid; flex: none; place-items: center; width: 26px; padding: 0; border: 0; background: transparent; color: #666; cursor: grab; touch-action: none; opacity: 0; transition: opacity 150ms ease; }
+.orderRow:hover .dragHandle, .orderRow:focus-within .dragHandle, .dragging .dragHandle { opacity: 1; }
+.dragHandle:active { cursor: grabbing; }
+.dragHandle:disabled { opacity: .35; cursor: default; }
+.dragHandle:focus-visible { outline: 2px solid #6950fa; border-radius: 5px; }
+.dragging { z-index: 5; transition: none; }
+.dragging .card { box-shadow: 0 8px 24px rgb(0 0 0 / 14%); }
+@media (hover: none) { .dragHandle { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .orderRow, .dragHandle { transition: none; } }
+.orderHint { color: #777; font-size: 12px; }
 .card h3 { margin: 0 0 4px; font-size: 16px; }
 .card p, .empty { color: #777; font-size: 14px; }
 .card p { margin: 0; }

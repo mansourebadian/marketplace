@@ -3,14 +3,17 @@
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Check, ChevronDown, Search, X } from 'lucide-react';
+import { Check, ChevronDown, GripVertical, Search, X } from 'lucide-react';
+import { reorderCatalogue } from '@/actions/catalogue-order.actions';
 import { addServiceCategory, deleteServiceCategory, getServiceCategory, updateServiceCategory } from '@/actions/service-categories.actions';
 import { APPOINTMENT_COLORS } from '@/lib/appointment-colors';
 import styles from './ServiceMenu.module.css';
 
 type Category = { slug: string; name: string; description?: string | null; color: string };
 type Suggestion = { name: string; durationMin: number; price: number; priceType?: string };
-type SavedService = Suggestion & { id: string; categoryKey: string };
+type SavedService = Suggestion & { id: string; categoryKey: string; position: number | null };
+type OrderedItem = { id: string; kind: 'service' | 'bundle' };
+type DragVisual = { category: string; key: string; from: number; to: number; delta: number; step: number };
 
 const categoryKey = (slug: string) => slug.startsWith('custom:') ? slug : `default:${slug}`;
 
@@ -39,11 +42,66 @@ export function ServiceMenu({ categories, services, bundles }: { categories: Cat
   const [saving, startTransition] = useTransition();
   const [selected, setSelected] = useState('all');
   const [search, setSearch] = useState('');
+  const [orders, setOrders] = useState<Record<string, OrderedItem[]>>({});
+  const [orderError, setOrderError] = useState('');
+  const [reordering, startReorder] = useTransition();
+  const drag = useRef<(DragVisual & { startY: number; centerY: number; ordered: OrderedItem[] }) | null>(null);
+  const [dragVisual, setDragVisual] = useState<DragVisual | null>(null);
   const query = search.trim().toLocaleLowerCase('fa');
   const visible = categories.filter(category => selected === 'all' || selected === category.slug);
   const count = (slug: string) => (suggestions[slug] || []).length + [...services, ...bundles].filter(service => service.categoryKey === categoryKey(slug)).length;
   const total = categories.reduce((sum, category) => sum + count(category.slug), 0);
   const selectedColor = APPOINTMENT_COLORS.find(option => option.value === color) ?? APPOINTMENT_COLORS[0];
+  function startDrag(event: React.PointerEvent<HTMLButtonElement>, category: string, key: string, ordered: OrderedItem[]) {
+    if (event.button !== 0) return;
+    const slot = event.currentTarget.closest<HTMLElement>('[data-order-slot]');
+    const from = ordered.findIndex(item => `${item.kind}:${item.id}` === key);
+    if (!slot || from < 0) return;
+    const rect = slot.getBoundingClientRect();
+    const step = rect.height + (parseFloat(getComputedStyle(slot).marginBottom) || 0);
+    event.currentTarget.setPointerCapture(event.pointerId);
+    const active = { category, key, from, to: from, delta: 0, step, startY: event.clientY, centerY: rect.top + rect.height / 2, ordered };
+    drag.current = active;
+    setDragVisual(active);
+  }
+  function moveDrag(event: React.PointerEvent<HTMLButtonElement>) {
+    const active = drag.current;
+    if (!active) return;
+    const delta = event.clientY - active.startY;
+    const center = active.centerY + delta;
+    const slots = Array.from(document.querySelectorAll<HTMLElement>('[data-order-slot]')).filter(slot => slot.dataset.orderCategory === active.category && slot.dataset.orderKey !== active.key);
+    const to = slots.filter(slot => { const rect = slot.getBoundingClientRect(); return center > rect.top + rect.height / 2; }).length;
+    active.delta = delta;
+    active.to = to;
+    setDragVisual({ category: active.category, key: active.key, from: active.from, to, delta, step: active.step });
+  }
+  function cancelDrag() { drag.current = null; setDragVisual(null); }
+  function finishDrag(event: React.PointerEvent<HTMLButtonElement>) {
+    const active = drag.current;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    cancelDrag();
+    if (active && active.to !== active.from) {
+      const target = active.ordered[active.to];
+      if (target) saveOrder(active.category, active.ordered, active.key, `${target.kind}:${target.id}`);
+    }
+  }
+  function saveOrder(category: string, ordered: OrderedItem[], fromKey: string, toKey: string) {
+    const key = (item: OrderedItem) => `${item.kind}:${item.id}`;
+    const from = ordered.findIndex(item => key(item) === fromKey);
+    const to = ordered.findIndex(item => key(item) === toKey);
+    if (from < 0 || to < 0 || from === to || reordering) return;
+    const next = [...ordered];
+    next.splice(to, 0, next.splice(from, 1)[0]);
+    setOrders(current => ({ ...current, [category]: next }));
+    setOrderError('');
+    startReorder(async () => {
+      try {
+        const result = await reorderCatalogue({ categoryKey: categoryKey(category), items: next });
+        if (result.error) { setOrders(current => ({ ...current, [category]: ordered })); setOrderError(result.error); return; }
+        router.refresh();
+      } catch { setOrders(current => ({ ...current, [category]: ordered })); setOrderError('ذخیره ترتیب انجام نشد. دوباره تلاش کنید.'); }
+    });
+  }
   useEffect(() => {
     const dialog = dialogRef.current;
     if (dialogOpen && dialog && !dialog.open) dialog.showModal();
@@ -140,6 +198,8 @@ export function ServiceMenu({ categories, services, bundles }: { categories: Cat
       <div className={styles.toolbar}>
         <label className={styles.search}><Search size={19} aria-hidden="true" /><input value={search} onChange={event => setSearch(event.target.value)} placeholder="جست‌وجوی نام خدمت" aria-label="جست‌وجوی نام خدمت" /></label>
       </div>
+      {orderError && <p className={styles.error} role="alert">{orderError}</p>}
+      {query && <p className={styles.orderHint}>برای تغییر ترتیب، جست‌وجو را پاک کنید.</p>}
       <div className={styles.layout}>
         <aside className={styles.categories} aria-label="دسته‌بندی خدمات">
           <h2>دسته‌بندی‌ها</h2>
@@ -148,8 +208,14 @@ export function ServiceMenu({ categories, services, bundles }: { categories: Cat
           <button type="button" className={styles.addCategory} onClick={() => { setEditingId(null); setName(''); setDescription(''); setColor('blue'); setError(''); setDialogOpen(true); }}>افزودن دسته‌بندی</button>
         </aside>
         <section className={styles.list} aria-label="پیشنهادهای خدمات">
+          {/* Drag refs are accessed only in pointer event handlers, never while rendering. */}
+          {/* eslint-disable-next-line react-hooks/refs */}
           {visible.length === 0 ? <div className={styles.empty}>هنوز تخصصی برای کسب‌وکار شما ثبت نشده است.</div> : visible.map(category => {
-            const items = [...(suggestions[category.slug] || []).map((item, index) => ({ ...item, id: `suggestion:${index}`, href: null as string | null })), ...services.filter(service => service.categoryKey === categoryKey(category.slug)).map(service => ({ ...service, href: `/catalogue/services/service/${encodeURIComponent(service.id)}/edit` })), ...bundles.filter(bundle => bundle.categoryKey === categoryKey(category.slug)).map(bundle => ({ ...bundle, name: `${bundle.name} (بسته)`, href: `/catalogue/services/package/${encodeURIComponent(bundle.id)}/edit` }))].filter(item => item.name.toLocaleLowerCase('fa').includes(query));
+            const savedItems = [...services.filter(service => service.categoryKey === categoryKey(category.slug)).map(service => ({ ...service, kind: 'service' as const, href: `/catalogue/services/service/${encodeURIComponent(service.id)}/edit` })), ...bundles.filter(bundle => bundle.categoryKey === categoryKey(category.slug)).map(bundle => ({ ...bundle, kind: 'bundle' as const, name: `${bundle.name} (بسته)`, href: `/catalogue/services/package/${encodeURIComponent(bundle.id)}/edit` }))].sort((a, b) => (a.position ?? Number.MAX_SAFE_INTEGER) - (b.position ?? Number.MAX_SAFE_INTEGER));
+            const savedOrder = orders[category.slug];
+            if (savedOrder) savedItems.sort((a, b) => { const aIndex = savedOrder.findIndex(item => item.id === a.id && item.kind === a.kind); const bIndex = savedOrder.findIndex(item => item.id === b.id && item.kind === b.kind); return (aIndex < 0 ? Number.MAX_SAFE_INTEGER : aIndex) - (bIndex < 0 ? Number.MAX_SAFE_INTEGER : bIndex); });
+            const ordered = savedItems.map(({ id, kind }) => ({ id, kind }));
+            const items = [...(suggestions[category.slug] || []).map((item, index) => ({ ...item, id: `suggestion:${index}`, href: null as string | null, kind: null as null })), ...savedItems].filter(item => item.name.toLocaleLowerCase('fa').includes(query));
             const categoryColor = APPOINTMENT_COLORS.find(color => color.value === category.color)?.hex || APPOINTMENT_COLORS[0].hex;
             return <section className={styles.group} key={category.slug}>
               <header className={styles.groupHeading}>
@@ -165,7 +231,21 @@ export function ServiceMenu({ categories, services, bundles }: { categories: Cat
                   </div>}
                 </div>
               </header>
-              {items.length ? items.map(item => item.href ? <Link href={item.href} className={`${styles.card} ${styles.cardLink}`} key={item.href} style={{ borderInlineStartColor: categoryColor }}><div><h3>{item.name}</h3><p>{item.durationMin.toLocaleString('fa-IR')} دقیقه</p></div><span>{item.priceType === 'FREE' ? 'رایگان' : `${item.priceType === 'STARTS_AT' ? 'از ' : ''}${item.price.toLocaleString('fa-IR')} تومان`}</span></Link> : <article className={styles.card} key={item.id} style={{ borderInlineStartColor: categoryColor }}><div><h3>{item.name}</h3><p>{item.durationMin.toLocaleString('fa-IR')} دقیقه</p></div><span>{item.priceType === 'FREE' ? 'رایگان' : `${item.priceType === 'STARTS_AT' ? 'از ' : ''}${item.price.toLocaleString('fa-IR')} تومان`}</span></article>) : <div className={category.slug.startsWith('custom:') && !query ? styles.emptyCategory : styles.empty}>{query ? 'خدمتی با این نام پیدا نشد.' : category.slug.startsWith('custom:') ? 'خدمتی وجود ندارد' : 'پیشنهادهای این تخصص هنوز اضافه نشده‌اند.'}</div>}
+              {items.length ? items.map(item => item.href && item.kind ? <div className={styles.orderSlot} key={item.href} data-order-slot data-order-category={category.slug} data-order-key={`${item.kind}:${item.id}`}><div className={`${styles.orderRow} ${dragVisual?.category === category.slug && dragVisual.key === `${item.kind}:${item.id}` ? styles.dragging : ''}`} style={{ transform: (() => {
+                if (!dragVisual || dragVisual.category !== category.slug) return undefined;
+                if (dragVisual.key === `${item.kind}:${item.id}`) return `translateY(${dragVisual.delta}px)`;
+                const index = ordered.findIndex(entry => entry.id === item.id && entry.kind === item.kind);
+                if (index > dragVisual.from && index <= dragVisual.to) return `translateY(${-dragVisual.step}px)`;
+                if (index < dragVisual.from && index >= dragVisual.to) return `translateY(${dragVisual.step}px)`;
+                return undefined;
+              })() }}>
+                <button type="button" className={styles.dragHandle} aria-label={`جابجایی ${item.name}؛ با کلیدهای بالا و پایین نیز می‌توانید ترتیب را تغییر دهید`} disabled={!!query || reordering || ordered.length < 2}
+                  onPointerDown={event => startDrag(event, category.slug, `${item.kind}:${item.id}`, ordered)}
+                  onPointerMove={moveDrag}
+                  onPointerUp={finishDrag}
+                  onPointerCancel={cancelDrag}
+                  onKeyDown={event => { if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return; event.preventDefault(); const index = ordered.findIndex(entry => entry.id === item.id && entry.kind === item.kind); const target = ordered[index + (event.key === 'ArrowUp' ? -1 : 1)]; if (target) saveOrder(category.slug, ordered, `${item.kind}:${item.id}`, `${target.kind}:${target.id}`); }}><GripVertical size={20} /></button>
+                <Link href={item.href} className={`${styles.card} ${styles.cardLink}`} style={{ borderInlineStartColor: categoryColor }}><div><h3>{item.name}</h3><p>{item.durationMin.toLocaleString('fa-IR')} دقیقه</p></div><span>{item.priceType === 'FREE' ? 'رایگان' : `${item.priceType === 'STARTS_AT' ? 'از ' : ''}${item.price.toLocaleString('fa-IR')} تومان`}</span></Link></div></div> : <article className={styles.card} key={item.id} style={{ borderInlineStartColor: categoryColor }}><div><h3>{item.name}</h3><p>{item.durationMin.toLocaleString('fa-IR')} دقیقه</p></div><span>{item.priceType === 'FREE' ? 'رایگان' : `${item.priceType === 'STARTS_AT' ? 'از ' : ''}${item.price.toLocaleString('fa-IR')} تومان`}</span></article>) : <div className={category.slug.startsWith('custom:') && !query ? styles.emptyCategory : styles.empty}>{query ? 'خدمتی با این نام پیدا نشد.' : category.slug.startsWith('custom:') ? 'خدمتی وجود ندارد' : 'پیشنهادهای این تخصص هنوز اضافه نشده‌اند.'}</div>}
             </section>;
           })}
         </section>

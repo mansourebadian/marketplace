@@ -223,6 +223,7 @@ model BusinessService {
   id          String   @id @default(cuid()) @db.NVarChar(36)
   businessId  String   @db.NVarChar(36)
   categoryKey String   @db.NVarChar(72)
+  position    Int?
   name        String   @db.NVarChar(255)
   description String?  @db.NVarChar(1000)
   treatmentId String?  @db.NVarChar(36)
@@ -245,6 +246,7 @@ model BusinessBundle {
   id            String               @id @default(cuid()) @db.NVarChar(36)
   businessId    String               @db.NVarChar(36)
   categoryKey   String               @db.NVarChar(72)
+  position      Int?
   name          String               @db.NVarChar(255)
   description   String?              @db.NVarChar(1000)
   scheduleType  String               @db.NVarChar(16)
