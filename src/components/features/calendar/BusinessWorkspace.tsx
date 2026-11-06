@@ -24,12 +24,12 @@ const catalogGroups = [{ title: 'کاتالوگ', items: ['فهرست خدمات
 
 export function BusinessWorkspace({ ownerName, activePage, label, children }: {
   ownerName: string;
-  activePage: '/calendar' | '/setup' | '/catalogue/services';
+  activePage: '/calendar' | '/setup' | '/catalogue/services' | '/catalogue/memberships' | '/catalogue/products';
   label: string;
   children: ReactNode;
 }) {
   const [setupOpen, setSetupOpen] = useState(false);
-  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [catalogOpen, setCatalogOpen] = useState(activePage === '/catalogue/memberships' || activePage === '/catalogue/products');
   const initials = ownerName.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
   useEffect(() => { if (!setupOpen) return; const close = (event: KeyboardEvent) => event.key === 'Escape' && setSetupOpen(false); document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close); }, [setupOpen]);
 
@@ -46,7 +46,7 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
       {navigation.map(({ icon: Icon, label: title, href }) => href
         ? <Link key={title} href={href} title={title} aria-label={title} aria-current={activePage === href ? 'page' : undefined} className={activePage === href ? styles.activeNav : styles.navIcon}><Icon size={25} strokeWidth={1.65} /></Link>
         : Icon === BookOpen
-          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={catalogOpen} aria-controls="business-catalog-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${catalogOpen || activePage === '/catalogue/services' ? styles.activeNav : ''}`} onClick={() => setCatalogOpen(open => !open)}><Icon size={25} strokeWidth={1.65} /></button>
+          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={catalogOpen} aria-controls="business-catalog-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${catalogOpen || activePage.startsWith('/catalogue/') ? styles.activeNav : ''}`} onClick={() => setCatalogOpen(open => !open)}><Icon size={25} strokeWidth={1.65} /></button>
           : <span key={title} title={title} aria-label={title} className={styles.navIcon}><Icon size={25} strokeWidth={1.65} /></span>)}
       <span className={styles.help} title="راهنما"><CircleHelp size={24} /></span>
     </aside>
@@ -56,7 +56,10 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
         <div className={styles.catalogSections}>
         {catalogGroups.map(group => <section key={group.title} className={styles.catalogGroup} aria-label={group.title}>
           <h2>{group.title}</h2>
-          <ul>{group.items.map(item => <li key={item}>{item === group.items[0] && group === catalogGroups[0] ? <Link href="/catalogue/services" aria-current={activePage === '/catalogue/services' ? 'page' : undefined} className={styles.catalogLink}>{item}</Link> : item}</li>)}</ul>
+          <ul>{group.items.map((item, index) => {
+            const href = group === catalogGroups[0] ? ['/catalogue/services', undefined, '/catalogue/memberships', '/catalogue/products'][index] : undefined;
+            return <li key={item}>{href ? <Link href={href} aria-current={activePage === href ? 'page' : undefined} className={styles.catalogLink}>{item}</Link> : item}</li>;
+          })}</ul>
         </section>)}
         </div>
       </aside>}

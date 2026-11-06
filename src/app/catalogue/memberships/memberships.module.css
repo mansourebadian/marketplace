@@ -1,0 +1,25 @@
+.page { overflow: auto; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse at 2% 35%, #d4c6ff 0%, #ead8fb 20%, transparent 48%), #f8f8f8; }
+.content { width: min(100%, 1100px); display: flex; align-items: center; justify-content: center; gap: clamp(40px, 8vw, 120px); padding: 72px 48px; }
+.copy { max-width: 510px; }
+.eyebrow { color: #338441; font-size: 13px; font-weight: 700; }
+.copy h1 { margin: 14px 0 18px; font-size: clamp(30px, 3vw, 42px); line-height: 1.45; font-weight: 800; }
+.copy p { margin: 0; font-size: 16px; line-height: 2; color: #333; }
+.copy ul { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 12px; }
+.copy li { display: flex; align-items: center; gap: 10px; font-size: 14px; line-height: 1.8; }
+.copy li svg { flex-shrink: 0; }
+.art { position: relative; width: 320px; height: 300px; flex: 0 0 320px; filter: drop-shadow(0 22px 20px #30205740); }
+.card { position: absolute; width: 275px; height: 165px; border-radius: 13px; color: white; padding: 24px; display: flex; flex-direction: column; overflow: hidden; }
+.card span { font-size: 18px; font-weight: 700; }
+.card strong { margin-top: auto; align-self: flex-end; font-size: 17px; line-height: 1.7; }
+.card small { margin-top: 5px; }
+.cardBack { top: 112px; right: 12px; transform: rotate(14deg); background: linear-gradient(125deg, #5fc6ab, #174ab5); }
+.cardMiddle { top: 75px; right: 20px; transform: rotate(-2deg); background: linear-gradient(120deg, #9e32c5, #ee4922 65%, #f4bb00); }
+.cardFront { top: 30px; right: 28px; transform: rotate(-14deg); background: linear-gradient(125deg, #392ca2, #ac35d6 60%, #c65389); }
+@media (max-width: 850px) { .content { flex-direction: column-reverse; gap: 12px; padding: 45px 24px; } .art { transform: scale(.8); margin: -25px 0; } }
+@media (max-width: 450px) { .content { padding-inline: 20px; } .art { transform: scale(.65); margin: -45px 0; } }
+
+.action { margin-top: 36px; }
+.startButton { border: 0; border-radius: 999px; background: #111; color: white; padding: 13px 24px; font-size: 15px; font-weight: 700; cursor: pointer; }
+.startButton:hover { background: #333; }
+.startButton:focus-visible { outline: 2px solid #6950fa; outline-offset: 3px; }
+.copy .notice { margin-top: 12px; font-size: 14px; color: #555; }
