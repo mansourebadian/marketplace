@@ -204,6 +204,7 @@ model Business {
   services         BusinessService[]
   bundles          BusinessBundle[]
   locations        BusinessLocation[]
+  teamMembers      BusinessTeamMember[]
   id               String                      @id @default(cuid()) @db.NVarChar(36)
   name             String                      @db.NVarChar(100)
   website          String?                     @db.NVarChar(255)
@@ -217,6 +218,33 @@ model Business {
   owner            User                        @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   createdAt        DateTime                    @default(now())
   updatedAt        DateTime                    @updatedAt
+}
+
+model BusinessTeamMember {
+  id              String   @id @default(cuid()) @db.NVarChar(36)
+  businessId      String   @db.NVarChar(36)
+  firstName       String   @db.NVarChar(100)
+  lastName        String?  @db.NVarChar(100)
+  email           String   @db.NVarChar(320)
+  phone           String?  @db.NVarChar(32)
+  additionalPhone String?  @db.NVarChar(32)
+  country         String?  @db.NVarChar(100)
+  birthday        DateTime? @db.Date
+  gender          String?  @db.NVarChar(64)
+  pronouns        String?  @db.NVarChar(64)
+  color           String   @db.NVarChar(16)
+  jobTitle        String?  @db.NVarChar(255)
+  startDate       DateTime? @db.Date
+  endDate         DateTime? @db.Date
+  employmentType  String?  @db.NVarChar(64)
+  externalId      String?  @db.NVarChar(100)
+  notes           String?  @db.NVarChar(1000)
+  imageName       String?  @db.NVarChar(100)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  business        Business @relation(fields: [businessId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([businessId])
 }
 
 model BusinessService {

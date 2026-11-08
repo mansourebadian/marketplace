@@ -12,13 +12,13 @@ export default async function TeamMembersPage() {
   if (!session?.user?.id || session.user.role !== 'OWNER') redirect('/auth/business');
   const business = await prisma.business.findUnique({
     where: { ownerId: session.user.id },
-    select: { name: true, businessAddress: true, owner: { select: { name: true, email: true, phone: true } } },
+    select: { name: true, businessAddress: true, owner: { select: { name: true, email: true, phone: true } }, locations: { select: { id: true, name: true, address: true }, orderBy: { createdAt: 'asc' } }, teamMembers: { select: { id: true, firstName: true, lastName: true, email: true, phone: true, imageName: true }, orderBy: { createdAt: 'asc' } } },
   });
   if (!business) redirect('/onboarding/business-name');
   if (!business.businessAddress) redirect('/onboarding/business-address');
 
   const ownerName = business.owner.name || business.name;
   return <BusinessWorkspace ownerName={ownerName} activePage="/team/team-members" label="اعضای تیم">
-    <TeamMembers ownerName={ownerName} ownerEmail={business.owner.email.endsWith('@phone.invalid') ? '' : business.owner.email} ownerPhone={business.owner.phone} />
+    <TeamMembers ownerName={ownerName} ownerEmail={business.owner.email.endsWith('@phone.invalid') ? '' : business.owner.email} ownerPhone={business.owner.phone} locations={business.locations} teamMembers={business.teamMembers} />
   </BusinessWorkspace>;
 }
