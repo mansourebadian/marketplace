@@ -11,10 +11,10 @@ export default async function CalendarPage() {
   if (!session?.user?.id || session.user.role !== 'OWNER') redirect('/auth/business');
   const business = await prisma.business.findUnique({
     where: { ownerId: session.user.id },
-    select: { name: true, businessAddress: true },
+    select: { name: true, businessAddress: true, teamMembers: { select: { id: true, firstName: true, lastName: true, imageName: true }, orderBy: { createdAt: 'asc' } } },
   });
   if (!business) redirect('/onboarding/business-name');
   if (!business.businessAddress) redirect('/onboarding/business-address');
 
-  return <BusinessCalendar ownerName={session.user.name || business.name} businessName={business.name} />;
+  return <BusinessCalendar ownerName={session.user.name || business.name} businessName={business.name} members={business.teamMembers} />;
 }

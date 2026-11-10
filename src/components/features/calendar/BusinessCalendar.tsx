@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { imageUrl } from '@/lib/image-server';
 import { BookOpen, CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Grid2X2Plus, RefreshCw, SlidersHorizontal } from 'lucide-react';
 import { BusinessWorkspace } from './BusinessWorkspace';
 import styles from './BusinessCalendar.module.css';
@@ -22,7 +25,9 @@ function monthStart(date: Date) {
   return start;
 }
 
-export function BusinessCalendar({ ownerName, businessName }: { ownerName: string; businessName: string }) {
+export function BusinessCalendar({ ownerName, businessName, members }: { ownerName: string; businessName: string; members: { id: string; firstName: string; lastName: string | null; imageName: string | null }[] }) {
+  const router = useRouter();
+  const [selectedMember, setSelectedMember] = useState('all');
   const [date, setDate] = useState(() => new Date());
   const [now, setNow] = useState(() => new Date());
   const [showDemo, setShowDemo] = useState(true);
@@ -41,12 +46,19 @@ export function BusinessCalendar({ ownerName, businessName }: { ownerName: strin
     day.setDate(day.getDate() + index);
     return day;
   });
-  const teamMembers = [
-    { id: 'owner', name: ownerName, initials },
-    ...(showDemo ? [{ id: 'demo', name: 'وندی اسمیت (نمونه)', initials: 'و س' }] : []),
+  const allMembers = [
+    { id: 'owner', name: ownerName, initials, imageName: null },
+    ...(showDemo ? [{ id: 'demo', name: 'وندی اسمیت (نمونه)', initials: 'و س', imageName: null }] : []),
+    ...members.map(member => ({
+      id: member.id,
+      name: [member.firstName, member.lastName].filter(Boolean).join(' '),
+      initials: [member.firstName, member.lastName].filter(Boolean).map(part => part![0]).join(''),
+      imageName: member.imageName,
+    })),
   ];
+  const teamMembers = allMembers.filter(member => selectedMember === 'all' || member.id === selectedMember);
   const dateRange = new Intl.DateTimeFormat('fa-IR', { day: 'numeric', month: 'short', year: 'numeric' }).formatRange(rangeDays[0], rangeDays[rangeDays.length - 1]);
-  const columns = teamMembers.map(member => member.name);
+
   const firstOfMonth = monthStart(date);
   const nextMonth = new Date(firstOfMonth);
   nextMonth.setDate(nextMonth.getDate() + 32);
@@ -114,11 +126,11 @@ export function BusinessCalendar({ ownerName, businessName }: { ownerName: strin
               </label>
               <button aria-label="تاریخ بعدی" onClick={() => moveDate(1)}><ChevronLeft size={17} /></button>
             </div>
-            <label className={styles.select}><select aria-label="فیلتر اعضای تیم" value={showDemo ? 'all' : 'owner'} onChange={event => setShowDemo(event.target.value === 'all')}><option value="all">اعضای تیم</option><option value="owner">{ownerName}</option></select><ChevronDown size={15} /></label>
-            <button aria-label={showDemo ? 'پنهان کردن عضو نمونه' : 'نمایش عضو نمونه'} onClick={() => setShowDemo(value => !value)}><SlidersHorizontal size={19} /></button>
+            <label className={styles.select}><select aria-label="فیلتر اعضای تیم" value={selectedMember} onChange={event => setSelectedMember(event.target.value)}><option value="all">اعضای تیم</option>{allMembers.map(member => <option key={member.id} value={member.id}>{member.name}</option>)}</select><ChevronDown size={15} /></label>
+            <button aria-label={showDemo ? 'پنهان کردن عضو نمونه' : 'نمایش عضو نمونه'} onClick={() => { if (showDemo && selectedMember === 'demo') setSelectedMember('all'); setShowDemo(value => !value); }}><SlidersHorizontal size={19} /></button>
           </div>
           <div className={styles.toolbarGroup}>
-            <button aria-label="به‌روزرسانی تقویم" onClick={() => { setNow(new Date()); }}><RefreshCw size={19} /></button>
+            <button aria-label="به‌روزرسانی تقویم" onClick={() => { setNow(new Date()); router.refresh(); }}><RefreshCw size={19} /></button>
             <div className={styles.viewPicker} ref={viewMenuRef} onKeyDown={event => {
               if (event.key === 'Escape') { setViewOpen(false); viewButtonRef.current?.focus(); }
               if (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'Home' || event.key === 'End') {
@@ -169,7 +181,7 @@ export function BusinessCalendar({ ownerName, businessName }: { ownerName: strin
             <div className={styles.threeDayRows}>
               {teamMembers.map(member => <div key={member.id} role="row" className={styles.threeDayRow}>
                 <div role="rowheader" className={styles.threeDayMember}>
-                  <span className={`${styles.memberAvatar} ${member.id === 'demo' ? styles.demoAvatar : ''}`}>{member.initials}</span>
+                  <span className={`${styles.memberAvatar} ${member.id === 'demo' ? styles.demoAvatar : ''}`}>{member.imageName ? <Image src={imageUrl(member.imageName)} alt="" fill sizes="59px" unoptimized /> : member.initials}</span>
                   <strong title={member.name}>{member.name}</strong>
                 </div>
                 {rangeDays.map(day => {
@@ -178,22 +190,22 @@ export function BusinessCalendar({ ownerName, businessName }: { ownerName: strin
                     ? [{ time: '۹:۰۰ – ۹:۴۰', name: 'جان دو' }, { time: '۱۱:۰۰ – ۱۱:۵۰', name: 'جین دو' }]
                     : [{ time: '۱۰:۰۰ – ۱۰:۳۰', name: 'جک دو' }];
                   return <div key={day.toDateString()} role="cell" className={`${styles.threeDayCell} ${isToday ? styles.hatchedDay : ''}`} aria-label={`${member.name}، ${day.toLocaleDateString('fa-IR', { dateStyle: 'full' })}`}>
-                    {isToday && showDemo && samples.map(sample => <div key={sample.name} className={styles.appointmentStrip}><bdi>{view === 'Week' ? sample.time.split(' – ')[0] : sample.time}</bdi><strong>{sample.name}</strong><span className={styles.sampleLabel}>نمونه</span></div>)}
+                    {isToday && showDemo && (member.id === 'owner' || member.id === 'demo') && samples.map(sample => <div key={sample.name} className={styles.appointmentStrip}><bdi>{view === 'Week' ? sample.time.split(' – ')[0] : sample.time}</bdi><strong>{sample.name}</strong><span className={styles.sampleLabel}>نمونه</span></div>)}
                   </div>;
                 })}
               </div>)}
             </div>
           </div> : <>
-          <div className={styles.teamHeader} style={{ gridTemplateColumns: `48px repeat(${columns.length}, minmax(130px, 1fr))` }}>
+          <div className={styles.teamHeader} style={{ gridTemplateColumns: `48px repeat(${teamMembers.length}, minmax(130px, 1fr))`, minWidth: `${48 + teamMembers.length * 130}px` }}>
             <div />
-            {columns.map((name, index) => <div className={styles.member} key={name}>
-              <span className={`${styles.memberAvatar} ${index === 1 ? styles.demoAvatar : ''}`}>{index === 0 ? initials : 'و س'}</span>
-              <strong>{name}</strong>
+            {teamMembers.map(member => <div className={styles.member} key={member.id}>
+              <span className={`${styles.memberAvatar} ${member.id === 'demo' ? styles.demoAvatar : ''}`}>{member.imageName ? <Image src={imageUrl(member.imageName)} alt="" fill sizes="59px" unoptimized /> : member.initials}</span>
+              <strong>{member.name}</strong>
             </div>)}
           </div>
-          <div className={styles.schedule}>
+          <div className={styles.schedule} style={{ minWidth: `${48 + teamMembers.length * 130}px` }}>
             <div className={styles.timeLabels}>{Array.from({ length: 24 }, (_, hour) => <div className={styles.hourLabel} key={hour}><strong>{String(hour % 12 || 12).replace(/\d/g, digit => '۰۱۲۳۴۵۶۷۸۹'[Number(digit)])}:۰۰</strong><span>{hour < 12 ? 'ق.ظ' : 'ب.ظ'}</span></div>)}</div>
-            <div className={styles.grid} style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(130px, 1fr))` }}>{columns.map(name => <div className={styles.column} key={name} aria-label={`${name}، بدون نوبت`} />)}</div>
+            <div className={styles.grid} style={{ gridTemplateColumns: `repeat(${teamMembers.length}, minmax(130px, 1fr))` }}>{teamMembers.map(member => <div className={styles.column} key={member.id} aria-label={`${member.name}، بدون نوبت`} />)}</div>
             {today && <div className={styles.currentTime} style={{ top: `${minutes / 60 * 96}px` }}><span>{now.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit', hour12: false })}</span></div>}
           </div>
           </>}

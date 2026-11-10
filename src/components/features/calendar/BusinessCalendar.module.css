@@ -85,7 +85,7 @@
 .sampleLabel { margin-inline-start: auto; font-size: 10px; color: #235569; }
 .teamHeader { display: grid; position: sticky; top: 0; z-index: 3; background: white; min-width: 450px; height: 110px; box-shadow: 0 4px 10px #00000008; }
 .member { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-size: 13px; }
-.memberAvatar { display: grid; place-items: center; height: 59px; width: 59px; border: 3px solid white; outline: 2px solid #a1e3ff; border-radius: 50%; background: #ecf9ff; color: #0083b2; font-size: 16px; font-weight: 700; }
+.memberAvatar { position: relative; overflow: hidden; display: grid; place-items: center; height: 59px; width: 59px; border: 3px solid white; outline: 2px solid #a1e3ff; border-radius: 50%; background: #ecf9ff; color: #0083b2; font-size: 16px; font-weight: 700; }
 .demoAvatar { background: #e5f5ef; color: #49816e; }
 .schedule { height: 2304px; position: relative; min-width: 450px; display: flex; }
 .timeLabels { width: 48px; flex-shrink: 0; background: white; }
@@ -99,3 +99,5 @@
 
 .catalogLink { display: block; margin: -10px -4px; padding: 10px 4px; border-radius: 8px; }
 .catalogLink:hover, .catalogLink[aria-current="page"] { background: #f0edff; }
+
+.memberAvatar img { object-fit: cover; }
