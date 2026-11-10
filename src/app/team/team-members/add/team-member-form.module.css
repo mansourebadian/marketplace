@@ -64,3 +64,22 @@
 .notice { margin-top: 28px; color: #777; font-size: 13px; }
 @media (max-width: 800px) { .layout { grid-template-columns: 1fr; gap: 28px; } .sidebar { position: static; } .sidebar h2 { padding-top: 12px; } .container h1 { font-size: 28px; } }
 @media (max-width: 520px) { .headerInner > strong { font-size: 15px; } .headerInner { padding: 0 16px; } .close, .add { min-height: 40px; padding: 0 15px; } .container { padding: 28px 16px 60px; } .grid { grid-template-columns: 1fr; } .grid > div:empty { display: none; } .full { grid-column: auto; } }
+
+.sidebar button[aria-current] { background: #efedff; }
+.sidebar button:not(:disabled) { cursor: pointer; }
+.serviceSearch { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 14px; border: 1px solid #d4d4d4; border-radius: 12px; color: #888; }
+.serviceSearch input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: 14px; }
+.serviceAll, .serviceGroupHeader, .serviceRow { display: flex; align-items: center; gap: 12px; font-size: 14px; cursor: pointer; }
+.serviceAll { margin: 36px 0; }
+.serviceAll input, .serviceGroupHeader input, .serviceRow input { width: 22px; height: 22px; flex: 0 0 22px; accent-color: #7053f6; cursor: pointer; }
+.serviceGroup { margin-bottom: 30px; }
+.serviceGroupHeader { min-height: 56px; padding: 12px 16px; border-radius: 12px; background: #f5f5f5; }
+.serviceCount { display: inline-grid; place-items: center; min-width: 21px; height: 21px; padding: 0 4px; border-radius: 50%; background: #eee; color: #777; font-size: 11px; }
+.serviceRow { min-height: 76px; padding: 12px 16px; border-bottom: 1px solid #e3e3e3; }
+.serviceRow:last-child { border-bottom: 0; }
+.serviceName { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.serviceName strong { font-weight: 500; }
+.serviceName small { color: #888; font-size: 13px; }
+.serviceEmpty { padding: 25px 0; color: #777; }
+.serviceError { color: #b42318; margin: 20px 0; }
+.serviceSaved { color: #178047; margin: 20px 0; }

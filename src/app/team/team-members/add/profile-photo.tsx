@@ -4,15 +4,16 @@ import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import Image from 'next/image';
 import { Pencil, UserRound, X } from 'lucide-react';
 import styles from './team-member-form.module.css';
+import { imageUrl } from '@/lib/image-server';
 
-export function ProfilePhoto({ onUploaded, onUploadingChange }: { onUploaded: (token: string) => void; onUploadingChange: (uploading: boolean) => void }) {
+export function ProfilePhoto({ initialImageName, onUploaded, onUploadingChange }: { initialImageName?: string | null; onUploaded: (token: string) => void; onUploadingChange: (uploading: boolean) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const viewRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ x: number; y: number; left: number; top: number; side: number; mode: 'move' | 'resize' } | null>(null);
   const [source, setSource] = useState<string | null>(null);
-  const [photo, setPhoto] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<string | null>(initialImageName ? imageUrl(initialImageName) : null);
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
   const [size, setSize] = useState({ width: 0, height: 0 });

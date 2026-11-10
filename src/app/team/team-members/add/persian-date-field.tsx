@@ -10,8 +10,8 @@ import gregorian from 'react-date-object/calendars/gregorian';
 import gregorianEn from 'react-date-object/locales/gregorian_en';
 import styles from './team-member-form.module.css';
 
-export function PersianDateField({ name, label }: { name: string; label: string }) {
-  const [date, setDate] = useState<DateObject | null>(null);
+export function PersianDateField({ name, label, initialValue }: { name: string; label: string; initialValue?: string | null }) {
+  const [date, setDate] = useState<DateObject | null>(() => initialValue ? new DateObject({ date: initialValue, format: 'YYYY-MM-DD', calendar: gregorian, locale: gregorianEn }).convert(persian, persianFa) : null);
   const [open, setOpen] = useState(false);
   const fieldRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);

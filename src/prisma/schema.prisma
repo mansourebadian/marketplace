@@ -207,6 +207,7 @@ model Business {
   teamMembers      BusinessTeamMember[]
   shifts           BusinessShift[]
   recurringShifts  BusinessRecurringShift[]
+  memberServices BusinessMemberServices[]
   id               String                      @id @default(cuid()) @db.NVarChar(36)
   name             String                      @db.NVarChar(100)
   website          String?                     @db.NVarChar(255)
@@ -406,4 +407,14 @@ model LocationOpeningHour {
   location   BusinessLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
   @@unique([locationId, day])
+}
+
+model BusinessMemberServices {
+  id String @id @default(cuid()) @db.NVarChar(36)
+  businessId String @db.NVarChar(36)
+  memberKey String @db.NVarChar(36)
+  serviceIds String @db.NVarChar(Max)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([businessId, memberKey])
 }

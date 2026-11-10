@@ -1,4 +1,5 @@
 ﻿import { notFound } from 'next/navigation';
+import { auth } from '@/auth';
 import prisma from '@/lib/prisma';
 import { BUSINESS_CATEGORIES } from '@/lib/business-categories';
 import { formatBusinessAddress } from '@/lib/business-address';
@@ -8,6 +9,8 @@ export default async function ServicesPage({ params, searchParams }: {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ source?: string; step?: string; services?: string }>;
 }) {
+  const session = await auth();
+  const customer = session?.user?.id && session.user.role === 'CUSTOMER' ? await prisma.user.findUnique({ where: { id: session.user.id }, select: { phone: true } }) : null;
   const { id } = await params;
   const { source, step, services: selectedParam } = await searchParams;
   const salon = source === 'business' ? null : await prisma.salon.findUnique({
@@ -43,6 +46,8 @@ export default async function ServicesPage({ params, searchParams }: {
   const base = `/salon/${encodeURIComponent(id)}`;
   const reviews = salon?.reviews || [];
   return <ServiceSelection
+    businessId={business ? id : null}
+    customerHasPhone={Boolean(customer?.phone?.trim())}
     salon={{ name: salon?.name || business!.name, address: salon ? salon.address : formatBusinessAddress(business!.businessAddress, business!.businessLocation) || 'آدرس ثبت نشده است', image: salon?.portfolio[0]?.imageUrl || salon?.imageUrl || null, rating: reviews.length ? reviews.reduce((total, review) => total + review.rating, 0) / reviews.length : null, reviewsCount: reviews.length }}
     services={services} backHref={`${base}/book${suffix}`} closeHref={`${base}${suffix}`}
     initialSelected={(selectedParam || '').split(',').filter((id) => services.some((service) => service.id === id))}
