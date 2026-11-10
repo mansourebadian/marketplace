@@ -1,0 +1,22 @@
+﻿.homeContent {
+  position: relative;
+  isolation: isolate;
+}
+
+.homeContent::before {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: calc(75vh + 520px);
+  min-height: 1150px;
+  pointer-events: none;
+  content: '';
+  background:
+    radial-gradient(ellipse 65% 55% at 92% 20%, rgba(196, 181, 253, 0.6), transparent 75%),
+    radial-gradient(ellipse 55% 48% at 12% 38%, rgba(251, 207, 232, 0.5), transparent 75%),
+    radial-gradient(ellipse 70% 48% at 20% 63%, rgba(199, 210, 254, 0.65), transparent 75%),
+    #faf8ff;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
+}

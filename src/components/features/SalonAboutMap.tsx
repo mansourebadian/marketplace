@@ -8,7 +8,7 @@ interface SalonAboutMapProps {
     address: string;
     lat: number;
     lng: number;
-    rating: number;
+    rating: number | null;
   };
 }
 
@@ -31,7 +31,7 @@ export default function SalonAboutMap({ description, location }: SalonAboutMapPr
           
           {/* پین کاستوم نقشه (بر اساس تصویر) */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black text-white px-3 py-1.5 rounded-full flex items-center gap-1.5 font-bold text-sm shadow-xl cursor-pointer hover:scale-105 transition-transform">
-            <span>{location.rating.toFixed(1)}</span>
+            {location.rating !== null && <span>{location.rating.toFixed(1)}</span>}
             <MapPin className="w-4 h-4" />
           </div>
         </div>

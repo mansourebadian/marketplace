@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Star, Clock, ChevronDown, MapPin } from 'lucide-react';
 
 // ایجاد یک اینترفیس برای تایپ‌دهی دقیق و رهایی از any
@@ -15,10 +16,11 @@ interface SalonType {
 }
 
 interface SalonSidebarProps {
-  salon: SalonType; 
+  salon: SalonType;
+  bookingHref: string;
 }
 
-export default function SalonSidebar({ salon }: SalonSidebarProps) {
+export default function SalonSidebar({ salon, bookingHref }: SalonSidebarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export default function SalonSidebar({ salon }: SalonSidebarProps) {
   // استفاده از تایپ Review برای curr
   const averageRating = salon.reviews?.length 
     ? (salon.reviews.reduce((acc: number, curr: Review) => acc + curr.rating, 0) / salon.reviews.length).toFixed(1)
-    : '۵.۰';
+    : null;
 
   return (
     <div className="w-full lg:w-[350px] shrink-0 sticky top-28 h-fit self-start transition-all duration-300 z-10 pb-10">
@@ -48,7 +50,7 @@ export default function SalonSidebar({ salon }: SalonSidebarProps) {
             <div className="mb-5 animate-in fade-in slide-in-from-top-4 duration-300">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">{salon.name}</h2>
               
-              <div className="flex items-center gap-1.5 text-[15px] mb-4">
+              {averageRating && <div className="flex items-center gap-1.5 text-[15px] mb-4">
                 <span className="font-bold text-gray-900">{averageRating}</span>
                 <div className="flex text-yellow-400">
                   {[...Array(5)].map((_, i) => (
@@ -56,7 +58,7 @@ export default function SalonSidebar({ salon }: SalonSidebarProps) {
                   ))}
                 </div>
                 <span className="text-purple-600 hover:underline cursor-pointer">({salon.reviews?.length || 0})</span>
-              </div>
+              </div>}
 
               <div className="flex items-center gap-2">
                 <span className="px-3 py-1 bg-purple-50 text-purple-700 text-[12px] font-semibold rounded-full">ویژه (Featured)</span>
@@ -64,9 +66,9 @@ export default function SalonSidebar({ salon }: SalonSidebarProps) {
             </div>
           )}
 
-          <button className="w-full bg-black text-white rounded-xl py-3.5 text-[15px] font-semibold hover:bg-gray-800 transition-colors shadow-sm">
+          <Link href={bookingHref} className="block w-full bg-black text-center text-white rounded-xl py-3.5 text-[15px] font-semibold hover:bg-gray-800 transition-colors shadow-sm">
             رزرو نوبت
-          </button>
+          </Link>
         </div>
 
         {isScrolled && (
@@ -114,3 +116,6 @@ export default function SalonSidebar({ salon }: SalonSidebarProps) {
     </div>
   );
 }
+
+
+

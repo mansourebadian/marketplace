@@ -1,7 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { getSalonById } from '@/actions/salon.actions';
+import Link from 'next/link';
+import { getSalonById, getBusinessAsSalon } from '@/actions/salon.actions';
 import { Header } from '@/components/shared/Header';
 import SalonSidebar from '@/components/features/SalonSidebar';
 import SalonAboutMap from '@/components/features/SalonAboutMap';
@@ -12,22 +13,22 @@ import {
 
 interface PageProps {
   params: Promise<{ id: string; locale?: string }>;
+  searchParams: Promise<{ source?: string }>;
 }
-export default async function SalonDetailPage({ params }: PageProps) {
-  console.log("=== ID Received ===", params); // این خط را اضافه کنید
-
-  const resolvedParams = await params;
-  const salonId = resolvedParams.id;
-  const salon = await getSalonById(salonId);
-  if (!salon) {
-    console.log("=== Salon Not Found in DB ===");
-    notFound();
-  }
+export default async function SalonDetailPage({ params, searchParams }: PageProps) {
+  const { id } = await params;
+  const { source } = await searchParams;
+  const legacySalon = source === 'business' ? null : await getSalonById(id);
+  const salon = legacySalon
+    ? { ...legacySalon, services: legacySalon.services.map((service) => ({ ...service, priceType: 'FIXED' })) }
+    : await getBusinessAsSalon(id);
+  if (!salon) notFound();
+  const bookingHref = `/salon/${encodeURIComponent(id)}/book${source === 'business' ? '?source=business' : ''}`;
 
   const reviewsCount = salon.reviews?.length || 0;
   const averageRating = reviewsCount > 0
     ? (salon.reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviewsCount).toFixed(1)
-    : '۵.۰';
+    : null;
 
   return (
     <main className="min-h-screen bg-white pb-20">
@@ -47,14 +48,14 @@ export default async function SalonDetailPage({ params }: PageProps) {
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{salon.name}</h1>
             <div className="flex flex-wrap items-center gap-2 text-[14px] text-gray-700">
-              <span className="font-bold text-gray-900">{averageRating}</span>
+              {averageRating && <><span className="font-bold text-gray-900">{averageRating}</span>
               <div className="flex text-yellow-400">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-current" />
                 ))}
               </div>
               <span className="text-purple-600 hover:underline cursor-pointer">({reviewsCount})</span>
-              <span className="text-gray-400 mx-1">•</span>
+              <span className="text-gray-400 mx-1">•</span></>}
               <span>{salon.address}</span>
             </div>
           </div>
@@ -69,10 +70,12 @@ export default async function SalonDetailPage({ params }: PageProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-3 h-[400px] md:h-[450px] mb-10 rounded-2xl overflow-hidden">
+        {salon.portfolio.length === 0 && !salon.imageUrl ? (
+          <div className="mb-10 flex h-[300px] items-center justify-center rounded-2xl bg-gray-100 text-gray-500">تصویری برای این سالن ثبت نشده است.</div>
+        ) : <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-3 h-[400px] md:h-[450px] mb-10 rounded-2xl overflow-hidden">
           <div className="md:col-span-2 relative h-full w-full bg-gray-100 group cursor-pointer overflow-hidden">
             <Image
-              src={salon.portfolio?.[0]?.imageUrl || "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=2070&auto=format&fit=crop"}
+              src={salon.portfolio?.[0]?.imageUrl || salon.imageUrl || "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=2070&auto=format&fit=crop"}
               alt="نمای اصلی سالن"
               fill
               className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700"
@@ -99,7 +102,7 @@ export default async function SalonDetailPage({ params }: PageProps) {
               </button>
             </div>
           </div>
-        </div>
+        </div>}
 
         <div className="flex flex-col lg:flex-row gap-12 relative items-start">
           <div className="flex-1 w-full lg:max-w-[calc(100%-380px)]">
@@ -114,12 +117,12 @@ export default async function SalonDetailPage({ params }: PageProps) {
                         <h3 className="text-[16px] font-medium text-gray-900">{service.name}</h3>
                         <p className="text-[14px] text-gray-500 mt-1">{service.durationMin} دقیقه</p>
                         <div className="flex items-center gap-2 mt-3 text-[14px]">
-                          <span className="font-semibold text-gray-900">{service.price.toLocaleString('fa-IR')} تومان</span>
+                          <span className="font-semibold text-gray-900">{service.priceType === 'FREE' ? 'رایگان' : (service.priceType === 'STARTS_AT' ? 'از ' : '') + service.price.toLocaleString('fa-IR') + ' تومان'}</span>
                         </div>
                       </div>
-                      <button className="px-6 py-2 rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900 hover:bg-gray-50 transition-colors">
+                      <Link href={bookingHref} className="px-6 py-2 rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900 hover:bg-gray-50 transition-colors">
                         رزرو
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 ))
@@ -156,7 +159,7 @@ export default async function SalonDetailPage({ params }: PageProps) {
             <div className="mb-14">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">نظرات (Reviews)</h2>
 
-              <div className="flex flex-col mb-10">
+              {reviewsCount > 0 ? <div className="flex flex-col mb-10">
                 <div className="flex items-center gap-1 text-yellow-400 mb-2">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-6 h-6 fill-current" />
@@ -167,6 +170,8 @@ export default async function SalonDetailPage({ params }: PageProps) {
                   <span className="text-purple-600 hover:underline cursor-pointer">({reviewsCount})</span>
                 </div>
               </div>
+
+              : <p className="mb-8 text-sm text-gray-500">هنوز نظری ثبت نشده است.</p>}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 mb-8">
                 {salon.reviews?.map((review) => (
@@ -200,17 +205,17 @@ export default async function SalonDetailPage({ params }: PageProps) {
 
             <hr className="border-gray-100 mb-12" />
 
-            <SalonAboutMap
+            {salon.lat !== null && salon.lng !== null ? <SalonAboutMap
               description={salon.description || 'توضیحاتی برای این سالن ثبت نشده است.'}
               location={{
                 address: salon.address,
-                lat: 35.6892,
-                lng: 51.3890,
-                rating: Number(averageRating) // اضافه کردن پراپرتی اجباری rating
+                lat: salon.lat,
+                lng: salon.lng,
+                rating: averageRating ? Number(averageRating) : null
               }}
-            />
+            /> : <div className="mt-16 border-t border-gray-100 pt-12"><h2 className="mb-4 text-2xl font-bold">درباره ما</h2><p className="text-gray-700">{salon.description || '??تصویری برای این سالن ثبت نشده است.'}</p><p className="mt-4 text-sm text-gray-500">{salon.address}</p></div>}
 
-            <div className="mt-10 mb-16">
+            {legacySalon && <div className="mt-10 mb-16">
               <h3 className="text-xl font-bold text-gray-900 mb-6">اطلاعات تکمیلی</h3>
               <ul className="space-y-4 grid grid-cols-1 md:grid-cols-2">
                 <li className="flex items-center gap-3 text-[15px] text-gray-900">
@@ -226,13 +231,16 @@ export default async function SalonDetailPage({ params }: PageProps) {
                   <span>پرداخت امن</span>
                 </li>
               </ul>
-            </div>
+            </div>}
           </div>
 
-          <SalonSidebar salon={salon} />
+          <SalonSidebar salon={salon} bookingHref={bookingHref} />
 
         </div>
       </div>
     </main>
   );
 }
+
+
+

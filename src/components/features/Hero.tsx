@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Search, Calendar as CalendarIcon, QrCode } from 'lucide-react';
@@ -8,14 +8,7 @@ import TreatmentsDropdown from '../shared/TreatmentsDropdown';
 
 export const Hero = () => {
   return (
-    <section className="relative pt-24 md:pt-44 pb-96 px-4 flex flex-col items-center justify-center min-h-[75vh]">
-
-      {/* Background Gradients */}
-      <div className="absolute inset-0 -z-10 bg-[#faf8ff] md:bg-[#faf8ff] overflow-hidden bg-gradient-to-b from-white via-white to-[#faf8ff]">
-        <div className="absolute top-[40%] md:top-[-5%] right-[-10%] md:right-[-5%] w-[80%] md:w-[60%] h-[60%] rounded-full bg-purple-200/70 blur-[100px] md:blur-[130px]" />
-        <div className="absolute top-[50%] md:top-[15%] left-[-10%] md:left-[-5%] w-[70%] md:w-[50%] h-[50%] rounded-full bg-pink-200/60 blur-[90px] md:blur-[110px]" />
-        <div className="absolute bottom-[-10%] right-[10%] md:right-[20%] w-[80%] md:w-[60%] h-[50%] rounded-full bg-blue-100/60 blur-[100px] md:blur-[120px]" />
-      </div>
+    <section className="relative pt-24 md:pt-44 pb-20 md:pb-24 px-4 flex flex-col items-center justify-center min-h-[75vh]">
 
       {/* Headings */}
       <div className="w-full text-right md:text-center mb-8 md:mb-10 space-y-3 max-w-[850px] z-10 px-0 md:px-4 mt-8 md:mt-0">
@@ -70,3 +63,5 @@ export const Hero = () => {
     </section>
   );
 };
+
+
