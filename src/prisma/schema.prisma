@@ -205,6 +205,8 @@ model Business {
   bundles          BusinessBundle[]
   locations        BusinessLocation[]
   teamMembers      BusinessTeamMember[]
+  shifts           BusinessShift[]
+  recurringShifts  BusinessRecurringShift[]
   id               String                      @id @default(cuid()) @db.NVarChar(36)
   name             String                      @db.NVarChar(100)
   website          String?                     @db.NVarChar(255)
@@ -246,6 +248,31 @@ model BusinessTeamMember {
   business        Business @relation(fields: [businessId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([businessId])
+}
+
+model BusinessShift {
+  id         String   @id @default(cuid()) @db.NVarChar(36)
+  businessId String   @db.NVarChar(36)
+  memberKey  String   @db.NVarChar(36)
+  date       String   @db.NVarChar(10)
+  startTime  String?  @db.NVarChar(5)
+  endTime    String?  @db.NVarChar(5)
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([businessId, memberKey, date])
+}
+
+model BusinessRecurringShift {
+  id          String   @id @default(cuid()) @db.NVarChar(36)
+  businessId  String   @db.NVarChar(36)
+  memberKey   String   @db.NVarChar(36)
+  startDate   String   @db.NVarChar(10)
+  endDate     String?  @db.NVarChar(10)
+  interval    Int
+  days        String   @db.NVarChar(Max)
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([businessId, memberKey, startDate])
 }
 
 model BusinessService {

@@ -24,13 +24,13 @@ const catalogGroups = [{ title: 'کاتالوگ', items: ['فهرست خدمات
 
 export function BusinessWorkspace({ ownerName, activePage, label, children }: {
   ownerName: string;
-  activePage: '/calendar' | '/setup' | '/catalogue/services' | '/catalogue/memberships' | '/catalogue/products' | '/team/team-members';
+  activePage: '/calendar' | '/setup' | '/catalogue/services' | '/catalogue/memberships' | '/catalogue/products' | '/team/team-members' | '/team/scheduled-shifts';
   label: string;
   children: ReactNode;
 }) {
   const [setupOpen, setSetupOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(activePage === '/catalogue/memberships' || activePage === '/catalogue/products');
-  const [teamOpen, setTeamOpen] = useState(activePage === '/team/team-members');
+  const [teamOpen, setTeamOpen] = useState(activePage.startsWith('/team/'));
   const initials = ownerName.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
   useEffect(() => { if (!setupOpen) return; const close = (event: KeyboardEvent) => event.key === 'Escape' && setSetupOpen(false); document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close); }, [setupOpen]);
 
@@ -49,7 +49,7 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
         : Icon === BookOpen
           ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={catalogOpen} aria-controls="business-catalog-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${catalogOpen || activePage.startsWith('/catalogue/') ? styles.activeNav : ''}`} onClick={() => { setCatalogOpen(open => !open); setTeamOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
           : Icon === UsersRound
-          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={teamOpen} aria-controls="business-team-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${teamOpen || activePage === '/team/team-members' ? styles.activeNav : ''}`} onClick={() => { setTeamOpen(open => !open); setCatalogOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
+          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={teamOpen} aria-controls="business-team-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${teamOpen || activePage.startsWith('/team/') ? styles.activeNav : ''}`} onClick={() => { setTeamOpen(open => !open); setCatalogOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
           : <span key={title} title={title} aria-label={title} className={styles.navIcon}><Icon size={25} strokeWidth={1.65} /></span>)}
       <span className={styles.help} title="راهنما"><CircleHelp size={24} /></span>
     </aside>
@@ -59,7 +59,7 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
         <div className={styles.catalogSections}>
           <section className={styles.catalogGroup}>
             <h2>تیم</h2>
-            <ul><li><Link href="/team/team-members" aria-current={activePage === '/team/team-members' ? 'page' : undefined} className={styles.catalogLink}>اعضای تیم</Link></li>{['شیفت‌های برنامه‌ریزی‌شده', 'برگه‌های ساعات کاری', 'پرداخت حقوق'].map(item => <li key={item}>{item}</li>)}</ul>
+            <ul><li><Link href="/team/team-members" aria-current={activePage === '/team/team-members' ? 'page' : undefined} className={styles.catalogLink}>اعضای تیم</Link></li><li><Link href="/team/scheduled-shifts" aria-current={activePage === '/team/scheduled-shifts' ? 'page' : undefined} className={styles.catalogLink}>شیفت‌های برنامه‌ریزی‌شده</Link></li>{['برگه‌های ساعات کاری', 'پرداخت حقوق'].map(item => <li key={item}>{item}</li>)}</ul>
           </section>
         </div>
       </aside>}
