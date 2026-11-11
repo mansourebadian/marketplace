@@ -18,3 +18,9 @@ test('explicit days off and service assignments override recurring availability'
   assert.deepEqual(businessAvailableStarts({ ...base, assignments: [{ memberKey: 'owner', serviceIds: '[]' }] }), []);
   assert.deepEqual(businessAvailableStarts({ ...base, shifts: [{ memberKey: 'owner', date, startTime: '12:00', endTime: '13:00' }] }), [time('12:00')]);
 });
+
+test('existing reservations exclude only overlapping times for the assigned specialist', () => {
+  const busy = [{ memberKey: 'owner', start: time('09:30'), end: time('10:00') }];
+  assert.deepEqual(businessAvailableStarts({ ...base, busy }), [time('10:00')]);
+  assert.deepEqual(businessAvailableStarts({ ...base, busy: [{ ...busy[0], memberKey: 'other' }] }), [time('09:00'), time('09:30'), time('10:00')]);
+});

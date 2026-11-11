@@ -91,7 +91,11 @@
 .timeLabels { width: 48px; flex-shrink: 0; background: white; }
 .hourLabel { height: 96px; font-size: 12px; line-height: 12px; display: flex; flex-direction: column; align-items: center; padding-top: 3px; }
 .grid { flex: 1; display: grid; background: repeating-linear-gradient(to bottom, transparent 0, transparent 47px, #e7e7e7 47px, #e7e7e7 48px, transparent 48px, transparent 95px, #dedede 95px, #dedede 96px), repeating-linear-gradient(45deg, #f6f6f6 0, #f6f6f6 4px, #ededed 4px, #ededed 8px); }
+.column { position: relative; min-width: 0; }
 .column + .column { border-inline-start: 1px solid #dfdfdf; }
+.calendarAppointment { position: absolute; inset-inline: 3px; z-index: 1; display: flex; flex-direction: column; gap: 2px; overflow: hidden; border: 1px solid #86c8e1; border-radius: 6px; background: #bde9f7; padding: 4px 6px; font-size: 12px; line-height: 16px; }
+.calendarAppointment strong, .calendarAppointment span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.calendarError { padding: 8px 16px; color: #b91c1c; font-size: 13px; }
 .currentTime { position: absolute; left: 0; right: 0; height: 1px; background: #f52c50; pointer-events: none; z-index: 2; }
 .currentTime span { position: absolute; top: -10px; inset-inline-start: 1px; border: 2px solid #f52c50; border-radius: 20px; background: white; color: #ed1740; width: 46px; text-align: center; font-size: 12px; line-height: 17px; direction: ltr; }
 @media (max-width: 850px) { .headerActions { gap: 14px; } .headerIcon { display: none; } .toolbar { flex-wrap: wrap; } .toolbarGroup { flex-wrap: wrap; } .dateLabel { padding-inline: 12px; } }

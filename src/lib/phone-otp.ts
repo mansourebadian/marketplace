@@ -53,14 +53,14 @@ export async function issuePhoneCode(db: PrismaClient, input: {
   const id = randomBytes(32).toString('hex');
   const code = randomInt(0, 1_000_000).toString().padStart(6, '0');
   const challenge = await transactionWithRetry(db, async (tx) => {
-    const hourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+    const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
     const recent = await tx.phoneChallenge.findFirst({ where: { phone: input.phone }, orderBy: { createdAt: 'desc' } });
     if (recent && now.getTime() - recent.createdAt.getTime() < OTP_COOLDOWN) {
       throw new PhoneOtpError('برای ارسال مجدد کد، یک دقیقه صبر کنید.');
     }
-    const phoneCount = await tx.phoneChallenge.count({ where: { phone: input.phone, createdAt: { gt: hourAgo } } });
-    const sourceCount = await tx.phoneChallenge.count({ where: { requestKey: input.requestKey, createdAt: { gt: hourAgo } } });
-    if (phoneCount >= 5 || sourceCount >= 20) throw new PhoneOtpError('تعداد درخواست‌ها بیش از حد مجاز است. لطفاً یک ساعت دیگر تلاش کنید.');
+    const phoneCount = await tx.phoneChallenge.count({ where: { phone: input.phone, createdAt: { gt: fiveMinutesAgo } } });
+    const sourceCount = await tx.phoneChallenge.count({ where: { requestKey: input.requestKey, createdAt: { gt: fiveMinutesAgo } } });
+    if (phoneCount >= 5 || sourceCount >= 20) throw new PhoneOtpError('تعداد درخواست‌ها بیش از حد مجاز است. لطفاً پنج دقیقه دیگر تلاش کنید.');
     await tx.phoneChallenge.updateMany({ where: { phone: input.phone, consumedAt: null }, data: { consumedAt: now } });
     return tx.phoneChallenge.create({ data: {
       id, ...input, codeHash: otpDigest(id, code), createdAt: now,

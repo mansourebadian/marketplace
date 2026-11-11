@@ -8,7 +8,7 @@ import { issuePhoneCode, verifyPhoneCode, requestDigest, OTP_COOKIE, PhoneOtpErr
 import { sendPhoneCode, smsConfigured } from '@/lib/sms';
 import { sessionCookie } from '@/lib/session-cookie';
 
-export type PhoneAuthState = { error?: string; sent?: boolean };
+export type PhoneAuthState = { error?: string; sent?: boolean; verified?: boolean };
 
 async function sendCode(phone: string, flow: 'business' | 'customer', callbackUrl: string): Promise<PhoneAuthState> {
   if (!smsConfigured()) return { error: 'سرویس ارسال پیامک هنوز تنظیم نشده است. لطفاً با پشتیبانی تماس بگیرید.' };
@@ -51,7 +51,7 @@ export async function resendPhoneOtp(): Promise<PhoneAuthState> {
   return sendCode(challenge.phone, challenge.flow === 'business' ? 'business' : 'customer', challenge.callbackUrl);
 }
 
-export async function confirmPhoneOtp(_previous: PhoneAuthState, formData: FormData): Promise<PhoneAuthState> {
+async function verifyAndCreateSession(formData: FormData): Promise<{ error: string } | { destination: string }> {
   const cookieStore = await cookies();
   const id = cookieStore.get(OTP_COOKIE)?.value;
   if (!id) return { error: 'درخواست تأیید پیدا نشد. دوباره شماره موبایل خود را وارد کنید.' };
@@ -60,7 +60,7 @@ export async function confirmPhoneOtp(_previous: PhoneAuthState, formData: FormD
   let destination: string;
   try {
     const result = await verifyPhoneCode(prisma, id, code);
-    if ('error' in result) return { error: result.error };
+    if ('error' in result) return { error: result.error || 'تأیید شماره انجام نشد. لطفاً دوباره تلاش کنید.' };
     const cookie = sessionCookie();
     cookieStore.set(cookie.name, result.sessionToken, { ...cookie.options, expires: result.expires });
     cookieStore.delete(OTP_COOKIE);
@@ -68,5 +68,17 @@ export async function confirmPhoneOtp(_previous: PhoneAuthState, formData: FormD
   } catch {
     return { error: 'تأیید شماره انجام نشد. لطفاً دوباره تلاش کنید.' };
   }
-  redirect(destination);
+  return { destination };
+}
+
+export async function confirmPhoneOtp(_previous: PhoneAuthState, formData: FormData): Promise<PhoneAuthState> {
+  const result = await verifyAndCreateSession(formData);
+  if ('error' in result) return result;
+  redirect(result.destination);
+}
+
+export async function confirmBookingPhoneOtp(formData: FormData): Promise<PhoneAuthState> {
+  const result = await verifyAndCreateSession(formData);
+  if ('error' in result) return result;
+  return { verified: true };
 }

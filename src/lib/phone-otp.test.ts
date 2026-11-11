@@ -136,7 +136,7 @@ test('phone OTP database lifecycle', { skip: process.env.OTP_DB_TEST !== '1' }, 
       assert.ok('error' in await verifyPhoneCode(db, challenge.id, code));
       assert.equal((await db.phoneChallenge.findUniqueOrThrow({ where: { id: challenge.id } })).attempts, 5);
     });
-    await t.test('resend invalidates the old code and enforces server cooldown and hourly limit', async () => {
+    await t.test('resend invalidates the old code and allows requests after the five-minute window', async () => {
       const args = input();
       let oldCode = '';
       const first = await issuePhoneCode(db, args, async (_, value) => { oldCode = value; });
@@ -147,7 +147,7 @@ test('phone OTP database lifecycle', { skip: process.env.OTP_DB_TEST !== '1' }, 
       assert.ok('error' in await verifyPhoneCode(db, first.id, oldCode, later));
       assert.ok('sessionToken' in await verifyPhoneCode(db, second.id, code, later));
       for (let i = 2; i < 5; i++) await issuePhoneCode(db, args, async () => {}, new Date(first.createdAt.getTime() + i * (OTP_COOLDOWN + 1)));
-      await assert.rejects(issuePhoneCode(db, args, async () => {}, new Date(first.createdAt.getTime() + 5 * (OTP_COOLDOWN + 1))), /بیش از حد/);
+      await issuePhoneCode(db, args, async () => {}, new Date(first.createdAt.getTime() + 5 * (OTP_COOLDOWN + 1)));
     });
     await t.test('provider failures never produce a usable challenge', async () => {
       const args = input();

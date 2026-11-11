@@ -17,6 +17,26 @@ const viewOptions = [
 type CalendarView = (typeof viewOptions)[number]['value'];
 const weekdays = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
 const persianDay = new Intl.DateTimeFormat('en-US-u-ca-persian', { day: 'numeric' });
+type CalendarAppointment = { id: string; memberKey: string; serviceName: string; startsAt: string; endsAt: string; customerName: string; firstVisit: boolean; note: string | null; isTest: boolean };
+
+function localDateKey(date: Date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function tehranDateKey(value: string) {
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tehran', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date(value));
+  const part = (type: string) => parts.find(item => item.type === type)?.value;
+  return `${part('year')}-${part('month')}-${part('day')}`;
+}
+
+function appointmentMinutes(value: string) {
+  const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Tehran', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(value));
+  return Number(parts.find(item => item.type === 'hour')?.value) * 60 + Number(parts.find(item => item.type === 'minute')?.value);
+}
+
+function appointmentTime(value: string) {
+  return new Intl.DateTimeFormat('fa-IR', { timeZone: 'Asia/Tehran', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(value));
+}
 
 function monthStart(date: Date) {
   const start = new Date(date);
@@ -33,6 +53,9 @@ export function BusinessCalendar({ ownerName, businessName, members }: { ownerNa
   const [showDemo, setShowDemo] = useState(true);
   const [view, setView] = useState<CalendarView>('Day');
   const [viewOpen, setViewOpen] = useState(false);
+  const [appointments, setAppointments] = useState<CalendarAppointment[]>([]);
+  const [appointmentsError, setAppointmentsError] = useState('');
+  const [refreshKey, setRefreshKey] = useState(0);
   const viewMenuRef = useRef<HTMLDivElement>(null);
   const viewButtonRef = useRef<HTMLButtonElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -58,6 +81,29 @@ export function BusinessCalendar({ ownerName, businessName, members }: { ownerNa
   ];
   const teamMembers = allMembers.filter(member => selectedMember === 'all' || member.id === selectedMember);
   const dateRange = new Intl.DateTimeFormat('fa-IR', { day: 'numeric', month: 'short', year: 'numeric' }).formatRange(rangeDays[0], rangeDays[rangeDays.length - 1]);
+  const selectedDateKey = localDateKey(date);
+
+  useEffect(() => {
+    const center = new Date(`${selectedDateKey}T12:00:00`);
+    const from = new Date(center); from.setDate(from.getDate() - 40);
+    const to = new Date(center); to.setDate(to.getDate() + 41);
+    const controller = new AbortController();
+    async function load() {
+      try {
+        const params = new URLSearchParams({ from: localDateKey(from), to: localDateKey(to) });
+        const response = await fetch(`/api/business/calendar/appointments?${params}`, { signal: controller.signal, cache: 'no-store' });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error);
+        setAppointments(result.appointments);
+        setAppointmentsError('');
+      } catch (error) {
+        if (!controller.signal.aborted) { setAppointments([]); setAppointmentsError(error instanceof Error ? error.message : 'دریافت نوبت‌ها انجام نشد.'); }
+      }
+    }
+    void load();
+    const timer = window.setInterval(load, 60_000);
+    return () => { controller.abort(); window.clearInterval(timer); };
+  }, [selectedDateKey, refreshKey]);
 
   const firstOfMonth = monthStart(date);
   const nextMonth = new Date(firstOfMonth);
@@ -130,7 +176,7 @@ export function BusinessCalendar({ ownerName, businessName, members }: { ownerNa
             <button aria-label={showDemo ? 'پنهان کردن عضو نمونه' : 'نمایش عضو نمونه'} onClick={() => { if (showDemo && selectedMember === 'demo') setSelectedMember('all'); setShowDemo(value => !value); }}><SlidersHorizontal size={19} /></button>
           </div>
           <div className={styles.toolbarGroup}>
-            <button aria-label="به‌روزرسانی تقویم" onClick={() => { setNow(new Date()); router.refresh(); }}><RefreshCw size={19} /></button>
+            <button aria-label="به‌روزرسانی تقویم" onClick={() => { setNow(new Date()); setRefreshKey(value => value + 1); router.refresh(); }}><RefreshCw size={19} /></button>
             <div className={styles.viewPicker} ref={viewMenuRef} onKeyDown={event => {
               if (event.key === 'Escape') { setViewOpen(false); viewButtonRef.current?.focus(); }
               if (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'Home' || event.key === 'End') {
@@ -155,6 +201,7 @@ export function BusinessCalendar({ ownerName, businessName, members }: { ownerNa
             </div>
           </div>
         </div>
+        {appointmentsError && <p role="alert" className={styles.calendarError}>{appointmentsError}</p>}
         <div className={styles.calendarScroll} ref={scrollRef}>
           {view === 'Month' ? <div className={styles.monthCalendar} aria-label="تقویم ماهانه">
             <div className={styles.weekdays}>{weekdays.map(day => <strong key={day}>{day}</strong>)}</div>
@@ -166,6 +213,7 @@ export function BusinessCalendar({ ownerName, businessName, members }: { ownerNa
                 const firstDay = persianDay.format(day) === '1';
                 return <button type="button" key={day.toISOString()} className={`${styles.monthDay} ${outsideMonth ? styles.outsideMonth : ''} ${isHatched ? styles.hatchedDay : ''}`} aria-label={day.toLocaleDateString('fa-IR', { dateStyle: 'full' })} aria-current={isToday ? 'date' : undefined} onClick={() => { setDate(day); changeView('Day'); }}>
                   <span className={`${styles.monthDayNumber} ${firstDay ? styles.monthStartLabel : ''}`}>{day.toLocaleDateString('fa-IR', firstDay ? { month: 'long', day: 'numeric' } : { day: 'numeric' })}</span>
+                  {appointments.filter(item => tehranDateKey(item.startsAt) === localDateKey(day) && (selectedMember === 'all' || item.memberKey === selectedMember)).map(item => <span key={item.id} className={styles.appointmentStrip}><bdi>{appointmentTime(item.startsAt)}</bdi><strong>{item.customerName} · {item.serviceName}</strong>{item.isTest && <span className={styles.sampleLabel}>آزمایشی</span>}</span>)}
                   {isToday && showDemo && <span className={styles.monthAppointments}>{monthSamples.map(sample => <span key={sample.name} className={styles.appointmentStrip}><bdi>{sample.time}</bdi><strong>{sample.name}</strong><span className={styles.sampleLabel}>نمونه</span></span>)}</span>}
                 </button>;
               })}
@@ -190,6 +238,7 @@ export function BusinessCalendar({ ownerName, businessName, members }: { ownerNa
                     ? [{ time: '۹:۰۰ – ۹:۴۰', name: 'جان دو' }, { time: '۱۱:۰۰ – ۱۱:۵۰', name: 'جین دو' }]
                     : [{ time: '۱۰:۰۰ – ۱۰:۳۰', name: 'جک دو' }];
                   return <div key={day.toDateString()} role="cell" className={`${styles.threeDayCell} ${isToday ? styles.hatchedDay : ''}`} aria-label={`${member.name}، ${day.toLocaleDateString('fa-IR', { dateStyle: 'full' })}`}>
+                    {appointments.filter(item => item.memberKey === member.id && tehranDateKey(item.startsAt) === localDateKey(day)).map(item => <div key={item.id} className={styles.appointmentStrip}><bdi>{appointmentTime(item.startsAt)}</bdi><strong>{item.customerName} · {item.serviceName}</strong>{item.isTest && <span className={styles.sampleLabel}>آزمایشی</span>}</div>)}
                     {isToday && showDemo && (member.id === 'owner' || member.id === 'demo') && samples.map(sample => <div key={sample.name} className={styles.appointmentStrip}><bdi>{view === 'Week' ? sample.time.split(' – ')[0] : sample.time}</bdi><strong>{sample.name}</strong><span className={styles.sampleLabel}>نمونه</span></div>)}
                   </div>;
                 })}
@@ -205,7 +254,7 @@ export function BusinessCalendar({ ownerName, businessName, members }: { ownerNa
           </div>
           <div className={styles.schedule} style={{ minWidth: `${48 + teamMembers.length * 130}px` }}>
             <div className={styles.timeLabels}>{Array.from({ length: 24 }, (_, hour) => <div className={styles.hourLabel} key={hour}><strong>{String(hour % 12 || 12).replace(/\d/g, digit => '۰۱۲۳۴۵۶۷۸۹'[Number(digit)])}:۰۰</strong><span>{hour < 12 ? 'ق.ظ' : 'ب.ظ'}</span></div>)}</div>
-            <div className={styles.grid} style={{ gridTemplateColumns: `repeat(${teamMembers.length}, minmax(130px, 1fr))` }}>{teamMembers.map(member => <div className={styles.column} key={member.id} aria-label={`${member.name}، بدون نوبت`} />)}</div>
+            <div className={styles.grid} style={{ gridTemplateColumns: `repeat(${teamMembers.length}, minmax(130px, 1fr))` }}>{teamMembers.map(member => <div className={styles.column} key={member.id} aria-label={`نوبت‌های ${member.name}`}>{appointments.filter(item => item.memberKey === member.id && tehranDateKey(item.startsAt) === selectedDateKey).map(item => <div key={item.id} className={styles.calendarAppointment} style={{ top: `${appointmentMinutes(item.startsAt) / 60 * 96}px`, height: `${Math.max(30, (new Date(item.endsAt).getTime() - new Date(item.startsAt).getTime()) / 60_000 / 60 * 96)}px` }} title={`${item.customerName} · ${item.serviceName}${item.isTest ? ' (آزمایشی)' : ''}\n${item.firstVisit ? 'اولین مراجعه' : 'مراجعه مجدد'}${item.note ? `\nتوضیحات: ${item.note}` : ''}`}><strong>{item.customerName}</strong><span>{item.serviceName}</span><span>{appointmentTime(item.startsAt)}{item.isTest && ' · آزمایشی'}</span></div>)}</div>)}</div>
             {today && <div className={styles.currentTime} style={{ top: `${minutes / 60 * 96}px` }}><span>{now.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit', hour12: false })}</span></div>}
           </div>
           </>}

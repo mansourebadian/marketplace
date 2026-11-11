@@ -7,12 +7,12 @@ import { ServiceSelection } from '@/components/features/ServiceSelection';
 
 export default async function ServicesPage({ params, searchParams }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ source?: string; step?: string; services?: string }>;
+  searchParams: Promise<{ source?: string; step?: string; services?: string; slot?: string }>;
 }) {
   const session = await auth();
-  const customer = session?.user?.id && session.user.role === 'CUSTOMER' ? await prisma.user.findUnique({ where: { id: session.user.id }, select: { phone: true } }) : null;
+  const customer = session?.user?.id && session.user.role === 'CUSTOMER' ? await prisma.user.findUnique({ where: { id: session.user.id }, select: { accounts: { where: { provider: 'phone' }, select: { id: true }, take: 1 } } }) : null;
   const { id } = await params;
-  const { source, step, services: selectedParam } = await searchParams;
+  const { source, step, services: selectedParam, slot } = await searchParams;
   const salon = source === 'business' ? null : await prisma.salon.findUnique({
     where: { id },
     select: {
@@ -47,7 +47,9 @@ export default async function ServicesPage({ params, searchParams }: {
   const reviews = salon?.reviews || [];
   return <ServiceSelection
     businessId={business ? id : null}
-    customerHasPhone={Boolean(customer?.phone?.trim())}
+    testPaymentsEnabled={process.env.NODE_ENV === 'development' && process.env.BOOKING_TEST_PAYMENTS === '1'}
+    customerHasPhone={Boolean(customer?.accounts.length)}
+    initialSlot={slot && /^\d{13}$/.test(slot) ? Number(slot) : null}
     salon={{ name: salon?.name || business!.name, address: salon ? salon.address : formatBusinessAddress(business!.businessAddress, business!.businessLocation) || 'آدرس ثبت نشده است', image: salon?.portfolio[0]?.imageUrl || salon?.imageUrl || null, rating: reviews.length ? reviews.reduce((total, review) => total + review.rating, 0) / reviews.length : null, reviewsCount: reviews.length }}
     services={services} backHref={`${base}/book${suffix}`} closeHref={`${base}${suffix}`}
     initialSelected={(selectedParam || '').split(',').filter((id) => services.some((service) => service.id === id))}
