@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { createTestBookingRecord } from '@/lib/test-booking';
+import { revalidatePath } from 'next/cache';
 
 const inputSchema = z.object({
   businessId: z.string().min(1).max(36),
@@ -23,5 +24,7 @@ export async function createTestBooking(input: unknown): Promise<{ id?: string; 
   const customerId = session.user.id;
   const verifiedPhone = await prisma.account.findFirst({ where: { userId: customerId, provider: 'phone' }, select: { id: true } });
   if (!verifiedPhone) return { error: 'شماره موبایل خود را تأیید کنید.' };
-  return createTestBookingRecord(parsed.data, customerId);
+  const result = await createTestBookingRecord(parsed.data, customerId);
+  if (result.id) revalidatePath('/');
+  return result;
 }

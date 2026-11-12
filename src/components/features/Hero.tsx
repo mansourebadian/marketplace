@@ -6,7 +6,7 @@ import DateTimePicker from './DateTimePicker';
 import LocationPicker from './LocationPicker'; // وارد کردن کامپوننت جدید
 import TreatmentsDropdown from '../shared/TreatmentsDropdown';
 
-export const Hero = () => {
+export const Hero = ({ bookingCount }: { bookingCount: string | null }) => {
   return (
     <section className="relative pt-24 md:pt-44 pb-20 md:pb-24 px-4 flex flex-col items-center justify-center min-h-[75vh]">
 
@@ -47,12 +47,12 @@ export const Hero = () => {
 
       {/* Stats and App Button */}
       <div className="mt-10 md:mt-12 flex flex-col items-center gap-6 z-10">
-        <p className="text-[14px] md:text-[15px] lg:text-[17px] text-gray-900">
-          <span className="font-semibold border-b-[2px] border-dotted border-gray-400 pb-0.5 ml-1.5 cursor-pointer hover:border-gray-800 transition-colors">
-            325,317
+        {bookingCount !== null && <p className="text-[14px] md:text-[15px] lg:text-[17px] text-gray-900">
+          <span className="font-semibold ml-1.5">
+            {bookingCount}
           </span>
-          نوبت رزرو شده در امروز
-        </p>
+          نوبت رزرو شده تاکنون
+        </p>}
 
         <button className="flex items-center gap-2 px-5 py-2.5 bg-white rounded-full border border-gray-200 shadow-sm hover:bg-gray-50 hover:shadow-md transition-all text-[14px] font-semibold text-gray-900 cursor-pointer">
           دریافت اپلیکیشن
