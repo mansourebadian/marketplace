@@ -55,10 +55,10 @@ async function getAuthenticatedCustomerId() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, role: true },
+    select: { id: true },
   });
 
-  return user?.role === 'CUSTOMER' ? user.id : null;
+  return user?.id ?? null;
 }
 
 export async function updateCustomerProfile(

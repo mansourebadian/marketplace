@@ -5,7 +5,7 @@ import { assignBookingServices } from '@/lib/booking-assignment';
 
 type TestBookingInput = { businessId: string; requestId: string; start: number; firstVisit: boolean; note: string; services: { id: string; memberKey: string }[] };
 
-export async function createTestBookingRecord(input: TestBookingInput, customerId: string): Promise<{ id?: string; error?: string }> {
+export async function createTestBookingRecord(input: TestBookingInput, customerId: string, status: 'TEST_CONFIRMED' | 'CONFIRMED' = 'TEST_CONFIRMED'): Promise<{ id?: string; error?: string }> {
   const { businessId, requestId, start, services: requested, firstVisit, note } = input;
   const dateParts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tehran', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date(start));
   const part = (name: string) => dateParts.find(item => item.type === name)?.value;
@@ -41,7 +41,7 @@ export async function createTestBookingRecord(input: TestBookingInput, customerI
         const assigned = assignBookingServices(validServices, businessProfessionals(availability), start);
         if (!assigned) return { error: 'متخصص انتخاب‌شده دیگر در این زمان در دسترس نیست.' };
         const reservation = await tx.businessReservation.create({ data: {
-          requestId, businessId, customerId, status: 'TEST_CONFIRMED', firstVisit, note: note.trim() || null,
+          requestId, businessId, customerId, status, firstVisit, note: note.trim() || null,
           total: validServices.reduce((sum, service) => sum + (service.priceType === 'FREE' ? 0 : service.price), 0),
           items: { create: assigned.map((item, position) => ({ memberKey: item.memberKey, serviceId: item.serviceId, serviceName: validServices[position].name, position, startsAt: new Date(item.start), endsAt: new Date(item.end), price: validServices[position].priceType === 'FREE' ? 0 : validServices[position].price })) },
         }, select: { id: true } });

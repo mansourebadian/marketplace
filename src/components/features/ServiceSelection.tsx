@@ -5,9 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { confirmBookingPhoneOtp, requestPhoneOtp, resendPhoneOtp } from '@/actions/phone-auth.actions';
-import { createTestBooking } from '@/actions/test-booking.actions';
+import { createPayAtVenueBooking } from '@/actions/test-booking.actions';
 import { latinDigits } from '@/lib/phone';
-import { ArrowRight, CalendarDays, Check, ChevronLeft, ChevronRight, CreditCard, Gift, ImageOff, Plus, Shuffle, Star, UsersRound, X } from 'lucide-react';
+import { ArrowRight, CalendarDays, Check, ChevronLeft, ChevronRight, Gift, ImageOff, Plus, Shuffle, Star, UsersRound, X } from 'lucide-react';
 
 type Service = { id: string; name: string; description: string | null; price: number; priceType: string; durationMin: number; categoryId: string; categoryName: string };
 type Salon = { name: string; address: string; image: string | null; rating: number | null; reviewsCount: number };
@@ -17,7 +17,7 @@ function priceLabel(service: Service) {
   return `${service.priceType === 'STARTS_AT' ? 'از ' : ''}${service.price.toLocaleString('fa-IR')} تومان`;
 }
 
-export function ServiceSelection({ salon, services, backHref, closeHref, servicesHref, initialSelected, step, businessId, customerHasPhone, initialSlot, testPaymentsEnabled }: { testPaymentsEnabled: boolean; initialSlot: number | null; customerHasPhone: boolean; businessId: string | null; salon: Salon; services: Service[]; backHref: string; closeHref: string; servicesHref: string; initialSelected: string[]; step: 'services' | 'time' }) {
+export function ServiceSelection({ salon, services, backHref, closeHref, servicesHref, initialSelected, step, businessId, customerHasPhone, initialSlot }: { initialSlot: number | null; customerHasPhone: boolean; businessId: string | null; salon: Salon; services: Service[]; backHref: string; closeHref: string; servicesHref: string; initialSelected: string[]; step: 'services' | 'time' }) {
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>(initialSelected);
   const [message, setMessage] = useState('');
@@ -53,16 +53,16 @@ export function ServiceSelection({ salon, services, backHref, closeHref, service
     setMessage('');
   }
 
-  async function submitTestBooking() {
+  async function submitBooking() {
     if (!businessId || selectedSlot === null || firstVisit === null || bookingPending || completedBooking) return;
     setMessage('');
     setBookingPending(true);
     requestId.current ||= crypto.randomUUID();
     try {
-      const result = await createTestBooking({ businessId, requestId: requestId.current, start: selectedSlot, firstVisit, note: bookingNote, services: selectedServices.map(service => ({ id: service.id, memberKey: chosenProfessionals[service.id]?.id || '__any__' })) });
+      const result = await createPayAtVenueBooking({ businessId, requestId: requestId.current, start: selectedSlot, firstVisit, note: bookingNote, services: selectedServices.map(service => ({ id: service.id, memberKey: chosenProfessionals[service.id]?.id || '__any__' })) });
       if (result.id) setCompletedBooking(result.id);
-      else setMessage(result.error || 'ثبت آزمایشی نوبت انجام نشد.');
-    } catch { setMessage('ثبت آزمایشی نوبت انجام نشد. دوباره تلاش کنید.'); }
+      else setMessage(result.error || 'ثبت نوبت انجام نشد.');
+    } catch { setMessage('ثبت نوبت انجام نشد. دوباره تلاش کنید.'); }
     finally { setBookingPending(false); }
   }
 
@@ -77,7 +77,7 @@ export function ServiceSelection({ salon, services, backHref, closeHref, service
       <div className="mx-auto grid max-w-[1200px] gap-8 px-4 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,444px)] lg:gap-20">
         <div className="min-w-0">
           <div className="mb-4 flex flex-wrap gap-3 text-sm text-gray-400"><span className={step === 'services' ? 'font-semibold text-gray-900' : ''}>خدمات</span><span>‹</span><span className={step === 'time' && !professionalStep ? 'font-semibold text-gray-900' : ''}>زمان</span><span>‹</span><span className={professionalStep && !visitStep ? 'font-semibold text-gray-900' : ''}>متخصص</span><span>‹</span><span className={visitStep && !reviewStep ? 'font-semibold text-gray-900' : ''}>اطلاعات مراجعه</span><span>‹</span><span className={reviewStep ? 'font-semibold text-gray-900' : ''}>تأیید</span></div>
-          {step === 'time' && completedBooking ? <section><h1 className="mb-6 text-3xl font-bold">نوبت آزمایشی ثبت شد</h1><div role="status" className="rounded-2xl border border-gray-200 bg-white p-6 leading-8"><p>نوبت در تقویم مجموعه ثبت شد. هیچ پرداخت واقعی انجام نشده است.</p><p className="mt-3 text-sm text-gray-500">شناسه نوبت: <bdi>{completedBooking}</bdi></p></div></section> : step === 'time' && reviewStep ? <BookingReview note={bookingNote} onNoteChange={value => { setBookingNote(value); requestId.current = null; }} address={salon.address} testPaymentsEnabled={testPaymentsEnabled} /> : step === 'time' && visitStep ? <FirstVisitSelection salonName={salon.name} value={firstVisit} onChange={value => { setFirstVisit(value); setMessage(''); requestId.current = null; if (value) setReviewStep(true); }} /> : step === 'time' && professionalStep && selectedSlot !== null && businessId ? <ProfessionalSelection businessId={businessId} slot={selectedSlot} services={selectedServices} location={salon.address} chosen={chosenProfessionals} onAvailability={setProfessionalAvailability} onChoose={(serviceId, professional) => { setChosenProfessionals(current => ({ ...current, [serviceId]: professional })); requestId.current = null; }} onBack={() => { setProfessionalStep(false); setProfessionalAvailability(null); }} /> : step === 'time' ? <DateSelection hasServices={selectedServices.length > 0} servicesHref={selectedHref} businessId={businessId} serviceIds={selectedServices.map(service => service.id).join(',')} chosenSlot={selectedSlot} onSlotChange={slot => { setSelectedSlot(slot); setChosenProfessionals({}); setProfessionalAvailability(null); setFirstVisit(null); setReviewStep(false); requestId.current = null; }} /> : <>
+          {step === 'time' && completedBooking ? <section><h1 className="mb-6 text-3xl font-bold">نوبت ثبت شد</h1><div role="status" className="rounded-2xl border border-gray-200 bg-white p-6 leading-8"><p>نوبت شما ثبت شد. هزینه خدمات را در محل مجموعه پرداخت کنید.</p><p className="mt-3 text-sm text-gray-500">شناسه نوبت: <bdi>{completedBooking}</bdi></p><Link href="/activities" className="mt-4 inline-block font-semibold text-purple-700 underline">مشاهده و مدیریت نوبت‌ها</Link></div></section> : step === 'time' && reviewStep ? <BookingReview note={bookingNote} onNoteChange={value => { setBookingNote(value); requestId.current = null; }} address={salon.address} /> : step === 'time' && visitStep ? <FirstVisitSelection salonName={salon.name} value={firstVisit} onChange={value => { setFirstVisit(value); setMessage(''); requestId.current = null; if (value) setReviewStep(true); }} /> : step === 'time' && professionalStep && selectedSlot !== null && businessId ? <ProfessionalSelection businessId={businessId} slot={selectedSlot} services={selectedServices} location={salon.address} chosen={chosenProfessionals} onAvailability={setProfessionalAvailability} onChoose={(serviceId, professional) => { setChosenProfessionals(current => ({ ...current, [serviceId]: professional })); requestId.current = null; }} onBack={() => { setProfessionalStep(false); setProfessionalAvailability(null); }} /> : step === 'time' ? <DateSelection hasServices={selectedServices.length > 0} servicesHref={selectedHref} businessId={businessId} serviceIds={selectedServices.map(service => service.id).join(',')} chosenSlot={selectedSlot} onSlotChange={slot => { setSelectedSlot(slot); setChosenProfessionals({}); setProfessionalAvailability(null); setFirstVisit(null); setReviewStep(false); requestId.current = null; }} /> : <>
           <h1 className="mb-8 text-3xl font-bold tracking-tight sm:text-[40px]">انتخاب خدمات</h1>
           {groups.length > 0 && <div className="sticky top-[72px] z-10 -mx-1 flex gap-2 overflow-x-auto bg-[#f5f5f5] px-1 py-2">{groups.map(([id, name]) => <a key={id} href={`#category-${encodeURIComponent(id)}`} onClick={() => setActiveCategory(id)} className={`shrink-0 rounded-full border px-4 py-2 text-sm ${activeCategory === id ? 'border-black bg-black text-white' : 'border-gray-300 bg-transparent text-gray-900 hover:border-black'}`}>{name}</a>)}</div>}
           {groups.length === 0 && <p className="rounded-2xl bg-white p-6 text-gray-500">هنوز خدماتی برای این سالن ثبت نشده است.</p>}
@@ -93,7 +93,7 @@ export function ServiceSelection({ salon, services, backHref, closeHref, service
           {step === 'time' && selectedSlot !== null && <div className="space-y-2 border-b border-gray-200 py-5 text-sm"><p>{new Intl.DateTimeFormat('fa-IR', { timeZone: 'Asia/Tehran', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(selectedSlot)}</p><p>{new Intl.DateTimeFormat('fa-IR', { timeZone: 'Asia/Tehran', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(selectedSlot)} · {selectedServices.reduce((sum, item) => sum + item.durationMin, 0).toLocaleString('fa-IR')} دقیقه</p></div>}
           <div className="space-y-4 border-b border-gray-200 py-5">{selectedServices.length ? selectedServices.map((service) => <div key={service.id} className="flex justify-between gap-3 text-sm"><div><p className="font-semibold">{service.name}</p><p className="mt-1 text-gray-500">{service.durationMin.toLocaleString('fa-IR')} دقیقه{chosenProfessionals[service.id] && ` · ${chosenProfessionals[service.id].name}`}</p>{step === 'services' && <button onClick={() => toggle(service.id)} className="mt-1 text-gray-500 underline">حذف</button>}</div><span className="shrink-0">{priceLabel(service)}</span></div>) : <p className="text-sm text-gray-500">هنوز خدمتی انتخاب نشده است.</p>}</div>
           <div className="flex justify-between py-6 font-bold"><span>مجموع</span><span>{selectedServices.length === 0 ? '۰ تومان' : `${hasStartingPrice ? 'از ' : ''}${total.toLocaleString('fa-IR')} تومان`}</span></div>
-          <div className="mt-auto">{message && <p role="alert" className="mb-4 text-sm text-red-700">{message}</p>}{completedBooking ? <Link href={closeHref} className="block w-full rounded-full bg-black px-6 py-3.5 text-center font-bold text-white hover:bg-gray-800">بازگشت به مجموعه</Link> : reviewStep ? <><p className="mb-3 text-sm text-gray-500">{testPaymentsEnabled ? 'پرداخت شبیه‌سازی می‌شود و هیچ مبلغی دریافت نخواهد شد.' : 'پرداخت و ثبت نهایی رزرو در حال حاضر فعال نیست.'}</p><button type="button" disabled={!testPaymentsEnabled || bookingPending} onClick={submitTestBooking} className="w-full rounded-full bg-black px-6 py-3.5 font-bold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400">{bookingPending ? 'در حال ثبت…' : testPaymentsEnabled ? 'پرداخت آزمایشی و ثبت نوبت' : 'پرداخت آنلاین'}</button></> : <button type="button" disabled={continueDisabled} onClick={() => { setMessage(''); if (step !== 'time') router.push(timeHref); else if (!phoneVerified) setPhoneOpen(true); else if (!professionalStep && businessId) setProfessionalStep(true); else if (professionalStep && !visitStep) setVisitStep(true); else if (firstVisit !== null) setReviewStep(true); }} className="w-full rounded-full bg-black px-6 py-3.5 font-bold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400">ادامه</button>}</div>
+          <div className="mt-auto">{message && <p role="alert" className="mb-4 text-sm text-red-700">{message}</p>}{completedBooking ? <Link href={closeHref} className="block w-full rounded-full bg-black px-6 py-3.5 text-center font-bold text-white hover:bg-gray-800">بازگشت به مجموعه</Link> : reviewStep ? <><p className="mb-3 text-sm text-gray-500">هزینه خدمات را در محل مجموعه پرداخت می‌کنید.</p><button type="button" disabled={bookingPending} onClick={submitBooking} className="w-full rounded-full bg-black px-6 py-3.5 font-bold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400">{bookingPending ? 'در حال ثبت…' : 'تأیید و ثبت نوبت'}</button></> : <button type="button" disabled={continueDisabled} onClick={() => { setMessage(''); if (step !== 'time') router.push(timeHref); else if (!phoneVerified) setPhoneOpen(true); else if (!professionalStep && businessId) setProfessionalStep(true); else if (professionalStep && !visitStep) setVisitStep(true); else if (firstVisit !== null) setReviewStep(true); }} className="w-full rounded-full bg-black px-6 py-3.5 font-bold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400">ادامه</button>}</div>
         </aside>
       </div>
       {phoneOpen && <BookingPhoneDialog onClose={() => setPhoneOpen(false)} onVerified={() => { setPhoneVerified(true); setPhoneOpen(false); if (businessId) setProfessionalStep(true); else setMessage('مرحله تأیید و ثبت نهایی رزرو هنوز فعال نشده است.'); router.refresh(); }} callbackUrl={`${timeHref}&slot=${selectedSlot}`} />}
@@ -101,7 +101,7 @@ export function ServiceSelection({ salon, services, backHref, closeHref, service
   );
 }
 
-function BookingReview({ note, onNoteChange, address, testPaymentsEnabled }: { note: string; onNoteChange: (note: string) => void; address: string; testPaymentsEnabled: boolean }) {
+function BookingReview({ note, onNoteChange, address }: { note: string; onNoteChange: (note: string) => void; address: string }) {
   const [editingNote, setEditingNote] = useState(false);
   const [draft, setDraft] = useState(note);
   return <section>
@@ -116,29 +116,23 @@ function BookingReview({ note, onNoteChange, address, testPaymentsEnabled }: { n
         <span className="mt-0.5 h-5 w-5 shrink-0 rounded-full border border-gray-300" aria-hidden="true" />
         <div><h2 className="font-semibold">پرداخت بیعانه</h2><p className="mt-1 text-sm text-gray-500">امکان پرداخت بیعانه در حال حاضر فعال نیست.</p></div>
       </div>
-    </div>
-    <h2 className="mb-4 mt-10 text-lg font-bold">روش پرداخت</h2>
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8">
-      <div className="flex items-center gap-3">
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600"><CreditCard className="h-6 w-6" aria-hidden="true" /></span>
-        <div><h3 className="font-semibold">پرداخت با کارت بانکی</h3><p className="mt-1 text-sm text-gray-500">درگاه پرداخت هنوز فعال نشده است.</p></div>
-      </div>
-      <p className="mt-6 text-sm leading-7 text-gray-500">{testPaymentsEnabled ? 'پرداخت آزمایشی فعال است و هیچ مبلغ واقعی دریافت نمی‌شود.' : 'پس از فعال شدن پرداخت، اطلاعات پرداخت در درگاه امن وارد می‌شود.'}</p>
+      <div className="my-5 border-t border-gray-200" />
+      <label className="flex items-start gap-4">
+        <input type="radio" name="payment-method" value="venue" checked readOnly className="mt-0.5 h-5 w-5 shrink-0 accent-black" />
+        <span><span className="block font-semibold">پرداخت در محل</span><span className="mt-1 block text-sm text-gray-500">هزینه خدمات را هنگام مراجعه به مجموعه پرداخت کنید.</span></span>
+      </label>
     </div>
     <h2 className="mb-4 mt-10 text-lg font-bold">جزئیات بیشتر</h2>
     <div className="space-y-3">
       <section className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8">
         <h3 className="font-semibold">سیاست لغو نوبت</h3>
-        <p className="mt-2 text-sm leading-7 text-gray-500">شرایط لغو این مجموعه هنوز ثبت نشده است. متن زیر صرفاً نمونه است و سیاست این مجموعه محسوب نمی‌شود.</p>
-        <p className="mt-4 text-sm leading-7">نمونه: بیعانه تا ۴۸ ساعت پیش از نوبت قابل بازگشت است.</p>
+        <p className="mt-2 text-sm leading-7 text-gray-500">لغو آنلاین تا ۲۴ ساعت پیش از نوبت از بخش فعالیت‌ها امکان‌پذیر است. پس از آن برای لغو با مجموعه تماس بگیرید. برای جابه‌جایی نوبت نیز فعلاً با مجموعه هماهنگ کنید.</p>
       </section>
       <section className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8">
         <h3 className="font-semibold">اطلاعات مهم</h3>
         <p className="mt-2 text-sm leading-7">لطفاً پیش از رزرو مطالعه کنید.</p>
         <p className="mt-3 text-sm leading-7 text-gray-500">شرایط اختصاصی این مجموعه هنوز ثبت نشده است. موارد زیر نمونه‌اند؛ برای اطلاع از شرایط واقعی با مجموعه تماس بگیرید.</p>
         <div className="mt-5 space-y-5 text-sm leading-7">
-          <p><span className="font-semibold">بیعانه: </span>در این نمونه، هنگام رزرو ۵۰٪ مبلغ به‌عنوان بیعانه دریافت و از هزینه نهایی کسر می‌شود. با لغو یا تغییر نوبت تا دست‌کم ۴۸ ساعت پیش از مراجعه، بیعانه بازگردانده یا به نوبت جدید منتقل می‌شود.</p>
-          <p><span className="font-semibold">تغییر و لغو: </span>در این نمونه، تغییر یا لغو باید حداقل ۴۸ ساعت پیش از نوبت اطلاع داده شود؛ لغو دیرتر یا عدم حضور مشمول هزینه‌ای معادل ۵۰٪ مبلغ رزرو است.</p>
           <p><span className="font-semibold">خدمات رنگ: </span>در این نمونه، برای مراجعه اولِ رنگ، تست حساسیت رایگان حداقل ۴۸ ساعت پیش از نوبت انجام می‌شود. این تست حدود پنج دقیقه زمان می‌برد.</p>
           <p><span className="font-semibold">تأخیر: </span>اگر احتمال می‌دهید دیر برسید، با مجموعه تماس بگیرید تا امکان حفظ نوبت بررسی شود.</p>
           {address && address !== 'آدرس ثبت نشده است' && <p><span className="font-semibold">آدرس مجموعه: </span>{address}</p>}
@@ -153,7 +147,7 @@ function BookingReview({ note, onNoteChange, address, testPaymentsEnabled }: { n
         <textarea id="booking-note" autoFocus rows={4} maxLength={1000} value={draft} onChange={event => setDraft(event.target.value)} placeholder="توضیحات یا درخواست خود را بنویسید" className="w-full resize-y rounded-xl border border-gray-300 px-4 py-3 text-sm leading-7 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100" />
         <div className="mt-4 flex flex-wrap gap-3"><button type="button" onClick={() => { onNoteChange(draft.trim()); setEditingNote(false); }} className="rounded-full bg-black px-5 py-2 text-sm font-semibold text-white hover:bg-gray-800">ذخیره توضیحات</button><button type="button" onClick={() => { setDraft(note); setEditingNote(false); }} className="rounded-full border border-gray-300 px-5 py-2 text-sm hover:border-gray-500">انصراف</button></div>
       </div> : <>{note && <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-gray-600">{note}</p>}<button type="button" onClick={() => { setDraft(note); setEditingNote(true); }} className="mt-4 rounded-full border border-gray-300 px-5 py-2 text-sm hover:border-gray-500">{note ? 'ویرایش' : 'افزودن'}</button></>}
-      <p className="mt-4 text-xs leading-6 text-gray-500">{testPaymentsEnabled ? 'این توضیحات همراه نوبت آزمایشی ذخیره می‌شود.' : 'این توضیحات فقط در همین صفحه نگه داشته می‌شود و هنوز برای مجموعه ارسال نمی‌شود.'}</p>
+      <p className="mt-4 text-xs leading-6 text-gray-500">این توضیحات همراه نوبت برای مجموعه ذخیره می‌شود.</p>
     </section>
   </section>;
 }

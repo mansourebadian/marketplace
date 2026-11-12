@@ -31,7 +31,6 @@ export default async function ProfilePage() {
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: {
-      role: true,
       name: true,
       firstName: true,
       lastName: true,
@@ -54,7 +53,7 @@ export default async function ProfilePage() {
     },
   });
 
-  if (!user || user.role !== 'CUSTOMER') {
+  if (!user) {
     redirect('/');
   }
 

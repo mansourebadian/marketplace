@@ -60,7 +60,7 @@ const ADDRESS_INITIAL_STATE: AddressActionState = { status: 'idle' };
 
 const NAV_ITEMS = [
   { label: 'پروفایل', icon: UserRound, href: '/profile' },
-  { label: 'فعالیت‌ها', icon: CalendarDays, href: '/activities' },
+  { label: 'نوبت‌های من', icon: CalendarDays, href: '/activities' },
   { label: 'کیف پول', icon: WalletCards },
   { label: 'پیام‌ها', icon: MessageCircle },
   { label: 'علاقه‌مندی‌ها', icon: Heart },
@@ -414,6 +414,7 @@ export function ProfilePageClient({ profile, addresses }: ProfilePageClientProps
       </aside>
 
       <main className="min-w-0 flex-1 bg-[#f7f7f8] px-4 py-7 sm:px-6 md:py-10 lg:px-10">
+        <div className="mx-auto mb-5 max-w-5xl"><Link href="/activities" className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-bold text-gray-900 hover:bg-gray-50"><CalendarDays className="h-4 w-4" /> مشاهده و لغو نوبت‌ها</Link></div>
         <div className="mx-auto max-w-5xl">
           <div className="mb-6 flex items-center justify-between gap-4">
             <div>

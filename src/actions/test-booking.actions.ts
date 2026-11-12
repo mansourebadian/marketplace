@@ -28,3 +28,15 @@ export async function createTestBooking(input: unknown): Promise<{ id?: string; 
   if (result.id) revalidatePath('/');
   return result;
 }
+
+export async function createPayAtVenueBooking(input: unknown): Promise<{ id?: string; error?: string }> {
+  const parsed = inputSchema.safeParse(input);
+  if (!parsed.success || new Set(parsed.data.services.map(service => service.id)).size !== parsed.data.services.length) return { error: 'اطلاعات رزرو معتبر نیست.' };
+  const session = await auth();
+  if (!session?.user?.id) return { error: 'برای ثبت رزرو دوباره وارد حساب خود شوید.' };
+  const verifiedPhone = await prisma.account.findFirst({ where: { userId: session.user.id, provider: 'phone' }, select: { id: true } });
+  if (!verifiedPhone) return { error: 'شماره موبایل خود را تأیید کنید.' };
+  const result = await createTestBookingRecord(parsed.data, session.user.id, 'CONFIRMED');
+  if (result.id) revalidatePath('/');
+  return result;
+}

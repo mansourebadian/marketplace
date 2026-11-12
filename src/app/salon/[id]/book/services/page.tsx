@@ -47,7 +47,6 @@ export default async function ServicesPage({ params, searchParams }: {
   const reviews = salon?.reviews || [];
   return <ServiceSelection
     businessId={business ? id : null}
-    testPaymentsEnabled={process.env.NODE_ENV === 'development' && process.env.BOOKING_TEST_PAYMENTS === '1'}
     customerHasPhone={Boolean(customer?.accounts.length)}
     initialSlot={slot && /^\d{13}$/.test(slot) ? Number(slot) : null}
     salon={{ name: salon?.name || business!.name, address: salon ? salon.address : formatBusinessAddress(business!.businessAddress, business!.businessLocation) || 'آدرس ثبت نشده است', image: salon?.portfolio[0]?.imageUrl || salon?.imageUrl || null, rating: reviews.length ? reviews.reduce((total, review) => total + review.rating, 0) / reviews.length : null, reviewsCount: reviews.length }}
