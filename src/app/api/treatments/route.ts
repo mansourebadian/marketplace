@@ -19,11 +19,9 @@ export type TreatmentCategory = {
 };
 
 // حداکثر تعداد سرویس نمایش‌داده‌شده زیر هر دسته‌بندی در دراپ‌داون
-const SERVICES_PREVIEW_LIMIT = 6;
-
 export async function GET() {
   try {
-    const categories = await prisma.serviceCategory.findMany({
+    const [categories, businessServices, uncategorizedServices] = await Promise.all([prisma.serviceCategory.findMany({
       orderBy: [{ order: "asc" }, { name: "asc" }],
       select: {
         id: true,
@@ -33,7 +31,6 @@ export async function GET() {
         order: true,
         _count: { select: { services: true } },
         services: {
-          take: SERVICES_PREVIEW_LIMIT,
           orderBy: { name: "asc" },
           select: {
             id: true,
@@ -43,7 +40,10 @@ export async function GET() {
           },
         },
       },
-    });
+    }),
+      prisma.businessService.findMany({ select: { id: true, name: true, price: true, durationMin: true, treatmentType: { select: { groupName: true, groupSlug: true } } }, orderBy: { name: 'asc' } }),
+      prisma.service.findMany({ where: { categoryId: null }, select: { id: true, name: true, price: true, durationMin: true }, orderBy: { name: 'asc' } }),
+    ]);
 
     const data: TreatmentCategory[] = categories.map((category) => ({
       id: category.id,
@@ -55,12 +55,29 @@ export async function GET() {
       services: category.services,
     }));
 
+    const registeredGroups = new Map<string, TreatmentCategory>();
+    for (const service of businessServices) {
+      const groupName = service.treatmentType?.groupName || 'سایر خدمات';
+      const groupKey = service.treatmentType?.groupSlug || 'other';
+      let group = registeredGroups.get(groupKey);
+      if (!group) {
+        group = { id: `business-${groupKey}`, name: groupName, slug: groupKey, icon: '', order: 0, servicesCount: 0, services: [] };
+        registeredGroups.set(groupKey, group);
+      }
+      if (!group.services.some(item => item.name === service.name)) group.services.push(service);
+    }
+    if (uncategorizedServices.length) registeredGroups.set('uncategorized-salons', { id: 'uncategorized-salons', name: 'سایر خدمات سالن‌ها', slug: 'other-salons', icon: '', order: 0, servicesCount: uncategorizedServices.length, services: uncategorizedServices });
+    for (const group of registeredGroups.values()) {
+      group.servicesCount = group.services.length;
+      data.push(group);
+    }
+
     return NextResponse.json(
       { data },
       {
         headers: {
           // دسته‌بندی‌ها کم‌تغییر هستند؛ کش لبه‌ای فشار روی SQL Server را کم می‌کند
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+          "Cache-Control": "no-store",
         },
       }
     );

@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { MapPin, Navigation, Loader2 } from 'lucide-react';
+import { CITIES } from '@/lib/cities';
 
 export default function LocationPicker() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,6 +10,8 @@ export default function LocationPicker() {
   const [isLoading, setIsLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const normalize = (text: string) => text.trim().replace(/[يى]/g, 'ی').replace(/ك/g, 'ک').toLocaleLowerCase('fa');
+  const suggestions = CITIES.filter((city) => normalize(city).includes(normalize(locationText)));
 
   // بستن منوی کشویی هنگام کلیک در خارج از کامپوننت
   useEffect(() => {
@@ -109,23 +112,27 @@ export default function LocationPicker() {
   return (
     <div 
       ref={containerRef}
-      className="relative flex items-center w-full lg:flex-1 px-4 py-3 lg:py-2 bg-white lg:bg-transparent border border-gray-200 lg:border-none lg:border-l lg:border-gray-100 rounded-xl lg:rounded-none group transition-all hover:border-gray-400 lg:hover:border-transparent cursor-text"
+      data-search-open={isOpen}
+      className={`relative flex items-center w-full lg:flex-1 px-4 py-3 lg:py-2 bg-white lg:bg-transparent border border-gray-200 lg:border-none lg:border-l lg:border-gray-100 rounded-xl lg:rounded-none group transition-all hover:border-gray-400 lg:hover:border-transparent cursor-text ${isOpen ? 'z-[100]' : ''}`}
       onClick={handleInputClick}
     >
       <MapPin className="w-5 h-5 text-gray-500 ml-3 stroke-[1.5] shrink-0" />
       <input
         ref={inputRef}
         type="text"
-        placeholder="مکان فعلی"
+        name="location"
+        placeholder="شهر یا منطقه را جستجو کنید"
+        aria-label="جستجوی شهر یا منطقه"
         value={locationText}
         onChange={(e) => setLocationText(e.target.value)}
+        onKeyDown={(event) => { if (event.key === 'Escape') setIsOpen(false); }}
         className="w-full bg-transparent border-none outline-none text-[15px] placeholder:text-gray-900/70 text-gray-900 font-medium"
       />
 
       {/* Popover / Dropdown منوی موقعیت مکانی */}
       {isOpen && (
-        <div className="absolute top-[calc(100%+12px)] right-0 w-full lg:w-[350px] bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.12)] border border-gray-100 p-2 z-50">
-          <button
+        <div id="location-suggestions" className="absolute top-[calc(100%+12px)] right-0 w-full lg:w-[350px] bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.12)] border border-gray-100 p-2 z-50">
+          <button type="button"
             onClick={(e) => {
               e.stopPropagation(); // جلوگیری از بسته شدن فوری توسط رویداد کلیک والد
               handleGetCurrentLocation();
@@ -144,6 +151,25 @@ export default function LocationPicker() {
               {isLoading ? 'در حال مسیریابی...' : 'مکان فعلی'}
             </span>
           </button>
+          <p className="px-4 pb-1 pt-2 text-xs font-semibold text-gray-500">انتخاب شهر</p>
+          <div className="max-h-60 overflow-y-auto">
+            {suggestions.map((city) => (
+              <button
+                key={city}
+                type="button"
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-right text-sm text-gray-900 hover:bg-gray-50"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setLocationText(city);
+                  setIsOpen(false);
+                }}
+              >
+                <MapPin className="h-4 w-4 shrink-0 text-gray-500" />
+                {city}
+              </button>
+            ))}
+            {suggestions.length === 0 && <p className="px-4 py-3 text-sm text-gray-500">می‌توانید نام شهر یا منطقه دلخواه را وارد و جستجو کنید.</p>}
+          </div>
         </div>
       )}
     </div>

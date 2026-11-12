@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React from 'react';
-import { Search, Calendar as CalendarIcon, QrCode } from 'lucide-react';
+import { Calendar as CalendarIcon, QrCode } from 'lucide-react';
 import DateTimePicker from './DateTimePicker';
 import LocationPicker from './LocationPicker'; // وارد کردن کامپوننت جدید
 import TreatmentsDropdown from '../shared/TreatmentsDropdown';
@@ -21,7 +21,7 @@ export const Hero = () => {
       </div>
 
       {/* Search Bar Container */}
-      <div className="w-full max-w-[950px] mx-auto bg-white/90 md:bg-white/60 lg:bg-white backdrop-blur-md lg:backdrop-blur-none rounded-3xl lg:rounded-full shadow-[0_12px_40px_rgb(0,0,0,0.08)] lg:shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-4 md:p-5 lg:p-2.5 flex flex-col lg:flex-row items-center gap-3 lg:gap-0 z-10 border border-white/40 lg:border-none">
+      <form action="/search" className="relative z-20 w-full max-w-[950px] mx-auto bg-white/90 md:bg-white/90 lg:bg-white rounded-3xl lg:rounded-full shadow-[0_12px_40px_rgb(0,0,0,0.08)] lg:shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-4 md:p-5 lg:p-2.5 flex flex-col lg:flex-row items-center gap-3 lg:gap-0 border border-white/40 lg:border-none">
 
         {/* Treatment Input */}
         <TreatmentsDropdown variant="hero" placeholder="همه خدمات" />
@@ -43,7 +43,7 @@ export const Hero = () => {
           <span className="lg:hidden">جستجوی فریشا</span>
           <span className="hidden lg:inline">جستجو</span>
         </button>
-      </div>
+      </form>
 
       {/* Stats and App Button */}
       <div className="mt-10 md:mt-12 flex flex-col items-center gap-6 z-10">

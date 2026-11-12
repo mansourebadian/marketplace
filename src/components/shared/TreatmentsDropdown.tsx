@@ -206,7 +206,7 @@ export default function TreatmentsDropdown({
 
       setPanelPosition({
         top: rect.bottom + 8,          // دقیقاً زیر input (8px فاصله)
-        left: rect.left,               // هم‌تراز لبه راست input
+        left: Math.max(8, Math.min(rect.left, viewportWidth - maxWidth - 8)),               // هم‌تراز لبه راست input
         width: maxWidth,               // حداکثر 520px، سازگار با موبایل
       });
     };
@@ -242,7 +242,6 @@ export default function TreatmentsDropdown({
         if (controller.signal.aborted) return;
 
         const normalized = normalize(json);
-        console.log('[TreatmentsDropdown] Categories loaded:', normalized.length, normalized);
 
         setCategories(normalized);
         loadedRef.current = true;
@@ -296,15 +295,16 @@ export default function TreatmentsDropdown({
 
   /* ---------- فیلتر سمت کلاینت (دسته + خدمات) ---------- */
   const results = useMemo<TreatmentCategory[]>(() => {
-    const q = query.trim().toLowerCase();
+    const normalizeText = (text: string) => text.trim().toLocaleLowerCase('fa').replace(/[يى]/g, 'ی').replace(/ك/g, 'ک');
+    const q = normalizeText(query);
     if (!q) return categories;
 
     const filtered: TreatmentCategory[] = [];
 
     for (const cat of categories) {
-      const catMatch = cat.name.toLowerCase().includes(q);
+      const catMatch = normalizeText(cat.name).includes(q);
       const matchedServices = cat.services.filter((sv) =>
-        sv.name.toLowerCase().includes(q),
+        normalizeText(sv.name).includes(q),
       );
 
       if (catMatch || matchedServices.length > 0) {
@@ -346,7 +346,7 @@ export default function TreatmentsDropdown({
 
   /* ---------- رندر ---------- */
   return (
-    <div ref={containerRef} className={styles.root}>
+    <div ref={containerRef} data-search-open={open} className={`${styles.root} ${open ? 'z-[100]' : ''}`}>
       {/* Trigger */}
       <div
         ref={triggerRef}
@@ -356,6 +356,7 @@ export default function TreatmentsDropdown({
         <Search className={styles.icon} strokeWidth={1.5} />
         <input
           type="text"
+          name="q"
           role="combobox"
           aria-expanded={open}
           aria-controls="treatments-panel"
@@ -452,7 +453,7 @@ export default function TreatmentsDropdown({
           )}
 
           {/* حالت جستجو: نمایش خدمات منطبق */}
-          {!loading && !error && results.length > 0 && isSearching && (
+          {!loading && !error && results.length > 0 && (
             <div className="space-y-3">
               {results.map((cat) => (
                 <div key={cat.id}>
@@ -460,7 +461,7 @@ export default function TreatmentsDropdown({
                     {cat.name}
                   </p>
                   <div className="space-y-0.5">
-                    {cat.services.slice(0, 6).map((sv) => (
+                    {cat.services.map((sv) => (
                       <button
                         key={sv.id}
                         type="button"

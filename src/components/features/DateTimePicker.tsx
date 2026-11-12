@@ -37,7 +37,9 @@ export default function DateTimePicker() {
     : 'هر زمان';
 
   return (
-    <div className="relative flex-1" ref={popoverRef}>
+    <div className={`relative flex-1 ${isOpen ? 'z-[100]' : ''}`} ref={popoverRef} data-search-open={isOpen}>
+      {selectedDate && <input type="hidden" name="date" value={[selectedDate.toDate().getFullYear(), String(selectedDate.toDate().getMonth() + 1).padStart(2, '0'), String(selectedDate.toDate().getDate()).padStart(2, '0')].join('-')} />}
+      {selectedTime !== 'any' && <input type="hidden" name="time" value={selectedTime} />}
       {/* دکمه باز کننده (Input Trigger) */}
       <div 
         onClick={() => setIsOpen(!isOpen)}
@@ -55,14 +57,14 @@ export default function DateTimePicker() {
           
           {/* ستون راست (در فارسی): انتخاب سریع */}
           <div className="flex flex-col gap-3 w-48 border-l border-gray-100 pl-6">
-            <button 
+            <button type="button" 
               onClick={setToday}
               className="flex flex-col items-center justify-center p-4 rounded-2xl border border-gray-200 hover:border-black transition-colors"
             >
               <span className="font-semibold text-gray-900">امروز</span>
               <span className="text-xs text-gray-500 mt-1">{new DateObject({ calendar: persian, locale: persian_fa }).format("dddd, D MMMM")}</span>
             </button>
-            <button 
+            <button type="button" 
               onClick={setTomorrow}
               className="flex flex-col items-center justify-center p-4 rounded-2xl border border-gray-200 hover:border-black transition-colors"
             >
@@ -92,14 +94,14 @@ export default function DateTimePicker() {
             <div className="flex items-center gap-3">
               <span className="text-sm font-semibold text-gray-900 ml-2">انتخاب زمان</span>
               
-              <button 
+              <button type="button" 
                 onClick={() => setSelectedTime('any')}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${selectedTime === 'any' ? 'border-2 border-purple-600 text-purple-700 bg-purple-50' : 'border border-gray-200 text-gray-700 hover:border-gray-300'}`}
               >
                 هر زمان
               </button>
               
-              <button 
+              <button type="button" 
                 onClick={() => setSelectedTime('morning')}
                 className={`flex flex-col items-center px-4 py-2 rounded-xl border transition-colors ${selectedTime === 'morning' ? 'border-2 border-purple-600 text-purple-700 bg-purple-50' : 'border-gray-200 hover:border-gray-300'}`}
               >
@@ -107,7 +109,7 @@ export default function DateTimePicker() {
                 <span className="text-[10px] text-gray-500">۹ تا ۱۲</span>
               </button>
               
-              <button 
+              <button type="button" 
                 onClick={() => setSelectedTime('afternoon')}
                 className={`flex flex-col items-center px-4 py-2 rounded-xl border transition-colors ${selectedTime === 'afternoon' ? 'border-2 border-purple-600 text-purple-700 bg-purple-50' : 'border-gray-200 hover:border-gray-300'}`}
               >
@@ -115,7 +117,7 @@ export default function DateTimePicker() {
                 <span className="text-[10px] text-gray-500">۱۲ تا ۱۷</span>
               </button>
               
-              <button 
+              <button type="button" 
                 onClick={() => setSelectedTime('evening')}
                 className={`flex flex-col items-center px-4 py-2 rounded-xl border transition-colors ${selectedTime === 'evening' ? 'border-2 border-purple-600 text-purple-700 bg-purple-50' : 'border-gray-200 hover:border-gray-300'}`}
               >
