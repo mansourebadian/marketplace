@@ -6,7 +6,7 @@ import DateTimePicker from './DateTimePicker';
 import LocationPicker from './LocationPicker'; // وارد کردن کامپوننت جدید
 import TreatmentsDropdown from '../shared/TreatmentsDropdown';
 
-export const Hero = ({ bookingCount }: { bookingCount: string | null }) => {
+export const Hero = ({ bookingCount, customerLabel }: { bookingCount: string | null; customerLabel: string | null }) => {
   return (
     <section className="relative pt-24 md:pt-44 pb-20 md:pb-24 px-4 flex flex-col items-center justify-center min-h-[75vh]">
 
@@ -16,7 +16,7 @@ export const Hero = ({ bookingCount }: { bookingCount: string | null }) => {
           رزرو خدمات مراقبت شخصی محلی
         </h1>
         <p className="text-[15px] md:text-[17px] text-gray-700 font-medium max-w-[700px] md:mx-auto mt-4 pl-4 md:pl-0">
-          بهترین سالن‌ها، آرایشگاه‌ها، مراکز درمانی، استودیوهای سلامتی و متخصصان زیبایی که مورد اعتماد میلیون‌ها نفر در سراسر جهان هستند را کشف کنید
+          بهترین سالن‌ها، آرایشگاه‌ها، مراکز درمانی، استودیوهای سلامتی و متخصصان زیبایی{customerLabel ? ` که مورد اعتماد ${customerLabel} هستند` : ''} را کشف کنید
         </p>
       </div>
 
@@ -54,7 +54,7 @@ export const Hero = ({ bookingCount }: { bookingCount: string | null }) => {
           نوبت رزرو شده تاکنون
         </p>}
 
-        <button className="flex items-center gap-2 px-5 py-2.5 bg-white rounded-full border border-gray-200 shadow-sm hover:bg-gray-50 hover:shadow-md transition-all text-[14px] font-semibold text-gray-900 cursor-pointer">
+        <button className="hidden items-center gap-2 px-5 py-2.5 bg-white rounded-full border border-gray-200 shadow-sm hover:bg-gray-50 hover:shadow-md transition-all text-[14px] font-semibold text-gray-900 cursor-pointer">
           دریافت اپلیکیشن
           <QrCode className="w-4 h-4" />
         </button>
