@@ -4,6 +4,11 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
+        protocol: "https",
+        hostname: "images.aryno.ir",
+        pathname: "/images/**",
+      },
+      {
         protocol: "http",
         hostname: "localhost",
         port: "4001",

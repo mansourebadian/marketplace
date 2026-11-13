@@ -1,3 +1,4 @@
+import { uploadImage } from '@/lib/image-server-upload';
 import { auth } from '@/auth';
 import { bundleSchema, createBusinessBundle } from '@/actions/business-bundles.actions';
 import { prisma } from '@/lib/prisma';
@@ -34,11 +35,10 @@ export async function POST(request: Request) {
     return Response.json({ error: 'تصاویر باید از نوع JPG، PNG، AVIF یا WebP و حداکثر ۴۵ مگابایت باشند.' }, { status: 400 });
   }
   const imageNames: string[] = [];
-  const base = process.env.IMAGE_SERVER_URL || process.env.NEXT_PUBLIC_IMAGE_SERVER_URL || 'http://localhost:4001';
   try {
     for (const item of files) {
       const file = item as File;
-      const response = await fetch(`${base.replace(/\/$/, '')}/images`, { method: 'POST', headers: { 'Content-Type': file.type }, body: file, cache: 'no-store' });
+      const response = await uploadImage(file);
       if (!response.ok) return Response.json({ error: 'بارگذاری تصویر در سرور تصاویر انجام نشد.' }, { status: 502 });
       const result: unknown = await response.json();
       const name = typeof result === 'object' && result !== null && 'name' in result ? result.name : null;

@@ -1,3 +1,4 @@
+import { uploadImage } from '@/lib/image-server-upload';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { createTeamPhotoToken } from '@/lib/team-photo-token';
@@ -15,8 +16,7 @@ export async function POST(request: Request) {
   const bytes = new Uint8Array(await file.arrayBuffer());
   if (![137, 80, 78, 71, 13, 10, 26, 10].every((value, index) => bytes[index] === value)) return Response.json({ error: 'فرمت تصویر معتبر نیست.' }, { status: 400 });
   try {
-    const base = process.env.IMAGE_SERVER_URL || process.env.NEXT_PUBLIC_IMAGE_SERVER_URL || 'http://localhost:4001';
-    const response = await fetch(`${base.replace(/\/$/, '')}/images`, { method: 'POST', headers: { 'Content-Type': 'image/png' }, body: file, cache: 'no-store' });
+    const response = await uploadImage(file);
     if (!response.ok) throw new Error('Image server rejected upload');
     const result: unknown = await response.json();
     const name = typeof result === 'object' && result !== null && 'name' in result ? result.name : null;

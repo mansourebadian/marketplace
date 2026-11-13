@@ -1,0 +1,13 @@
+.header > div:first-child span:first-child::before { width: 100%; }
+.header > div:first-child span:nth-child(2)::before { content: ''; position: absolute; inset-block: 0; inset-inline-start: 0; width: 60%; border-radius: inherit; background: #7652ff; }
+.header button:disabled { opacity: .48; cursor: not-allowed; }
+.content { max-width: 696px; margin: 42px auto 100px; }
+.content h1 { margin: 0 0 6px; font-size: clamp(28px, 3vw, 40px); font-weight: 750; line-height: 1.6; }
+.description { margin: 0 0 30px; color: #808080; font-size: 16px; line-height: 1.9; }
+.group { border: 0; padding: 0; margin: 0 0 30px; min-width: 0; }.group legend { font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+.options { display: flex; flex-wrap: wrap; gap: 9px; }
+.option { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 5px 14px; border: 1px solid #d6d6d6; border-radius: 24px; font-size: 14px; cursor: pointer; transition: background .15s, border-color .15s; }
+.option:hover { border-color: #7652ff; }.selected { background: #f0edff; border-color: #7652ff; color: #5536dd; }.option:has(input:focus-visible) { outline: 2px solid #7652ff; outline-offset: 3px; }
+.option input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.error { color: #c92338; font-size: 14px; }
+@media (max-width: 760px) { .content { margin: 36px 24px 70px; }.description { font-size: 14px; }.option { font-size: 13px; } }

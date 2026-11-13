@@ -1,0 +1,25 @@
+.page { overflow: auto; font-family: var(--font-iransans), system-ui, sans-serif; background: radial-gradient(ellipse at 0% 13%, #78e6d1 0, #c9f4df 21%, transparent 43%), #f8f8f8; }
+.content { min-height: 100%; max-width: 1100px; margin: auto; padding: 64px 40px; display: flex; align-items: center; justify-content: center; gap: clamp(55px, 9vw, 150px); }
+.copy { flex: 0 1 500px; }
+.copy h1 { max-width: 500px; margin: 0 0 18px; font-size: clamp(30px, 3vw, 40px); line-height: 1.45; font-weight: 750; }
+.copy p { margin: 0 0 24px; font-size: 16px; line-height: 1.8; }
+.copy ul { list-style: none; display: grid; gap: 10px; margin: 0; padding: 0; font-size: 14px; line-height: 1.8; }
+.copy li { display: flex; align-items: flex-start; gap: 12px; }
+.copy li svg { flex: none; margin-top: 3px; }
+.actions { display: flex; align-items: center; gap: 24px; margin-top: 52px; font-size: 15px; font-weight: 700; }
+.actions button { border: 0; border-radius: 28px; background: #111; color: #fff; padding: 14px 21px; font: inherit; }
+.actions button:disabled { cursor: not-allowed; }
+.actions a { color: #111; text-decoration: none; }
+.actions .start { border-radius: 28px; background: #111; color: #fff; padding: 14px 21px; }
+.actions a:hover { text-decoration: underline; }
+.art { position: relative; flex: 0 0 380px; height: 460px; direction: rtl; }
+.phoneFront, .phoneBack { position: absolute; overflow: hidden; background: white; border: 6px solid #fff; border-radius: 23px; box-shadow: 0 8px 22px #00000019; }
+.phoneFront { width: 220px; height: 430px; top: 0; right: 16px; z-index: 1; }
+.phoneBack { width: 200px; height: 410px; top: 40px; left: 0; }
+.photo { height: 155px; background: url('/images/professionals-auth-hero.png') center / cover; }
+.phoneCopy { display: flex; flex-direction: column; gap: 9px; padding: 14px 12px; font-size: 12px; }
+.phoneCopy strong { font-size: 15px; }.phoneCopy small { color: #555; }.rating { display: flex; align-items: center; gap: 4px; }.rating small { color: #6950fa; }
+.tag { align-self: flex-start; padding: 4px 8px; border-radius: 4px; background: #efedff; color: #6950fa; }.phoneCopy hr { width: 100%; border: 0; border-top: 1px solid #eee; }.book { align-self: flex-end; margin-top: 12px; padding: 7px 12px; border-radius: 5px; background: #111; color: white; }
+.search { display: flex; align-items: center; gap: 5px; padding: 12px 8px; font-size: 10px; }.map { height: 180px; display: flex; align-items: center; justify-content: space-around; color: #352d54; background: repeating-linear-gradient(35deg, transparent 0 26px, #fff 27px 31px, transparent 32px 53px), repeating-linear-gradient(120deg, #d5eedc 0 30px, #fff 31px 35px, #e9ead9 36px 60px); }.previewLine, .previewLineShort { height: 12px; margin: 22px 12px 0; border-radius: 6px; background: #eee; }.previewLineShort { width: 55%; margin-top: 10px; }
+@media (max-width: 900px) { .content { gap: 35px; padding: 45px 25px; }.art { flex-basis: 300px; transform: scale(.8); transform-origin: center; margin-inline: -35px; } }
+@media (max-width: 650px) { .content { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 20px; }.copy { flex: none; }.actions { margin-top: 30px; }.art { flex: none; align-self: center; width: 300px; height: 370px; transform-origin: top center; margin: 0; } }

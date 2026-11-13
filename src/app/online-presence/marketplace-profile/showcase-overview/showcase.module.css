@@ -1,0 +1,3 @@
+.progress span:first-child::before { width: 100%; }
+.disabled { cursor: not-allowed; }
+.rocket { overflow: visible; }

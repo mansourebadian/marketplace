@@ -12,7 +12,7 @@ const navigation = [
   { icon: Tag, label: 'فروش' },
   { icon: Smile, label: 'مشتریان' },
   { icon: BookOpen, label: 'فهرست خدمات' },
-  { icon: ContactRound, label: 'مخاطبین' },
+  { icon: ContactRound, label: 'حضور آنلاین' },
   { icon: Megaphone, label: 'بازاریابی' },
   { icon: UsersRound, label: 'تیم' },
   { icon: TrendingUp, label: 'گزارش‌ها' },
@@ -24,13 +24,14 @@ const catalogGroups = [{ title: 'کاتالوگ', items: ['فهرست خدمات
 
 export function BusinessWorkspace({ ownerName, activePage, label, children }: {
   ownerName: string;
-  activePage: '/calendar' | '/setup' | '/catalogue/services' | '/catalogue/memberships' | '/catalogue/products' | '/team/team-members' | '/team/scheduled-shifts';
+  activePage: '/calendar' | '/setup' | '/catalogue/services' | '/catalogue/memberships' | '/catalogue/products' | '/team/team-members' | '/team/scheduled-shifts' | '/online-presence/marketplace-profile';
   label: string;
   children: ReactNode;
 }) {
   const [setupOpen, setSetupOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(activePage === '/catalogue/memberships' || activePage === '/catalogue/products');
   const [teamOpen, setTeamOpen] = useState(activePage.startsWith('/team/'));
+  const [presenceOpen, setPresenceOpen] = useState(activePage.startsWith('/online-presence/'));
   const initials = ownerName.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
   useEffect(() => { if (!setupOpen) return; const close = (event: KeyboardEvent) => event.key === 'Escape' && setSetupOpen(false); document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close); }, [setupOpen]);
 
@@ -47,13 +48,28 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
       {navigation.map(({ icon: Icon, label: title, href }) => href
         ? <Link key={title} href={href} title={title} aria-label={title} aria-current={activePage === href ? 'page' : undefined} className={activePage === href ? styles.activeNav : styles.navIcon}><Icon size={25} strokeWidth={1.65} /></Link>
         : Icon === BookOpen
-          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={catalogOpen} aria-controls="business-catalog-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${catalogOpen || activePage.startsWith('/catalogue/') ? styles.activeNav : ''}`} onClick={() => { setCatalogOpen(open => !open); setTeamOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
+          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={catalogOpen} aria-controls="business-catalog-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${catalogOpen || activePage.startsWith('/catalogue/') ? styles.activeNav : ''}`} onClick={() => { setCatalogOpen(open => !open); setTeamOpen(false); setPresenceOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
           : Icon === UsersRound
-          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={teamOpen} aria-controls="business-team-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${teamOpen || activePage.startsWith('/team/') ? styles.activeNav : ''}`} onClick={() => { setTeamOpen(open => !open); setCatalogOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
+          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={teamOpen} aria-controls="business-team-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${teamOpen || activePage.startsWith('/team/') ? styles.activeNav : ''}`} onClick={() => { setTeamOpen(open => !open); setCatalogOpen(false); setPresenceOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
+          : Icon === ContactRound
+          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={presenceOpen} aria-controls="business-presence-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${presenceOpen || activePage.startsWith('/online-presence/') ? styles.activeNav : ''}`} onClick={() => { setPresenceOpen(open => !open); setCatalogOpen(false); setTeamOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
           : <span key={title} title={title} aria-label={title} className={styles.navIcon}><Icon size={25} strokeWidth={1.65} /></span>)}
       <span className={styles.help} title="راهنما"><CircleHelp size={24} /></span>
     </aside>
     <div className={styles.workspaceBody}>
+      {presenceOpen && <aside id="business-presence-panel" className={styles.catalogPanel} aria-label="منوی حضور آنلاین">
+        <button type="button" className={styles.catalogCollapse} onClick={() => setPresenceOpen(false)} aria-label="بستن منوی حضور آنلاین"><ChevronLeft size={18} /></button>
+        <div className={styles.catalogSections}>
+          <section className={styles.catalogGroup}>
+            <h2>رزرو آنلاین</h2>
+            <ul><li><Link href="/online-presence/marketplace-profile" className={styles.catalogLink} aria-current={activePage === '/online-presence/marketplace-profile' ? 'page' : undefined}>پروفایل در بازار آرینو</Link></li>{['رزرو با گوگل', 'رزرو با فیسبوک و اینستاگرام', 'لینک‌های مستقیم'].map(item => <li key={item}>{item}</li>)}</ul>
+          </section>
+          <section className={styles.catalogGroup}>
+            <h2>وب‌سایت‌های شما</h2>
+            <ul>{['وب‌سایت هوشمند', 'فروشگاه محصولات'].map(item => <li key={item}>{item}</li>)}</ul>
+          </section>
+        </div>
+      </aside>}
       {teamOpen && <aside id="business-team-panel" className={styles.catalogPanel} aria-label="منوی تیم">
         <button type="button" className={styles.catalogCollapse} onClick={() => setTeamOpen(false)} aria-label="بستن منوی تیم"><ChevronLeft size={18} /></button>
         <div className={styles.catalogSections}>

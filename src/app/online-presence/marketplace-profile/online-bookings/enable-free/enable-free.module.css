@@ -1,0 +1,14 @@
+.progress span:first-child::before { width: 100%; }
+.progress span:nth-child(2)::before, .progress span:nth-child(3)::before { content: ''; position: absolute; inset-block: 0; inset-inline-start: 0; border-radius: inherit; background: #7652ff; }
+.progress span:nth-child(2)::before { width: 100%; }.progress span:nth-child(3)::before { width: 50%; }
+.disabled { opacity: .45; cursor: not-allowed; }
+.content { max-width: 696px; margin: 42px auto 100px; }
+.content h1 { margin: 0 0 25px; font-size: clamp(28px, 3vw, 40px); font-weight: 750; line-height: 1.6; }
+.content p { margin: 26px 0 0; font-size: 16px; line-height: 1.9; }
+.art { height: 394px; position: relative; overflow: hidden; border-radius: 10px; background: radial-gradient(ellipse at 5% 0%, #9955ed 0%, #e1a9ef 42%, transparent 75%), #f9f5fa; }
+.card { position: absolute; width: 288px; height: 380px; inset-inline-start: 50%; top: 62px; transform: translateX(50%); overflow: hidden; border: 8px solid #fff9; border-radius: 28px 28px 0 0; background: white; box-shadow: 0 8px 28px #5541692c; }
+.photo { height: 190px; background: url('/images/professionals-auth-hero.png') center / cover; }
+.cardText { display: grid; gap: 9px; padding: 14px; font-size: 12px; }.cardText strong { font-size: 17px; }.cardText span { color: #555; }.rating { display: flex; align-items: center; gap: 4px; }.rating small { color: #777; }
+.book { position: absolute; top: 73px; left: calc(50% - 220px); padding: 12px 20px; border: 4px solid #ffffffba; border-radius: 35px; background: #101617; color: white; font-size: 14px; box-shadow: 0 4px 14px #0002; }
+.growth { position: absolute; top: 200px; right: calc(50% - 245px); display: flex; align-items: center; gap: 15px; padding: 12px 18px; border: 5px solid #ffffffa8; border-radius: 19px; background: #fffc; box-shadow: 0 5px 18px #0002; }.growth div { display: grid; gap: 3px; }.growth strong { font-size: 21px; }.growth span { font-size: 12px; }
+@media (max-width: 760px) { .content { margin: 36px 24px 70px; }.content p { font-size: 14px; }.art { height: 330px; }.card { top: 50px; width: 230px; }.photo { height: 155px; }.book { left: 4%; }.growth { top: 190px; right: 4%; }.header :global(button), .header a { font-size: 12px; } }

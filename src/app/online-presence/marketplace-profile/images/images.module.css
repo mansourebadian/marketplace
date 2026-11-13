@@ -1,0 +1,24 @@
+.header > div:first-child span:first-child::before { width: 100%; }
+.header > div:first-child span:nth-child(2)::before { content: ''; position: absolute; inset-block: 0; inset-inline-start: 0; width: 40%; border-radius: inherit; background: #7652ff; }
+.header button:disabled { opacity: .48; cursor: not-allowed; }
+.guide { display: inline-flex; align-items: center; padding: 0 12px; color: #111; text-decoration: none; font-size: 14px; font-weight: 700; }
+.content { max-width: 1184px; margin: 42px auto 100px; }
+.content h1 { margin: 0 0 8px; font-size: clamp(28px, 3vw, 40px); line-height: 1.6; font-weight: 750; }
+.description { margin: 0 0 28px; color: #808080; font-size: 16px; line-height: 1.9; }
+.drop { border: 1px dashed #d3d3d3; border-radius: 18px; padding: 8px; }
+.dropInner { min-height: 280px; background: #f7f7f7; border-radius: 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; }
+.dropInner strong { font-size: 18px; }.dropInner span { color: #808080; font-size: 14px; }
+.dropInner button { border: 1px solid #d5d5d5; border-radius: 24px; background: white; padding: 8px 18px; font: inherit; cursor: pointer; }
+.compact .dropInner { min-height: 110px; flex-direction: row; flex-wrap: wrap; padding: 12px; }
+.dragging { border-color: #7652ff; background: #f1eeff; }
+.hint { margin: 8px 0 18px; color: #888; font-size: 13px; line-height: 1.7; }
+.error { color: #d42038; font-size: 14px; }
+.uploading { padding: 17px; border-radius: 12px; background: #f7f7f7; font-size: 14px; font-weight: 700; }
+.track { height: 4px; border-radius: 4px; background: #e9e9e9; margin-top: 16px; overflow: hidden; }.track span { display: block; height: 100%; background: #111; transition: width .2s; }
+.gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 216px; gap: 10px; }
+.tile { position: relative; overflow: hidden; border-radius: 12px; border: 1px solid #e4e4e4; background: #f3f3f3; cursor: grab; }.tile img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cover { grid-column: span 2; grid-row: span 2; }.badge { position: absolute; bottom: 10px; inset-inline-start: 10px; padding: 3px 12px; border-radius: 20px; color: #6543ff; background: #efedff; font-size: 12px; }
+.tileActions { position: absolute; top: 8px; inset-inline-end: 8px; display: flex; gap: 4px; }.tileActions button { width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid #ddd; border-radius: 50%; background: #fffffff0; cursor: pointer; }.tileActions button:disabled { opacity: .5; cursor: not-allowed; }
+.add { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 16px; background: #f1f1f1; font: inherit; cursor: pointer; }.add span { font-size: 13px; }.add:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 1250px) { .content { margin-inline: 32px; } }
+@media (max-width: 650px) { .content { margin: 36px 20px 70px; }.description { font-size: 14px; }.guide { display: none; }.gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 150px; }.cover { grid-column: span 2; grid-row: span 2; }.compact .dropInner { flex-direction: column; }.header :global(button), .header a { font-size: 12px; } }

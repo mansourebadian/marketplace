@@ -453,7 +453,7 @@ export default function TreatmentsDropdown({
           )}
 
           {/* حالت جستجو: نمایش خدمات منطبق */}
-          {!loading && !error && results.length > 0 && (
+          {!loading && !error && results.length > 0 && isSearching && (
             <div className="space-y-3">
               {results.map((cat) => (
                 <div key={cat.id}>

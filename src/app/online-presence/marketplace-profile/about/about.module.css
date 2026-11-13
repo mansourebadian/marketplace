@@ -1,0 +1,10 @@
+.header > div:first-child span:first-child::before { width: 100%; }
+.header > div:first-child span:nth-child(2)::before { content: ''; position: absolute; inset-block: 0; inset-inline-start: 0; width: 80%; border-radius: inherit; background: #7652ff; }
+.header button:disabled { opacity: .48; cursor: not-allowed; }
+.content { max-width: 696px; margin: 42px auto 100px; }
+.content h1 { margin: 0 0 6px; font-size: clamp(28px, 3vw, 40px); font-weight: 750; line-height: 1.6; }
+.intro { margin: 0 0 28px; color: #808080; font-size: 16px; line-height: 1.9; }
+.labelRow { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 14px; font-weight: 700; }.labelRow span { color: #888; font-weight: 400; }
+.textarea { display: block; width: 100%; min-height: 122px; resize: vertical; padding: 15px; border: 1px solid #d4d4d4; border-radius: 13px; font: inherit; font-size: 14px; line-height: 1.8; color: #111; background: white; }.textarea::placeholder { color: #b2b2b2; }.textarea:focus { border-color: #7652ff; outline: 2px solid #7652ff33; }
+.hint { margin: 4px 0 0; color: #888; font-size: 12px; line-height: 1.7; }.error { color: #c92338; font-size: 14px; }
+@media (max-width: 760px) { .content { margin: 36px 24px 70px; }.intro { font-size: 14px; } }
