@@ -22,7 +22,7 @@ export default async function PhoneVerificationPage() {
     <section dir="rtl" className="relative z-20 flex min-h-[100dvh] w-full flex-col bg-white px-5 py-5 sm:px-8 lg:w-1/2 lg:overflow-y-auto">
       <Link href={backHref} aria-label="بازگشت و ویرایش شماره موبایل" className="absolute left-5 top-5 inline-flex h-11 w-11 items-center justify-center rounded-full text-neutral-900 hover:bg-neutral-100 sm:left-8 sm:top-5"><ArrowLeft className="h-6 w-6" /></Link>
       <div className="mx-auto w-full max-w-[396px] pb-10 pt-20 lg:pt-[8vh]">
-        <PhoneOtpForm key={challenge.id} phone={challenge.phone} resendAt={challenge.createdAt.getTime() + OTP_COOLDOWN} backHref={backHref} />
+        <PhoneOtpForm key={challenge.id} flow={business ? 'business' : 'customer'} phone={challenge.phone} resendAt={challenge.createdAt.getTime() + OTP_COOLDOWN} backHref={backHref} />
       </div>
     </section>
     <aside className="relative hidden min-h-[100dvh] w-1/2 overflow-hidden lg:block">

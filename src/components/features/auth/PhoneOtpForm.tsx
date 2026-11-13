@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { confirmPhoneOtp, resendPhoneOtp } from '@/actions/phone-auth.actions';
 import { latinDigits } from '@/lib/phone';
 
-export function PhoneOtpForm({ phone, resendAt, backHref }: { phone: string; resendAt: number; backHref: string }) {
+export function PhoneOtpForm({ phone, resendAt, backHref, flow }: { phone: string; resendAt: number; backHref: string; flow: 'business' | 'customer' }) {
   const [digits, setDigits] = useState<string[]>(Array(6).fill(''));
   const inputs = useRef<Array<HTMLInputElement | null>>([]);
   const [state, action, pending] = useActionState(confirmPhoneOtp, {});
@@ -31,6 +31,7 @@ export function PhoneOtpForm({ phone, resendAt, backHref }: { phone: string; res
 
   return <div dir="rtl" className="w-full">
     <header className="mb-6 text-center">
+      <p className="mb-2 text-sm font-semibold text-neutral-500">{flow === 'business' ? 'ورود متخصصان' : 'ورود مشتریان'}</p>
       <h1 className="text-2xl font-bold text-neutral-950">شماره موبایل خود را تأیید کنید</h1>
       <p className="mt-2 text-sm leading-7 text-neutral-500">کد تأیید به شمارهٔ <bdi dir="ltr" className="whitespace-nowrap">{phone}</bdi> ارسال شد.</p>
     </header>
