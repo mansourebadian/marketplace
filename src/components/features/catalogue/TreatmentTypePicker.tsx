@@ -94,6 +94,6 @@ export function TreatmentTypePicker({ initial }: { initial?: Treatment | null })
         {!filtered.length && <li role="presentation" className={styles.message}>نوع خدمتی پیدا نشد.</li>}
       </ul>}
     </div>}
-    <small>به مشتریان کمک می‌کند خدمت شما را در بازار فرشا پیدا کنند.</small>
+    <small>به مشتریان کمک می‌کند خدمت شما را در بازار آرینو پیدا کنند.</small>
   </div>;
 }

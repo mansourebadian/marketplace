@@ -2,7 +2,7 @@ import { createHmac, randomBytes, randomInt, timingSafeEqual, randomUUID } from 
 import { Prisma, type PrismaClient } from '@prisma/client';
 import { safePhoneCallback } from './phone';
 
-export const OTP_COOKIE = 'fresha-phone-challenge';
+export const OTP_COOKIE = 'aryno-phone-challenge';
 export const OTP_LIFETIME = 5 * 60 * 1000;
 export const OTP_COOLDOWN = 60 * 1000;
 export const OTP_MAX_ATTEMPTS = 5;

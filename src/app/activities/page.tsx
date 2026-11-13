@@ -9,8 +9,8 @@ import {
 } from '@/components/features/activities/ActivitiesPageClient';
 
 export const metadata: Metadata = {
-  title: 'فعالیت‌ها | فرشا',
-  description: 'مشاهده نوبت‌ها، کارت‌های هدیه و خریدهای حساب کاربری فرشا',
+  title: 'فعالیت‌ها | آرینو',
+  description: 'مشاهده نوبت‌ها، کارت‌های هدیه و خریدهای حساب کاربری آرینو',
 };
 
 export default async function ActivitiesPage() {

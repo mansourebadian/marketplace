@@ -110,7 +110,7 @@ export const COUNTRIES: Country[] = [
   { code: 'MC', nameFa: 'موناکو', nameEn: 'Monaco', dialCode: '+377' },
   { code: 'LI', nameFa: 'لیختن‌اشتاین', nameEn: 'Liechtenstein', dialCode: '+423' },
   { code: 'AD', nameFa: 'آندورا', nameEn: 'Andorra', dialCode: '+376' },
-  { code: 'SM', nameFa: 'سان مارینو', nameEn: 'San Marino', dialCode: '+378' },
+  { code: 'SM', nameFa: 'سان مارینو', nameEn: 'San Maryno', dialCode: '+378' },
   { code: 'VA', nameFa: 'واتیکان', nameEn: 'Vatican City', dialCode: '+379' },
   { code: 'AL', nameFa: 'آلبانی', nameEn: 'Albania', dialCode: '+355' },
   { code: 'MK', nameFa: 'مقدونیه شمالی', nameEn: 'North Macedonia', dialCode: '+389' },

@@ -4,7 +4,7 @@ import { sendPhoneCode, smsConfigured } from './sms';
 
 test('SMS adapters use configured providers and fail closed', async t => {
   const values = {
-    SMS_PROVIDER: '', KAVENEGAR_API_KEY: 'test-key', KAVENEGAR_OTP_TEMPLATE: 'test-pattern',
+    SMS_PROVIDER: '', SMSIR_API_KEY: 'test-key', SMSIR_TEMPLATE_ID: '123456', SMSIR_PARAMETER_NAME: 'Code', KAVENEGAR_API_KEY: 'test-key', KAVENEGAR_OTP_TEMPLATE: 'test-pattern',
     MELIPAYAMAK_USERNAME: 'test-user', MELIPAYAMAK_PASSWORD: 'test-password', MELIPAYAMAK_BODY_ID: '123',
     TWILIO_ACCOUNT_SID: 'ACtest', TWILIO_AUTH_TOKEN: 'test-token', TWILIO_FROM: '+15555550100',
     SMS_WEBHOOK_URL: 'https://gateway.example.test/otp', SMS_WEBHOOK_TOKEN: 'test-token',
@@ -15,6 +15,7 @@ test('SMS adapters use configured providers and fail closed', async t => {
     assert.equal(smsConfigured(), false);
     await assert.rejects(sendPhoneCode('+989123456789', '012345'), /NOT_CONFIGURED/);
     for (const fixture of [
+      { provider: 'smsir', host: 'api.sms.ir', success: { status: 1, data: { messageId: 123 } }, failure: { status: 0 } },
       { provider: 'kavenegar', host: 'api.kavenegar.com', success: { return: { status: 200 } }, failure: { return: { status: 401 } } },
       { provider: 'melipayamak', host: 'rest.payamak-panel.com', success: { RetStatus: 1, Value: '123456789' }, failure: { RetStatus: 1, Value: '-1' } },
       { provider: 'twilio', host: 'api.twilio.com', success: { sid: 'SMtest', status: 'queued' }, failure: { sid: 'SMtest', status: 'failed' } },
@@ -27,6 +28,10 @@ test('SMS adapters use configured providers and fail closed', async t => {
           assert.equal(new URL(String(url)).hostname, fixture.host);
           assert.equal(options?.method, 'POST');
           assert.ok(String(options?.body).includes('012345'));
+          if (fixture.provider === 'smsir') {
+            assert.equal(new Headers(options?.headers).get('X-API-KEY'), 'test-key');
+            assert.deepEqual(JSON.parse(String(options?.body)), { mobile: '09123456789', templateId: 123456, parameters: [{ name: 'Code', value: '012345' }] });
+          }
           return Response.json(fixture.success);
         });
         await sendPhoneCode('+989123456789', '012345');
@@ -35,6 +40,11 @@ test('SMS adapters use configured providers and fail closed', async t => {
         fetchMock.mock.mockImplementation(async () => { throw new Error('network failure'); });
         await assert.rejects(sendPhoneCode('+989123456789', '012345'));
       });
+    }
+    process.env.SMS_PROVIDER = 'smsir';
+    for (const id of ['', '0', '1.5', '9007199254740992']) {
+      process.env.SMSIR_TEMPLATE_ID = id;
+      assert.equal(smsConfigured(), false);
     }
     process.env.SMS_PROVIDER = 'webhook';
     process.env.SMS_WEBHOOK_URL = 'http://gateway.example.test/otp';

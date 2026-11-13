@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma';
 import { BusinessWorkspace } from '@/components/features/calendar/BusinessWorkspace';
 import styles from '@/components/features/settings/BusinessDetails.module.css';
 
-export const metadata: Metadata = { title: 'جزئیات کسب‌وکار | فرشا' };
+export const metadata: Metadata = { title: 'جزئیات کسب‌وکار | آرینو' };
 
 function parseObject(value: string | null): Record<string, unknown> {
   try { const parsed: unknown = JSON.parse(value || '{}'); return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, unknown> : {}; } catch { return {}; }

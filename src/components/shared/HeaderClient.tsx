@@ -54,7 +54,7 @@ export const HeaderClient = ({
   const [isSigningOut, setIsSigningOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
-  const displayName = user?.name?.trim() || user?.email || 'کاربر فرشا';
+  const displayName = user?.name?.trim() || user?.email || 'کاربر آرینو';
   const avatarLetter = displayName.trim().charAt(0).toLocaleUpperCase('fa-IR');
 
   useEffect(() => {
@@ -104,7 +104,7 @@ export const HeaderClient = ({
           className="shrink-0 cursor-pointer text-2xl font-bold tracking-tighter text-gray-950"
           dir="ltr"
         >
-          fresha
+          aryno
         </Link>
 
         {hasSearch && <CompactSearchBar />}
@@ -117,7 +117,7 @@ export const HeaderClient = ({
             href="/auth/business"
             className="hidden rounded-full border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50 sm:inline-flex"
           >
-            فرشا برای متخصصان
+            آرینو برای متخصصان
           </Link>
 
           {user ? (
@@ -295,7 +295,7 @@ export const HeaderClient = ({
                   className="flex items-center gap-3 px-5 py-4 text-sm font-bold text-gray-950 transition-colors hover:bg-gray-50"
                 >
                   <BriefcaseBusiness className="h-[19px] w-[19px] stroke-[1.7]" />
-                  <span>فرشا برای متخصصان</span>
+                  <span>آرینو برای متخصصان</span>
                   <ArrowLeft className="me-auto h-4 w-4" />
                 </Link>
               </div>
@@ -325,7 +325,7 @@ export const HeaderClient = ({
                     className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-[15px] font-medium text-gray-700 transition-colors hover:bg-gray-50"
                   >
                     <Smartphone className="h-5 w-5 text-gray-500" />
-                    دانلود اپلیکیشن Fresha
+                    دانلود اپلیکیشن Aryno
                   </button>
                 </div>
 
@@ -351,7 +351,7 @@ export const HeaderClient = ({
                     className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-[15px] font-medium text-gray-700 transition-colors hover:bg-gray-50"
                   >
                     <BriefcaseBusiness className="h-5 w-5 text-gray-500" />
-                    نرم‌افزار مدیریت Fresha
+                    نرم‌افزار مدیریت Aryno
                   </Link>
                 </div>
 

@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { BUSINESS_CATEGORIES } from '@/lib/business-categories';
 import { BundleForm } from '@/components/features/catalogue/BundleForm';
 
-export const metadata: Metadata = { title: 'افزودن بسته | فرشا' };
+export const metadata: Metadata = { title: 'افزودن بسته | آرینو' };
 
 export default async function AddBundlePage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
   const session = await auth();

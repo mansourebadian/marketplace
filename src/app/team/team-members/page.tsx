@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { BusinessWorkspace } from '@/components/features/calendar/BusinessWorkspace';
 import { TeamMembers } from './team-members';
 
-export const metadata: Metadata = { title: 'اعضای تیم | فرشا' };
+export const metadata: Metadata = { title: 'اعضای تیم | آرینو' };
 
 export default async function TeamMembersPage() {
   const session = await auth();

@@ -12,8 +12,8 @@ import { AuthFooter } from '@/components/features/auth/AuthFooter';
 import { imageUrl } from '@/lib/image-server';
 
 export const metadata: Metadata = {
-  title: 'فرشا برای مشتریان | فرشا',
-  description: 'ورود یا ثبت‌نام مشتریان برای رزرو و مدیریت نوبت‌ها در فرشا',
+  title: 'آرینو برای مشتریان | آرینو',
+  description: 'ورود یا ثبت‌نام مشتریان برای رزرو و مدیریت نوبت‌ها در آرینو',
 };
 
 const SIDE_IMAGE_URL = imageUrl('auth-side.svg');
@@ -73,7 +73,7 @@ export default async function CustomerAuthPage({
           <div className="w-full max-w-md flex flex-col gap-7">
             <div className="flex flex-col items-center text-center">
               <h1 className="text-3xl font-bold text-gray-900">
-                فرشا برای مشتریان
+                آرینو برای مشتریان
               </h1>
               <p className="mt-3 text-[15px] leading-7 text-gray-500">
                 حساب بسازید یا وارد شوید تا نوبت‌های خود را رزرو و مدیریت کنید

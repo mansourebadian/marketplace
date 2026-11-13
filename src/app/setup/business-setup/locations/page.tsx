@@ -4,7 +4,7 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { LocationsPage } from '@/components/features/settings/LocationsPage';
 
-export const metadata: Metadata = { title: 'موقعیت‌ها | فرشا' };
+export const metadata: Metadata = { title: 'موقعیت‌ها | آرینو' };
 
 export default async function LocationsRoute() {
   const session = await auth();

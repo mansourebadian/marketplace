@@ -359,7 +359,7 @@ export const CustomerAuthForm = ({
           href="/auth/business"
           className="font-semibold text-indigo-600 hover:text-indigo-800"
         >
-          به فرشا برای متخصصان بروید
+          به آرینو برای متخصصان بروید
         </Link>
       </p>
     </form>

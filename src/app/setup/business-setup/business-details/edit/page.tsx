@@ -4,7 +4,7 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { BusinessDetailsEdit } from '@/components/features/settings/BusinessDetailsEdit';
 
-export const metadata: Metadata = { title: 'ویرایش جزئیات کسب‌وکار | فرشا' };
+export const metadata: Metadata = { title: 'ویرایش جزئیات کسب‌وکار | آرینو' };
 
 export default async function BusinessDetailsEditPage() {
   const session = await auth();

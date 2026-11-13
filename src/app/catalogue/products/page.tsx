@@ -7,7 +7,7 @@ import { BusinessWorkspace } from '@/components/features/calendar/BusinessWorksp
 import { StartProductsButton } from './StartProductsButton';
 import styles from './products.module.css';
 
-export const metadata: Metadata = { title: 'محصولات | فرشا' };
+export const metadata: Metadata = { title: 'محصولات | آرینو' };
 
 export default async function ProductsPage() {
   const session = await auth();

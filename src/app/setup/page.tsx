@@ -4,7 +4,7 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { WorkspaceSettings } from '@/components/features/settings/WorkspaceSettings';
 
-export const metadata: Metadata = { title: 'تنظیمات فضای کاری | فرشا' };
+export const metadata: Metadata = { title: 'تنظیمات فضای کاری | آرینو' };
 
 export default async function SetupPage() {
   const session = await auth();

@@ -102,7 +102,7 @@ export function ActivitiesPageClient({ user, reservations }: ActivitiesPageClien
   }, []);
   const dateKey = date ? new DateObject(date).convert(gregorian, gregorianEn).format('YYYY-MM-DD') : '';
   const filteredReservations = reservations.filter(reservation => matchesReservationFilter(reservation, filter, dateKey, now));
-  const displayName = user?.name?.trim() || user?.email || 'کاربر فرشا';
+  const displayName = user?.name?.trim() || user?.email || 'کاربر آرینو';
   const emptyState = EMPTY_STATES[activeTab];
 
   return (

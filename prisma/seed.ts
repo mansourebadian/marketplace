@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient()
 
-// دسته‌بندی خدمات - مشابه لیست Treatments در Fresha
+// دسته‌بندی خدمات - مشابه لیست Treatments در Aryno
 const categories = [
   { slug: 'hair-styling',       name: 'مو و آرایش مو',        icon: 'Scissors',       order: 1 },
   { slug: 'nails',              name: 'ناخن',                  icon: 'Hand',           order: 2 },

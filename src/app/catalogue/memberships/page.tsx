@@ -7,7 +7,7 @@ import { BusinessWorkspace } from '@/components/features/calendar/BusinessWorksp
 import styles from './memberships.module.css';
 import { StartMembershipButton } from './StartMembershipButton';
 
-export const metadata: Metadata = { title: 'عضویت‌ها | فرشا' };
+export const metadata: Metadata = { title: 'عضویت‌ها | آرینو' };
 
 export default async function MembershipsPage() {
   const session = await auth();
@@ -36,7 +36,7 @@ export default async function MembershipsPage() {
         <div className={styles.art} aria-hidden="true">
           <div className={`${styles.card} ${styles.cardBack}`}><span>عضویت ویژه</span><strong>مزایای اختصاصی</strong></div>
           <div className={`${styles.card} ${styles.cardMiddle}`}><span>عضویت طلایی</span><strong>پیشنهادهای ویژه</strong></div>
-          <div className={`${styles.card} ${styles.cardFront}`}><span>عضویت فرشا</span><small>برای مشتریان وفادار</small><strong>مزایای بیشتر،<br />تجربه‌ای بهتر</strong></div>
+          <div className={`${styles.card} ${styles.cardFront}`}><span>عضویت آرینو</span><small>برای مشتریان وفادار</small><strong>مزایای بیشتر،<br />تجربه‌ای بهتر</strong></div>
         </div>
       </div>
     </section>

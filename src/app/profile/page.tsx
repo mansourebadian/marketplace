@@ -9,8 +9,8 @@ import {
 import prisma from '@/lib/prisma';
 
 export const metadata: Metadata = {
-  title: 'پروفایل من | فرشا',
-  description: 'مشاهده و ویرایش مشخصات و آدرس‌های حساب مشتری فرشا',
+  title: 'پروفایل من | آرینو',
+  description: 'مشاهده و ویرایش مشخصات و آدرس‌های حساب مشتری آرینو',
 };
 
 function splitDisplayName(name: string | null) {

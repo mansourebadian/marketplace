@@ -5,8 +5,8 @@ import { ArrowLeft } from 'lucide-react';
 import { BusinessAuthForm } from '@/components/features/auth/BusinessAuthForm';
 
 export const metadata: Metadata = {
-  title: 'فرشا برای متخصصان | فرشا',
-  description: 'ورود یا ساخت حساب کسب‌وکار برای مدیریت و رشد مجموعه در فرشا',
+  title: 'آرینو برای متخصصان | آرینو',
+  description: 'ورود یا ساخت حساب کسب‌وکار برای مدیریت و رشد مجموعه در آرینو',
 };
 
 export default async function BusinessAuthPage({ searchParams }: {
@@ -43,7 +43,7 @@ export default async function BusinessAuthPage({ searchParams }: {
           <div className="w-full max-w-[420px]">
             <header className="mb-7 text-center">
               <h1 className="text-[28px] font-bold tracking-tight text-neutral-950 sm:text-[30px]">
-                فرشا برای متخصصان
+                آرینو برای متخصصان
               </h1>
               <p className="mt-2 text-[15px] leading-7 text-neutral-600">
                 برای مدیریت کسب‌وکارتان حساب بسازید یا وارد شوید
@@ -55,7 +55,7 @@ export default async function BusinessAuthPage({ searchParams }: {
         </div>
 
         <p className="mx-auto max-w-md pb-2 text-center text-xs leading-5 text-neutral-500">
-          با ادامه، شرایط استفاده و سیاست حفظ حریم خصوصی فرشا را می‌پذیرید.
+          با ادامه، شرایط استفاده و سیاست حفظ حریم خصوصی آرینو را می‌پذیرید.
         </p>
       </section>
 
@@ -82,7 +82,7 @@ export default async function BusinessAuthPage({ searchParams }: {
           dir="rtl"
           className="absolute inset-x-0 bottom-[8%] z-20 text-center text-white"
         >
-          <p className="text-5xl font-bold tracking-tight drop-shadow-sm">فرشا</p>
+          <p className="text-5xl font-bold tracking-tight drop-shadow-sm">آرینو</p>
           <p className="mt-1 text-xl font-semibold drop-shadow-sm">برای متخصصان</p>
         </div>
       </aside>

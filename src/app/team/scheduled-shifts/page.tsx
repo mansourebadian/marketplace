@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { BusinessWorkspace } from '@/components/features/calendar/BusinessWorkspace';
 import { ScheduledShifts } from './scheduled-shifts';
 
-export const metadata: Metadata = { title: 'شیفت‌های برنامه‌ریزی‌شده | فرشا' };
+export const metadata: Metadata = { title: 'شیفت‌های برنامه‌ریزی‌شده | آرینو' };
 
 export default async function ScheduledShiftsPage() {
   const session = await auth();

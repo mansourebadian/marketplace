@@ -6,7 +6,7 @@ import { BUSINESS_CATEGORIES } from '@/lib/business-categories';
 import { BusinessWorkspace } from '@/components/features/calendar/BusinessWorkspace';
 import { ServiceMenu } from '@/components/features/catalogue/ServiceMenu';
 
-export const metadata: Metadata = { title: 'فهرست خدمات | فرشا' };
+export const metadata: Metadata = { title: 'فهرست خدمات | آرینو' };
 
 export default async function ServiceMenuPage() {
   const session = await auth();

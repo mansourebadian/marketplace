@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { BUSINESS_CATEGORIES } from '@/lib/business-categories';
 import { ServiceForm } from '@/components/features/catalogue/ServiceForm';
 
-export const metadata: Metadata = { title: 'افزودن خدمت | فرشا' };
+export const metadata: Metadata = { title: 'افزودن خدمت | آرینو' };
 
 export default async function AddServicePage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
   const session = await auth();

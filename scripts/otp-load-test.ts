@@ -67,7 +67,7 @@ try {
     });
     await db.phoneChallenge.createMany({ data: rows });
     if (mode === 'http' && actionFields.length === 0) {
-      const response = await fetch(`${origin}/auth/phone`, { headers: { cookie: `fresha-phone-challenge=${rows[0].id}` }, signal: AbortSignal.timeout(30_000) });
+      const response = await fetch(`${origin}/auth/phone`, { headers: { cookie: `aryno-phone-challenge=${rows[0].id}` }, signal: AbortSignal.timeout(30_000) });
       if (response.status !== 200) throw new Error('Could not load the real OTP form');
       const html = await response.text();
       actionFields = [...html.matchAll(/<input\b[^>]*>/g)].flatMap(match => {
@@ -93,7 +93,7 @@ try {
             const data = new FormData();
             for (const [name, value] of actionFields) data.set(name, value);
             data.set('code', codes[index]);
-            const response = await fetch(`${origin}/auth/phone`, { method: 'POST', headers: { origin, cookie: `fresha-phone-challenge=${rows[index].id}` }, body: data, redirect: 'manual', signal: AbortSignal.timeout(30_000) });
+            const response = await fetch(`${origin}/auth/phone`, { method: 'POST', headers: { origin, cookie: `aryno-phone-challenge=${rows[index].id}` }, body: data, redirect: 'manual', signal: AbortSignal.timeout(30_000) });
             if (response.status === 303 && response.headers.get('location') === '/auth/business/complete' && response.headers.getSetCookie().some(cookie => /authjs\.session-token=/.test(cookie))) report.authenticated++;
             else { report.wrongResult++; report.exceptionCodes[`HTTP_${response.status}`] = (report.exceptionCodes[`HTTP_${response.status}`] ?? 0) + 1; }
             await response.arrayBuffer();

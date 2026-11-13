@@ -2,6 +2,7 @@ export function smsConfigured() {
   const env = process.env;
   switch (env.SMS_PROVIDER) {
     case 'console': return env.NODE_ENV === 'development';
+    case 'smsir': return Boolean(env.SMSIR_API_KEY?.trim() && /^[1-9]\d*$/.test(env.SMSIR_TEMPLATE_ID ?? '') && Number.isSafeInteger(Number(env.SMSIR_TEMPLATE_ID)) && env.SMSIR_PARAMETER_NAME?.trim());
     case 'kavenegar': return Boolean(env.KAVENEGAR_API_KEY && env.KAVENEGAR_OTP_TEMPLATE);
     case 'melipayamak': return Boolean(env.MELIPAYAMAK_USERNAME && env.MELIPAYAMAK_PASSWORD && env.MELIPAYAMAK_BODY_ID);
     case 'twilio': return Boolean(env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN && (env.TWILIO_FROM || env.TWILIO_MESSAGING_SERVICE_SID));
@@ -17,7 +18,21 @@ export async function sendPhoneCode(phone: string, code: string) {
     console.info(`[OTP:DEV] phone=${phone} code=${code} expires=5min`);
     return;
   }
-  const text = `کد تأیید فرشا: ${code}\nاعتبار: ۵ دقیقه\nاین کد را در اختیار دیگران قرار ندهید.`;
+  if (env.SMS_PROVIDER === 'smsir') {
+    const response = await fetch('https://api.sms.ir/v1/send/verify', {
+      method: 'POST', cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(10_000),
+      headers: { 'Content-Type': 'application/json', 'X-API-KEY': env.SMSIR_API_KEY! },
+      body: JSON.stringify({
+        mobile: phone.startsWith('+98') ? `0${phone.slice(3)}` : phone,
+        templateId: Number(env.SMSIR_TEMPLATE_ID),
+        parameters: [{ name: env.SMSIR_PARAMETER_NAME!.trim(), value: code }],
+      }),
+    });
+    const result = await response.json() as { status?: number; data?: { messageId?: number } };
+    if (!response.ok || result.status !== 1 || !result.data?.messageId) throw new Error('SMS_SEND_FAILED');
+    return;
+  }
+  const text = `کد تأیید آرینو: ${code}\nاعتبار: ۵ دقیقه\nاین کد را در اختیار دیگران قرار ندهید.`;
   if (env.SMS_PROVIDER === 'twilio') {
     const body = new URLSearchParams({ To: phone, Body: text });
     if (env.TWILIO_MESSAGING_SERVICE_SID) body.set('MessagingServiceSid', env.TWILIO_MESSAGING_SERVICE_SID);

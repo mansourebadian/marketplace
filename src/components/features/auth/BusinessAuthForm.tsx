@@ -226,7 +226,7 @@ export const BusinessAuthForm = ({ authError = null, initialMethod = 'email' }: 
           href="/auth/customer"
           className="mt-1 inline-flex text-sm font-semibold text-violet-600 transition hover:text-violet-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2"
         >
-          رفتن به فرشا برای مشتریان
+          رفتن به آرینو برای مشتریان
         </Link>
       </div>
     </form>

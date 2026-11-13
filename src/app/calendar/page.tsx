@@ -4,7 +4,7 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { BusinessCalendar } from '@/components/features/calendar/BusinessCalendar';
 
-export const metadata: Metadata = { title: 'تقویم | فرشا' };
+export const metadata: Metadata = { title: 'تقویم | آرینو' };
 
 export default async function CalendarPage() {
   const session = await auth();

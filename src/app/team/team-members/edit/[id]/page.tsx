@@ -4,7 +4,7 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { AddTeamMember } from '../../add/team-member-form';
 
-export const metadata: Metadata = { title: 'ویرایش عضو تیم | فرشا' };
+export const metadata: Metadata = { title: 'ویرایش عضو تیم | آرینو' };
 
 export default async function EditTeamMemberPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ section?: string }> }) {
   const session = await auth();

@@ -6,8 +6,8 @@ import { BusinessSignUpForm } from '@/components/features/auth/BusinessSignUpFor
 import { DEFAULT_COUNTRY } from '@/components/features/auth/countries';
 
 export const metadata: Metadata = {
-  title: 'تکمیل ثبت نام | فرشا',
-  description: 'حساب فرشای خود را برای ثبت نام متخصصان کامل کنید. ',
+  title: 'تکمیل ثبت نام | آرینو',
+  description: 'حساب آرینوی خود را برای ثبت نام متخصصان کامل کنید. ',
 };
 
 function splitDisplayName(name: string | null) {
@@ -59,7 +59,7 @@ export default async function BusinessCompletePage() {
       <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6 py-12">
         <header className="mb-8 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-400">
-            فرشا برای متخصصان
+            آرینو برای متخصصان
           </p>
           <h1 className="mt-3 text-3xl font-bold tracking-tight text-neutral-950">
             تکمیل فرآیند ثبت نام

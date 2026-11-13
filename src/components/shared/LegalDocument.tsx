@@ -3,15 +3,15 @@ import { Globe2, Menu, Search } from 'lucide-react';
 import styles from './LegalDocument.module.css';
 
 const legalLinks = [
-  ['مرور کلی', 'https://terms.fresha.com/'],
-  ['شرایط استفاده', 'https://terms.fresha.com/terms-of-use'],
+  ['مرور کلی', 'https://terms.aryno.com/'],
+  ['شرایط استفاده', 'https://terms.aryno.com/terms-of-use'],
   ['سیاست حفظ حریم خصوصی', '/privacy-policy'],
   ['شرایط خدمات', '/terms-of-service'],
-  ['شرایط شرکا', 'https://terms.fresha.com/partner-terms'],
-  ['کارت‌های هدیهٔ فرشا', 'https://terms.fresha.com/gift-cards'],
+  ['شرایط شرکا', 'https://terms.aryno.com/partner-terms'],
+  ['کارت‌های هدیهٔ آرینو', 'https://terms.aryno.com/gift-cards'],
   ['حفاظت از داده‌ها', '/privacy-policy#security'],
   ['کوکی‌ها', '/privacy-policy#cookies'],
-  ['برنامهٔ معرفی شرکا', 'https://terms.fresha.com/partner-referral-program'],
+  ['برنامهٔ معرفی شرکا', 'https://terms.aryno.com/partner-referral-program'],
 ] as const;
 
 function SocialIcon({ name }: { name: 'facebook' | 'twitter' | 'linkedin' | 'instagram' }) {
@@ -74,7 +74,7 @@ export function LegalDocument({ title, documentId, currentPath, sections, varian
       <a className={styles.skipLink} href={`#${documentId}`}>رفتن به متن سند</a>
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <Link href="/" className={styles.logo} aria-label="فرشا، صفحهٔ اصلی" dir="ltr">fresha</Link>
+          <Link href="/" className={styles.logo} aria-label="آرینو، صفحهٔ اصلی" dir="ltr">aryno</Link>
           <Link href="/" className={styles.search}><Search size={20} aria-hidden="true" />جست‌وجوی خدمات یا مراکز</Link>
           <nav aria-label="منوی اصلی" className={styles.headerLinks}>
             <Link href="/auth/business">برای متخصصان</Link>
@@ -110,26 +110,26 @@ export function LegalDocument({ title, documentId, currentPath, sections, varian
               <PolicyBody body={body} />
             </section>
           ))}
-          {moreInfo && <a href="mailto:dpo@fresha.com" className={styles.moreInfo}>اطلاعات بیشتر</a>}
+          {moreInfo && <a href="mailto:dpo@aryno.com" className={styles.moreInfo}>اطلاعات بیشتر</a>}
         </article>
       </main>
       <footer className={styles.footer}>
         <div className={styles.footerColumns}>
           <div>
-            <Link href="/" className={styles.footerLogo} aria-label="فرشا، صفحهٔ اصلی"><span aria-hidden="true" /> <b dir="ltr">fresha</b></Link>
+            <Link href="/" className={styles.footerLogo} aria-label="آرینو، صفحهٔ اصلی"><span aria-hidden="true" /> <b dir="ltr">aryno</b></Link>
             <div className={styles.socials}>
-              <a href="https://www.facebook.com/fresha" aria-label="فیسبوک فرشا"><SocialIcon name="facebook" /></a>
-              <a href="https://twitter.com/fresha" aria-label="توییتر فرشا"><SocialIcon name="twitter" /></a>
-              <a href="https://www.linkedin.com/company/fresha" aria-label="لینکدین فرشا"><SocialIcon name="linkedin" /></a>
-              <a href="https://www.instagram.com/fresha" aria-label="اینستاگرام فرشا"><SocialIcon name="instagram" /></a>
+              <a href="https://www.facebook.com/aryno" aria-label="فیسبوک آرینو"><SocialIcon name="facebook" /></a>
+              <a href="https://twitter.com/aryno" aria-label="توییتر آرینو"><SocialIcon name="twitter" /></a>
+              <a href="https://www.linkedin.com/company/aryno" aria-label="لینکدین آرینو"><SocialIcon name="linkedin" /></a>
+              <a href="https://www.instagram.com/aryno" aria-label="اینستاگرام آرینو"><SocialIcon name="instagram" /></a>
             </div>
           </div>
-          <nav aria-label="دربارهٔ فرشا"><h2>دربارهٔ فرشا</h2><a href="https://www.fresha.com/careers">فرصت‌های شغلی در فرشا</a><a href="mailto:hello@fresha.com">پشتیبانی مشتریان</a></nav>
-          <nav aria-label="برای کسب‌وکارها"><h2>برای کسب‌وکارها</h2><Link href="/auth/business">برای متخصصان</Link><a href="https://www.fresha.com/pricing">قیمت‌گذاری</a><a href="mailto:hello@fresha.com">پشتیبانی شرکا</a></nav>
-          <nav aria-label="اطلاعات حقوقی"><h2>حقوقی</h2><Link href="/privacy-policy">سیاست حفظ حریم خصوصی</Link><a href="/terms-of-service">شرایط خدمات</a><a href="https://terms.fresha.com/terms-of-use">شرایط استفاده</a></nav>
+          <nav aria-label="دربارهٔ آرینو"><h2>دربارهٔ آرینو</h2><a href="https://www.aryno.com/careers">فرصت‌های شغلی در آرینو</a><a href="mailto:hello@aryno.com">پشتیبانی مشتریان</a></nav>
+          <nav aria-label="برای کسب‌وکارها"><h2>برای کسب‌وکارها</h2><Link href="/auth/business">برای متخصصان</Link><a href="https://www.aryno.com/pricing">قیمت‌گذاری</a><a href="mailto:hello@aryno.com">پشتیبانی شرکا</a></nav>
+          <nav aria-label="اطلاعات حقوقی"><h2>حقوقی</h2><Link href="/privacy-policy">سیاست حفظ حریم خصوصی</Link><a href="/terms-of-service">شرایط خدمات</a><a href="https://terms.aryno.com/terms-of-use">شرایط استفاده</a></nav>
           <div className={styles.mobileApp}><h2>اپلیکیشن رایگان موبایل</h2></div>
         </div>
-        <div className={styles.footerBottom}><span><Globe2 size={16} aria-hidden="true" /> فارسی</span><span dir="ltr">© {new Date().getFullYear()} Fresha.com SV Ltd</span></div>
+        <div className={styles.footerBottom}><span><Globe2 size={16} aria-hidden="true" /> فارسی</span><span dir="ltr">© {new Date().getFullYear()} Aryno.com SV Ltd</span></div>
       </footer>
     </div>
   );
