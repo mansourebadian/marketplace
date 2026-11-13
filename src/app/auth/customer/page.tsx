@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: 'ورود یا ثبت‌نام مشتریان برای رزرو و مدیریت نوبت‌ها در آرینو',
 };
 
-const SIDE_IMAGE_URL = imageUrl('auth-side.svg');
+const SIDE_IMAGE_URL = imageUrl('4f7697f2-cca8-4f97-be85-e4a86ab0e174.png');
 
 interface CustomerAuthPageProps {
   searchParams: Promise<{
@@ -90,7 +90,16 @@ export default async function CustomerAuthPage({
         <AuthFooter />
       </section>
 
-      <aside className="hidden lg:block relative w-1/2 min-h-screen">
+      <aside className="hidden lg:block relative w-1/2 min-h-screen overflow-hidden bg-[#e9e0d8]">
+        <Image
+          src={SIDE_IMAGE_URL}
+          alt=""
+          fill
+          unoptimized
+          sizes="50vw"
+          className="object-cover scale-110 blur-2xl"
+          aria-hidden="true"
+        />
         <Image
           src={SIDE_IMAGE_URL}
           alt="مشتری در حال رزرو نوبت با موبایل"
@@ -98,7 +107,7 @@ export default async function CustomerAuthPage({
           priority
           unoptimized
           sizes="50vw"
-          className="object-cover"
+          className="object-contain"
         />
       </aside>
     </main>
