@@ -6,6 +6,7 @@ import { getSalonById, getBusinessAsSalon } from '@/actions/salon.actions';
 import { Header } from '@/components/shared/Header';
 import SalonSidebar from '@/components/features/SalonSidebar';
 import SalonAboutMap from '@/components/features/SalonAboutMap';
+import SalonBusinessDetails from '@/components/features/SalonBusinessDetails';
 import {
   Share, Heart, ChevronRight, Star,
   BadgeCheck, Check, CreditCard
@@ -78,28 +79,28 @@ export default async function SalonDetailPage({ params, searchParams }: PageProp
               src={salon.portfolio?.[0]?.imageUrl || salon.imageUrl || "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=2070&auto=format&fit=crop"}
               alt="نمای اصلی سالن"
               fill
+              unoptimized={!legacySalon}
               className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700"
             />
           </div>
           <div className="hidden md:flex flex-col gap-2 md:gap-3 h-full">
             <div className="relative flex-1 bg-gray-100 w-full overflow-hidden cursor-pointer group">
-              <Image
-                src={salon.portfolio?.[1]?.imageUrl || "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=2070&auto=format&fit=crop"}
+              {salon.portfolio?.[1]?.imageUrl && <Image
+                src={salon.portfolio[1].imageUrl}
                 alt="جزئیات سالن ۱"
                 fill
+                unoptimized={!legacySalon}
                 className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700"
-              />
+              />}
             </div>
             <div className="relative flex-1 bg-gray-100 w-full overflow-hidden cursor-pointer group">
-              <Image
-                src={salon.portfolio?.[2]?.imageUrl || "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?q=80&w=2070&auto=format&fit=crop"}
+              {salon.portfolio?.[2]?.imageUrl && <Image
+                src={salon.portfolio[2].imageUrl}
                 alt="جزئیات سالن ۲"
                 fill
+                unoptimized={!legacySalon}
                 className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700"
-              />
-              <button className="absolute bottom-4 left-4 md:right-4 md:left-auto bg-white text-gray-900 px-4 py-2 rounded-full text-[14px] font-semibold shadow-md hover:bg-gray-50 transition-colors z-10 border border-gray-200">
-                مشاهده همه تصاویر
-              </button>
+              />}
             </div>
           </div>
         </div>}
@@ -213,7 +214,9 @@ export default async function SalonDetailPage({ params, searchParams }: PageProp
                 lng: salon.lng,
                 rating: averageRating ? Number(averageRating) : null
               }}
-            /> : <div className="mt-16 border-t border-gray-100 pt-12"><h2 className="mb-4 text-2xl font-bold">درباره ما</h2><p className="text-gray-700">{salon.description || '??تصویری برای این سالن ثبت نشده است.'}</p><p className="mt-4 text-sm text-gray-500">{salon.address}</p></div>}
+            /> : <div className="mt-16 border-t border-gray-100 pt-12"><h2 className="mb-4 text-2xl font-bold">درباره ما</h2><p className="text-gray-700 whitespace-pre-line">{salon.description || '??تصویری برای این سالن ثبت نشده است.'}</p><p className="mt-4 text-sm text-gray-500">{salon.address}</p></div>}
+
+            {'openingHours' in salon && <SalonBusinessDetails hours={salon.openingHours} features={salon.features} />}
 
             {legacySalon && <div className="mt-10 mb-16">
               <h3 className="text-xl font-bold text-gray-900 mb-6">اطلاعات تکمیلی</h3>

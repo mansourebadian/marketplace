@@ -18,7 +18,7 @@ export default function SalonAboutMap({ description, location }: SalonAboutMapPr
       {/* بخش درباره ما */}
       <section className="mb-10">
         <h2 className="text-2xl font-bold mb-4 text-gray-900">درباره ما</h2>
-        <p className="text-gray-700 leading-relaxed text-justify">
+        <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line">
           {description}
         </p>
       </section>

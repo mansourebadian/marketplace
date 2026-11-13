@@ -6,6 +6,7 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { BusinessWorkspace } from '@/components/features/calendar/BusinessWorkspace';
 import styles from './profile.module.css';
+import Dashboard from './profile-dashboard';
 
 export const metadata: Metadata = { title: 'پروفایل در بازار آرینو | آرینو' };
 
@@ -14,10 +15,17 @@ export default async function MarketplaceProfilePage() {
   if (!session?.user?.id || session.user.role !== 'OWNER') redirect('/auth/business');
   const business = await prisma.business.findUnique({
     where: { ownerId: session.user.id },
-    select: { name: true, businessAddress: true },
+    select: { id: true, name: true, businessAddress: true, businessLocation: true, updatedAt: true, locations: { orderBy: { createdAt: 'asc' }, take: 1, select: { name: true, address: true } } },
   });
   if (!business) redirect('/onboarding/business-name');
   if (!business.businessAddress) redirect('/onboarding/business-address');
+  let details: Record<string, unknown> = {};
+  try { const parsed: unknown = JSON.parse(business.businessAddress); if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) details = parsed as Record<string, unknown>; } catch { /* Legacy plain-text address. */ }
+  if (details.marketplaceSetupComplete === true) {
+    const image = Array.isArray(details.venueImages) ? details.venueImages.find((name: unknown): name is string => typeof name === 'string' && /^[0-9a-f-]{36}\.(jpg|jpeg|png|webp)$/i.test(name)) : undefined;
+    const address = [business.locations[0]?.address || (typeof details.address === 'string' ? details.address : business.businessAddress), business.businessLocation].filter(Boolean).join('، ');
+    return <BusinessWorkspace ownerName={session.user.name || business.name} activePage="/online-presence/marketplace-profile" label="پروفایل در بازار آرینو"><Dashboard businessId={business.id} name={business.locations[0]?.name || business.name} address={address} image={image} updatedAt={business.updatedAt.toISOString()} /></BusinessWorkspace>;
+  }
 
   return <BusinessWorkspace ownerName={session.user.name || business.name} activePage="/online-presence/marketplace-profile" label="پروفایل در بازار آرینو">
     <section className={styles.page} aria-labelledby="profile-title">

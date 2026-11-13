@@ -2,6 +2,21 @@ import Link from 'next/link';
 import { ImageOff, Star } from 'lucide-react';
 import prisma from '@/lib/prisma';
 import { formatBusinessAddress } from '@/lib/business-address';
+import { imageUrl } from '@/lib/image-server';
+
+function businessCoverImage(address: string | null): string | null {
+  if (!address) return null;
+  try {
+    const data: unknown = JSON.parse(address);
+    if (!data || typeof data !== 'object' || !('venueImages' in data) || !Array.isArray(data.venueImages)) return null;
+    const cover = data.venueImages.find((name: unknown): name is string =>
+      typeof name === 'string' && /^[0-9a-f-]{36}\.(jpg|jpeg|png|webp)$/i.test(name),
+    );
+    return cover ? imageUrl(cover) : null;
+  } catch {
+    return null;
+  }
+}
 
 type Card = {
   id: string;
@@ -30,7 +45,7 @@ async function getSalons(): Promise<Card[] | null> {
       ...businesses.map((business) => ({
         id: business.id, name: business.name,
         address: formatBusinessAddress(business.businessAddress, business.businessLocation),
-        imageUrl: null, rating: null, reviewsCount: null,
+        imageUrl: businessCoverImage(business.businessAddress), rating: null, reviewsCount: null,
         createdAt: business.createdAt, href: `/salon/${business.id}?source=business`,
       })),
     ];

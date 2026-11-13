@@ -200,6 +200,7 @@ model Business {
   previousSoftware String?                     @db.NVarChar(64)
   businessLocation String?                     @db.NVarChar(300)
   businessAddress  String?                     @db.NVarChar(1200)
+  marketplaceDescription String?               @db.NVarChar(1200)
   categories       BusinessCategorySelection[]
   serviceCategories BusinessServiceCategory[]
   services         BusinessService[]
