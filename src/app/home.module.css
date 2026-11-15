@@ -24,3 +24,10 @@
     #faf8ff;
   mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
 }
+
+.footer {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+

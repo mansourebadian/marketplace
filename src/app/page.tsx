@@ -32,6 +32,10 @@ export default async function HomePage() {
         <Hero bookingCount={bookingCount === null ? null : bookingCount.toLocaleString('fa-IR')} customerLabel={customerLabel} />
         <SalonSections />
       </div>
+      <footer
+        className={styles.footer}
+        dangerouslySetInnerHTML={{ __html: `<a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=8708724&Code=mbE6E79svpx9DuBarDZpfTBKWOOfydrA'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=8708724&Code=mbE6E79svpx9DuBarDZpfTBKWOOfydrA' alt='' style='cursor:pointer' code='mbE6E79svpx9DuBarDZpfTBKWOOfydrA'></a>` }}
+      />
     </main>
   );
 }
