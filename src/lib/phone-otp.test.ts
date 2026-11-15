@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import { PrismaClient } from '@prisma/client';
 import { setTimeout as delay } from 'node:timers/promises';
 import 'dotenv/config';
-import { issuePhoneCode, verifyPhoneCode, otpDigest, OTP_LIFETIME, OTP_COOLDOWN } from './phone-otp';
+import { issuePhoneCode, verifyPhoneCode, otpDigest, OTP_LIFETIME, OTP_COOLDOWN, SESSION_LIFETIME } from './phone-otp';
 import { sendPhoneCode } from './sms';
 
 for (const flow of ['business', 'customer']) {
@@ -29,12 +29,40 @@ for (const flow of ['business', 'customer']) {
       assert.ok('sessionToken' in result);
       assert.equal(result.destination, '/calendar');
       assert.equal(sessionUserId, user.id);
+      assert.equal(result.expires.getTime() - now.getTime(), 30 * 24 * 60 * 60 * 1000);
     } finally {
       if (previousSecret === undefined) delete process.env.AUTH_SECRET;
       else process.env.AUTH_SECRET = previousSecret;
     }
   });
 }
+
+test('customer phone sign-in keeps a 30-day session and returns to the customer profile', async () => {
+  const previousSecret = process.env.AUTH_SECRET;
+  process.env.AUTH_SECRET = 'isolated-routing-test-secret';
+  const now = new Date();
+  let savedExpires: Date | undefined;
+  const transaction = {
+    phoneChallenge: {
+      updateMany: async () => ({ count: 1 }),
+      findUnique: async () => ({ id: 'customer-challenge', phone: '+989123456789', flow: 'customer', callbackUrl: '/profile', attempts: 1, expiresAt: new Date(now.getTime() + OTP_LIFETIME), codeHash: otpDigest('customer-challenge', '123456') }),
+      update: async () => ({}),
+    },
+    account: { findUnique: async () => ({ user: { id: 'customer', role: 'CUSTOMER', business: null } }) },
+    session: { create: async ({ data }: { data: { expires: Date } }) => { savedExpires = data.expires; } },
+  };
+  const db = { $transaction: async (operation: (tx: typeof transaction) => Promise<unknown>) => operation(transaction) } as unknown as PrismaClient;
+  try {
+    const result = await verifyPhoneCode(db, 'customer-challenge', '123456', now);
+    assert.ok('sessionToken' in result);
+    assert.equal(result.destination, '/profile');
+    assert.equal(SESSION_LIFETIME, 30 * 24 * 60 * 60 * 1000);
+    assert.equal(savedExpires?.getTime(), now.getTime() + SESSION_LIFETIME);
+  } finally {
+    if (previousSecret === undefined) delete process.env.AUTH_SECRET;
+    else process.env.AUTH_SECRET = previousSecret;
+  }
+});
 
 
 // Explicit opt-in: exercises real database transactions with synthetic, isolated records.

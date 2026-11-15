@@ -3,6 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { BusinessAuthForm } from '@/components/features/auth/BusinessAuthForm';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'آرینو برای متخصصان | آرینو',
@@ -12,6 +14,10 @@ export const metadata: Metadata = {
 export default async function BusinessAuthPage({ searchParams }: {
   searchParams: Promise<{ error?: string | string[]; method?: string }>;
 }) {
+  const session = await auth();
+  if (session?.user?.id && session.user.role === 'OWNER') {
+    redirect('/calendar');
+  }
   const params = await searchParams;
   const errorCode = Array.isArray(params.error) ? params.error[0] : params.error;
   const messages: Record<string, string> = {

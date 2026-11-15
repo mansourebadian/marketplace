@@ -12,6 +12,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth(async (request) => {
   cookies: { sessionToken: sessionCookie() },
   session: {
     strategy: 'database',
+    maxAge: 30 * 24 * 60 * 60,
   },
   providers: [
     Google({
