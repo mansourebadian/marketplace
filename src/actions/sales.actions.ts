@@ -48,7 +48,10 @@ export async function createQuickSale(input: unknown): Promise<{ error?: string 
     if (!business) return { error: 'کسب‌وکار پیدا نشد.' };
     const items = parsed.data.items;
     const result = await prisma.$transaction(async tx => {
-      if (parsed.data.customerId && !(await tx.businessReservation.findFirst({ where: { businessId: business.id, customerId: parsed.data.customerId }, select: { id: true } }))) return false;
+      if (parsed.data.customerId) {
+        const [reservation, client] = await Promise.all([tx.businessReservation.findFirst({ where: { businessId: business.id, customerId: parsed.data.customerId }, select: { id: true } }), tx.businessClient.findFirst({ where: { businessId: business.id, id: parsed.data.customerId }, select: { id: true } })]);
+        if (!reservation && !client) return false;
+      }
       const services = await tx.businessService.findMany({ where: { businessId: business.id, id: { in: items.map(item => item.id) } }, select: { id: true, price: true, priceType: true } });
       if (services.length !== items.length || items.some(item => { const service = services.find(entry => entry.id === item.id); return !service || !['FIXED', 'FREE'].includes(service.priceType) || (service.priceType === 'FREE' ? 0 : service.price) !== item.price; })) return false;
       const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);

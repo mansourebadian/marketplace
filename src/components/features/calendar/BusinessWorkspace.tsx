@@ -24,7 +24,7 @@ const catalogGroups = [{ title: 'کاتالوگ', items: ['فهرست خدمات
 
 export function BusinessWorkspace({ ownerName, activePage, label, children }: {
   ownerName: string;
-  activePage: '/dashboard' | '/calendar' | '/sales/daily-sales' | '/setup' | '/catalogue/services' | '/catalogue/memberships' | '/catalogue/products' | '/team/team-members' | '/team/scheduled-shifts' | '/online-presence/marketplace-profile';
+  activePage: '/dashboard' | '/calendar' | '/sales/daily-sales' | '/clients/list' | '/setup' | '/catalogue/services' | '/catalogue/memberships' | '/catalogue/products' | '/team/team-members' | '/team/scheduled-shifts' | '/online-presence/marketplace-profile';
   label: string;
   children: ReactNode;
 }) {
@@ -33,6 +33,7 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
   const [teamOpen, setTeamOpen] = useState(activePage.startsWith('/team/'));
   const [presenceOpen, setPresenceOpen] = useState(activePage.startsWith('/online-presence/'));
   const [salesOpen, setSalesOpen] = useState(activePage.startsWith('/sales/'));
+  const [clientsOpen, setClientsOpen] = useState(activePage.startsWith('/clients/'));
   const initials = ownerName.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
   useEffect(() => { if (!setupOpen) return; const close = (event: KeyboardEvent) => event.key === 'Escape' && setSetupOpen(false); document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close); }, [setupOpen]);
 
@@ -49,17 +50,26 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
       {navigation.map(({ icon: Icon, label: title, href }) => href
         ? <Link key={title} href={href} title={title} aria-label={title} aria-current={activePage === href ? 'page' : undefined} className={activePage === href ? styles.activeNav : styles.navIcon}><Icon size={25} strokeWidth={1.65} /></Link>
         : Icon === Tag
-          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={salesOpen} aria-controls="business-sales-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${salesOpen || activePage.startsWith('/sales/') ? styles.activeNav : ''}`} onClick={() => { setSalesOpen(open => !open); setCatalogOpen(false); setTeamOpen(false); setPresenceOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
+          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={salesOpen} aria-controls="business-sales-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${salesOpen || activePage.startsWith('/sales/') ? styles.activeNav : ''}`} onClick={() => { setSalesOpen(open => !open); setCatalogOpen(false); setTeamOpen(false); setPresenceOpen(false); setClientsOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
+          : Icon === Smile
+          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={clientsOpen} aria-controls="business-clients-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${clientsOpen || activePage.startsWith('/clients/') ? styles.activeNav : ''}`} onClick={() => { setClientsOpen(open => !open); setSalesOpen(false); setCatalogOpen(false); setTeamOpen(false); setPresenceOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
           : Icon === BookOpen
-          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={catalogOpen} aria-controls="business-catalog-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${catalogOpen || activePage.startsWith('/catalogue/') ? styles.activeNav : ''}`} onClick={() => { setCatalogOpen(open => !open); setTeamOpen(false); setPresenceOpen(false); setSalesOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
+          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={catalogOpen} aria-controls="business-catalog-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${catalogOpen || activePage.startsWith('/catalogue/') ? styles.activeNav : ''}`} onClick={() => { setCatalogOpen(open => !open); setTeamOpen(false); setPresenceOpen(false); setSalesOpen(false); setClientsOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
           : Icon === UsersRound
-          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={teamOpen} aria-controls="business-team-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${teamOpen || activePage.startsWith('/team/') ? styles.activeNav : ''}`} onClick={() => { setTeamOpen(open => !open); setCatalogOpen(false); setPresenceOpen(false); setSalesOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
+          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={teamOpen} aria-controls="business-team-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${teamOpen || activePage.startsWith('/team/') ? styles.activeNav : ''}`} onClick={() => { setTeamOpen(open => !open); setCatalogOpen(false); setPresenceOpen(false); setSalesOpen(false); setClientsOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
           : Icon === ContactRound
-          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={presenceOpen} aria-controls="business-presence-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${presenceOpen || activePage.startsWith('/online-presence/') ? styles.activeNav : ''}`} onClick={() => { setPresenceOpen(open => !open); setCatalogOpen(false); setTeamOpen(false); setSalesOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
+          ? <button key={title} type="button" title={title} aria-label={title} aria-expanded={presenceOpen} aria-controls="business-presence-panel" className={`${styles.navIcon} ${styles.catalogTrigger} ${presenceOpen || activePage.startsWith('/online-presence/') ? styles.activeNav : ''}`} onClick={() => { setPresenceOpen(open => !open); setCatalogOpen(false); setTeamOpen(false); setSalesOpen(false); setClientsOpen(false); }}><Icon size={25} strokeWidth={1.65} /></button>
           : <span key={title} title={title} aria-label={title} className={styles.navIcon}><Icon size={25} strokeWidth={1.65} /></span>)}
       <span className={styles.help} title="راهنما"><CircleHelp size={24} /></span>
     </aside>
     <div className={styles.workspaceBody}>
+      {clientsOpen && <aside id="business-clients-panel" className={styles.catalogPanel} aria-label="منوی مشتریان">
+        <button type="button" className={styles.catalogCollapse} onClick={() => setClientsOpen(false)} aria-label="بستن منوی مشتریان"><ChevronLeft size={18} /></button>
+        <div className={styles.catalogSections}>
+          <section className={styles.catalogGroup}><h2>مشتریان</h2><ul><li><Link href="/clients/list" className={styles.catalogLink} aria-current={activePage === '/clients/list' ? 'page' : undefined}>فهرست مشتریان</Link></li><li>بخش‌بندی مشتریان</li></ul></section>
+          <section className={styles.catalogGroup}><h2>تعامل</h2><ul><li>وفاداری مشتریان</li><li>اعتبار آنلاین</li></ul></section>
+        </div>
+      </aside>}
       {salesOpen && <aside id="business-sales-panel" className={styles.catalogPanel} aria-label="منوی فروش">
         <button type="button" className={styles.catalogCollapse} onClick={() => setSalesOpen(false)} aria-label="بستن منوی فروش"><ChevronLeft size={18} /></button>
         <div className={styles.catalogSections}>

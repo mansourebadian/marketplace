@@ -47,6 +47,34 @@ model CustomerAddress {
   @@unique([userId, label])
 }
 
+model BusinessClient {
+  id         String   @id @default(cuid()) @db.NVarChar(36)
+  businessId String   @db.NVarChar(36)
+  firstName  String   @db.NVarChar(100)
+  lastName   String?  @db.NVarChar(100)
+  email      String?  @db.NVarChar(320)
+  phone      String?  @db.NVarChar(32)
+  birthday   DateTime? @db.Date
+  gender     String?  @db.NVarChar(32)
+  details    String   @db.NVarChar(Max)
+  photo      Bytes?   @db.VarBinary(Max)
+  photoType  String?  @db.NVarChar(32)
+  createdAt  DateTime @default(now())
+
+  @@index([businessId])
+}
+
+model BusinessClientPhoto {
+  id          String @id @default(cuid()) @db.NVarChar(36)
+  businessId  String @db.NVarChar(36)
+  customerId  String @db.NVarChar(1000)
+  identityKey String @unique @db.NVarChar(64)
+  photo       Bytes  @db.VarBinary(Max)
+  photoType   String @db.NVarChar(32)
+
+  @@index([businessId])
+}
+
 model Account {
   id                String  @id @default(cuid()) @db.NVarChar(36)
   userId            String
