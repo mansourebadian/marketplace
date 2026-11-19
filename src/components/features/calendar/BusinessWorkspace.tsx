@@ -7,7 +7,7 @@ import styles from './BusinessCalendar.module.css';
 import { SetupGuide } from './SetupGuide';
 
 const navigation = [
-  { icon: House, label: 'خانه' },
+  { icon: House, label: 'خانه', href: '/dashboard' },
   { icon: CalendarDays, label: 'تقویم', href: '/calendar' },
   { icon: Tag, label: 'فروش' },
   { icon: Smile, label: 'مشتریان' },
@@ -24,7 +24,7 @@ const catalogGroups = [{ title: 'کاتالوگ', items: ['فهرست خدمات
 
 export function BusinessWorkspace({ ownerName, activePage, label, children }: {
   ownerName: string;
-  activePage: '/calendar' | '/setup' | '/catalogue/services' | '/catalogue/memberships' | '/catalogue/products' | '/team/team-members' | '/team/scheduled-shifts' | '/online-presence/marketplace-profile';
+  activePage: '/dashboard' | '/calendar' | '/setup' | '/catalogue/services' | '/catalogue/memberships' | '/catalogue/products' | '/team/team-members' | '/team/scheduled-shifts' | '/online-presence/marketplace-profile';
   label: string;
   children: ReactNode;
 }) {
@@ -97,4 +97,5 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
 
   </main>;
 }
+
 
