@@ -10,9 +10,10 @@ export const metadata: Metadata = { title: 'فروش روزانه | آرینو' 
 export default async function DailySalesPage({ searchParams }: { searchParams: Promise<{ date?: string }> }) {
   const session = await auth();
   if (!session?.user?.id || session.user.role !== 'OWNER') redirect('/auth/business');
-  const business = await prisma.business.findUnique({ where: { ownerId: session.user.id }, select: { id: true, name: true, businessAddress: true } });
+  const business = await prisma.business.findUnique({ where: { ownerId: session.user.id }, select: { id: true, name: true, businessAddress: true, services: { select: { id: true, name: true, price: true, priceType: true }, orderBy: { createdAt: 'asc' } } } });
   if (!business) redirect('/onboarding/business-name');
   if (!business.businessAddress) redirect('/onboarding/business-address');
+  const customers = await prisma.user.findMany({ where: { businessReservations: { some: { businessId: business.id } } }, select: { id: true, name: true, firstName: true, lastName: true, email: true, phone: true }, orderBy: { name: 'asc' } });
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tehran', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
   const requested = (await searchParams).date;
   const validDate = requested && /^\d{4}-\d{2}-\d{2}$/.test(requested) && !Number.isNaN(new Date(`${requested}T12:00:00Z`).getTime()) && new Date(`${requested}T12:00:00Z`).toISOString().slice(0, 10) === requested;
@@ -25,5 +26,5 @@ export default async function DailySalesPage({ searchParams }: { searchParams: P
     console.error('Loading daily sales failed', error);
     unavailable = true;
   }
-  return <BusinessWorkspace ownerName={session.user.name || business.name} activePage="/sales/daily-sales" label="فروش روزانه"><DailySales today={today} date={date} sales={sales} unavailable={unavailable} /></BusinessWorkspace>;
+  return <BusinessWorkspace ownerName={session.user.name || business.name} activePage="/sales/daily-sales" label="فروش روزانه"><DailySales today={today} date={date} sales={sales} services={business.services} customers={customers} unavailable={unavailable} /></BusinessWorkspace>;
 }

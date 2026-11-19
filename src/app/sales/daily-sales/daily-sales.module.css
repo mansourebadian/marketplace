@@ -5,6 +5,12 @@
 .actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .actions button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 20px; border-radius: 28px; font-size: 14px; font-weight: 700; cursor: pointer; }
 .export { border: 1px solid #d5d5d5; background: white; color: #555; }
+.exportWrap { position: relative; }
+.chevronOpen { transform: rotate(180deg); }
+.exportMenu { position: absolute; z-index: 10; inset-inline-start: 0; top: calc(100% + 8px); width: 200px; padding: 8px; border: 1px solid #ddd; border-radius: 16px; background: white; box-shadow: 0 5px 18px #00000020; }
+.actions .exportMenu button { display: flex; justify-content: flex-start; width: 100%; min-height: 40px; padding: 8px 12px; border: 0; border-radius: 8px; background: transparent; color: #111; font-size: 14px; font-weight: 400; text-align: start; }
+.actions .exportMenu button:hover:not(:disabled), .actions .exportMenu button:focus-visible { background: #f0edff; }
+.actions .exportMenu button span { margin-inline-start: auto; color: #777; font-size: 11px; }
 .add { border: 1px solid #333; background: #333; color: white; }
 .actions button:disabled { opacity: .5; cursor: not-allowed; }
 .dateControl { display: inline-flex; align-items: stretch; margin: 32px 0 20px; overflow: hidden; border: 1px solid #d7d7d7; border-radius: 24px; background: white; }

@@ -459,6 +459,7 @@ model BusinessReservationItem {
 model BusinessSale {
   id          String   @id @default(cuid()) @db.NVarChar(36)
   businessId  String   @db.NVarChar(36)
+  customerId  String?  @db.NVarChar(1000)
   date        String   @db.NVarChar(10)
   kind        String   @db.NVarChar(12)
   category    String   @db.NVarChar(32)
