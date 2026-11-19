@@ -211,6 +211,7 @@ model Business {
   recurringShifts  BusinessRecurringShift[]
   memberServices BusinessMemberServices[]
   reservations BusinessReservation[]
+  sales            BusinessSale[]
   id               String                      @id @default(cuid()) @db.NVarChar(36)
   name             String                      @db.NVarChar(100)
   website          String?                     @db.NVarChar(255)
@@ -453,4 +454,19 @@ model BusinessReservationItem {
 
   @@unique([reservationId, position])
   @@index([memberKey, startsAt, endsAt])
+}
+
+model BusinessSale {
+  id          String   @id @default(cuid()) @db.NVarChar(36)
+  businessId  String   @db.NVarChar(36)
+  date        String   @db.NVarChar(10)
+  kind        String   @db.NVarChar(12)
+  category    String   @db.NVarChar(32)
+  paymentType String   @db.NVarChar(16)
+  quantity    Int
+  amount      Int
+  createdAt   DateTime @default(now())
+  business    Business @relation(fields: [businessId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([businessId, date])
 }
