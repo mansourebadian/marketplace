@@ -24,7 +24,7 @@ const catalogGroups = [{ title: 'کاتالوگ', items: ['فهرست خدمات
 
 export function BusinessWorkspace({ ownerName, activePage, label, children }: {
   ownerName: string;
-  activePage: '/dashboard' | '/calendar' | '/sales/daily-sales' | '/clients/list' | '/setup' | '/catalogue/services' | '/catalogue/memberships' | '/catalogue/products' | '/team/team-members' | '/team/scheduled-shifts' | '/online-presence/marketplace-profile';
+  activePage: '/dashboard' | '/calendar' | '/sales/daily-sales' | '/sales/register' | '/sales/appointments-list' | '/clients/list' | '/setup' | '/catalogue/services' | '/catalogue/memberships' | '/catalogue/products' | '/team/team-members' | '/team/scheduled-shifts' | '/online-presence/marketplace-profile';
   label: string;
   children: ReactNode;
 }) {
@@ -73,7 +73,7 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
       {salesOpen && <aside id="business-sales-panel" className={styles.catalogPanel} aria-label="منوی فروش">
         <button type="button" className={styles.catalogCollapse} onClick={() => setSalesOpen(false)} aria-label="بستن منوی فروش"><ChevronLeft size={18} /></button>
         <div className={styles.catalogSections}>
-          <section className={styles.catalogGroup}><h2>فروش</h2><ul><li><Link href="/sales/daily-sales" className={styles.catalogLink} aria-current={activePage === '/sales/daily-sales' ? 'page' : undefined}>خلاصه فروش روزانه</Link></li>{['صندوق', 'نوبت‌ها', 'فروش‌ها', 'پرداخت‌ها'].map(item => <li key={item}>{item}</li>)}</ul></section>
+          <section className={styles.catalogGroup}><h2>فروش</h2><ul><li><Link href="/sales/daily-sales" className={styles.catalogLink} aria-current={activePage === '/sales/daily-sales' ? 'page' : undefined}>خلاصه فروش روزانه</Link></li><li><Link href="/sales/register" className={styles.catalogLink} aria-current={activePage === '/sales/register' ? 'page' : undefined}>صندوق</Link></li><li><Link href="/sales/appointments-list" className={styles.catalogLink} aria-current={activePage === '/sales/appointments-list' ? 'page' : undefined}>نوبت‌ها</Link></li>{['فروش‌ها', 'پرداخت‌ها'].map(item => <li key={item}>{item}</li>)}</ul></section>
           <section className={styles.catalogGroup}><h2>اقلام فروخته‌شده</h2><ul>{['کارت‌های هدیه', 'بسته‌ها', 'عضویت‌ها', 'سفارش محصولات'].map(item => <li key={item}>{item}</li>)}</ul></section>
         </div>
       </aside>}

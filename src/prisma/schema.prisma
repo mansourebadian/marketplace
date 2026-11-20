@@ -457,6 +457,10 @@ model BusinessReservation {
   businessId     String                    @db.NVarChar(36)
   customerId     String
   status         String                    @db.NVarChar(24)
+  appointmentStatus String                 @default("BOOKED") @db.NVarChar(24)
+  cancellationReason String?               @db.NVarChar(255)
+  beforeNoShowStatus String?               @db.NVarChar(24)
+  beforeNoShowAppointmentStatus String?    @db.NVarChar(24)
   firstVisit     Boolean
   note           String?                   @db.NVarChar(1000)
   total          Int
