@@ -39,7 +39,7 @@ export function BusinessWorkspace({ ownerName, activePage, label, children }: {
 
   return <main dir="rtl" className={styles.shell} aria-label={label}>
     <header className={styles.header}>
-      <span className={styles.logo}>آرینو</span>
+      <Link href="/" className={styles.logo} aria-label="آرینو، صفحهٔ اصلی">آرینو</Link>
       <div className={styles.headerActions}>
         <button type="button" className={styles.setup} onClick={() => setSetupOpen(true)}><Rocket size={19} /> ادامهٔ راه‌اندازی <ChevronLeft size={18} /></button>
         {[Search, ChartNoAxesColumnIncreasing, Bell, MessageCircle, Wallet].map((Icon, index) => <span className={styles.headerIcon} key={index}><Icon size={23} strokeWidth={1.7} /></span>)}

@@ -88,7 +88,7 @@ export default async function BusinessAuthPage({ searchParams }: {
           dir="rtl"
           className="absolute inset-x-0 bottom-[8%] z-20 text-center text-white"
         >
-          <p className="text-5xl font-bold tracking-tight drop-shadow-sm">آرینو</p>
+          <Link href="/" aria-label="آرینو، صفحهٔ اصلی" className="text-5xl font-bold tracking-tight drop-shadow-sm">آرینو</Link>
           <p className="mt-1 text-xl font-semibold drop-shadow-sm">برای متخصصان</p>
         </div>
       </aside>

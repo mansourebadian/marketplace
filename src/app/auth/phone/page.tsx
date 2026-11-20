@@ -29,7 +29,7 @@ export default async function PhoneVerificationPage() {
       <Image src="/images/professionals-auth-hero.png" alt="متخصصان زیبایی در سالن" fill priority sizes="50vw" className="object-cover object-center" />
       <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
       <div aria-hidden="true" className="absolute -left-[7%] top-[-5%] z-10 h-[110%] w-[14%] rounded-[50%] bg-white" />
-      <div dir="rtl" className="absolute inset-x-0 bottom-[7%] z-20 text-center text-white"><p className="text-5xl font-bold">آرینو</p><p className="mt-2 text-xl font-semibold">{business ? 'برای متخصصان' : 'برای مشتریان'}</p></div>
+      <div dir="rtl" className="absolute inset-x-0 bottom-[7%] z-20 text-center text-white"><Link href="/" aria-label="آرینو، صفحهٔ اصلی" className="text-5xl font-bold">آرینو</Link><p className="mt-2 text-xl font-semibold">{business ? 'برای متخصصان' : 'برای مشتریان'}</p></div>
     </aside>
   </main>;
 }
