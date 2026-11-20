@@ -140,13 +140,15 @@ export default async function SalonDetailPage({ params, searchParams }: PageProp
               {salon.teamMembers?.map((member) => (
                 <div key={member.id} className="flex flex-col items-center group cursor-pointer">
                   <div className="relative mb-3">
-                    <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-transparent group-hover:border-gray-200 transition-colors relative">
-                      <Image
-                        src={member.avatarUrl || `https://ui-avatars.com/api/?name=${member.name}&background=random`}
+                    <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-transparent group-hover:border-gray-200 transition-colors relative flex items-center justify-center bg-purple-100 text-purple-700 text-2xl font-semibold">
+                      {member.avatarUrl ? <Image
+                        src={member.avatarUrl}
                         alt={member.name}
                         fill
+                        unoptimized={!legacySalon}
+                        sizes="112px"
                         className="object-cover"
-                      />
+                      /> : <span aria-hidden="true">{member.name.trim().charAt(0)}</span>}
                     </div>
                   </div>
                   <h4 className="text-[15px] font-semibold text-gray-900 mt-2">{member.name}</h4>

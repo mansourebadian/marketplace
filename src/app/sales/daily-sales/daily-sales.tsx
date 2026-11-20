@@ -105,6 +105,8 @@ export function DailySales({ today, date, sales, services, customers, unavailabl
     </div>}
     {quickSaleOpen && <QuickSale date={date} services={services} customers={customers} onClose={() => setQuickSaleOpen(false)} onManual={() => { setQuickSaleOpen(false); setError(''); setOpen(true); }} onSaved={() => { setQuickSaleOpen(false); router.refresh(); }} />}
     {open && <div className={styles.overlay}><div className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="sale-title"><h2 id="sale-title">ثبت تراکنش</h2><p>تراکنش برای {label} ثبت می‌شود.</p><form onSubmit={submit} className={styles.form}>
+      <label>مشتری<select name="customerId" defaultValue=""><option value="">مشتری حضوری (بدون نام)</option>{customers.map(customer => <option key={customer.id} value={customer.id}>{customer.name || [customer.firstName, customer.lastName].filter(Boolean).join(' ') || customer.phone || customer.email}</option>)}</select></label>
+      <p>برای نمایش مبلغ در فهرست مشتریان، مشتری را انتخاب کنید.</p>
       <label>نوع تراکنش<select name="kind"><option value="SALE">فروش و دریافت وجه</option><option value="REFUND">بازپرداخت</option></select></label>
       <label>نوع کالا یا خدمت<select name="category">{categories.map(([key, name]) => <option key={key} value={key}>{name}</option>)}</select></label>
       <label>روش پرداخت<select name="paymentType">{payments.map(([key, name]) => <option key={key} value={key}>{name}</option>)}</select></label>

@@ -1,6 +1,6 @@
 // src/components/features/SalonAboutMap.tsx
 import React from 'react';
-import { MapPin } from 'lucide-react';
+import SalonLocationMap from './SalonLocationMap';
 
 interface SalonAboutMapProps {
   description: string;
@@ -25,16 +25,7 @@ export default function SalonAboutMap({ description, location }: SalonAboutMapPr
 
       {/* بخش نقشه */}
       <section>
-        <div className="relative w-full h-[320px] rounded-2xl overflow-hidden bg-gray-100 mb-4 border border-gray-200 shadow-inner">
-          {/* در پروژه واقعی، اینجا از کامپوننت Mapbox یا Leaflet استفاده کنید */}
-          <div className="absolute inset-0 bg-[url('/images/map-placeholder.jpg')] bg-cover bg-center"></div>
-          
-          {/* پین کاستوم نقشه (بر اساس تصویر) */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black text-white px-3 py-1.5 rounded-full flex items-center gap-1.5 font-bold text-sm shadow-xl cursor-pointer hover:scale-105 transition-transform">
-            {location.rating !== null && <span>{location.rating.toFixed(1)}</span>}
-            <MapPin className="w-4 h-4" />
-          </div>
-        </div>
+        <SalonLocationMap lat={location.lat} lng={location.lng} />
         
         {/* اطلاعات آدرس زیر نقشه */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">

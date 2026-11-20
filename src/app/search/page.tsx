@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { formatBusinessAddress } from '@/lib/business-address';
 import { businessAvailableStarts } from '@/lib/business-availability';
 import { businessAddressFields, matchesSearch } from '@/lib/search-matching';
+import { isServiceOffered } from '@/lib/offered-services';
 
 type Params = { q?: string | string[]; location?: string | string[]; date?: string | string[]; time?: string | string[] };
 const value = (input: string | string[] | undefined) => (typeof input === 'string' ? input.trim().slice(0, 200) : '');
@@ -20,7 +21,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     if (!validDate) throw new Error('Invalid search date');
     const [salons, businesses] = await Promise.all([
       prisma.salon.findMany({
-        include: { services: { select: { name: true, category: { select: { name: true } } } } },
+        include: { services: { where: { salon: { teamMembers: { some: {} } } }, select: { name: true, category: { select: { name: true } } } } },
         orderBy: { createdAt: 'desc' },
       }),
       prisma.business.findMany({
@@ -37,7 +38,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     ]);
     const matchingSalons = salons.filter(salon =>
       matchesSearch(q, [salon.name, ...salon.services.flatMap(service => [service.name, service.category?.name])]) && matchesSearch(location, [salon.address]));
-    const candidates = businesses.filter(business =>
+    const candidates = businesses.map(business => ({ ...business, services: business.services.filter(service => isServiceOffered(service.id, ['owner', ...business.teamMembers.map(member => member.id)], business.memberServices)) })).filter(business =>
       matchesSearch(q, [business.name, ...business.services.flatMap(service => [service.name, service.treatmentType?.name, service.treatmentType?.groupName])]) && matchesSearch(location, businessAddressFields(business.businessAddress, business.businessLocation)));
     const dayStart = date ? new Date(`${date}T00:00:00+03:30`) : null;
     const reservations = dayStart ? await prisma.businessReservationItem.findMany({

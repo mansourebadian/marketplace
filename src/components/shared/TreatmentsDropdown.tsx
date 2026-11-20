@@ -181,6 +181,7 @@ export default function TreatmentsDropdown({
 }: TreatmentsDropdownProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [categories, setCategories] = useState<TreatmentCategory[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -295,6 +296,7 @@ export default function TreatmentsDropdown({
 
   /* ---------- فیلتر سمت کلاینت (دسته + خدمات) ---------- */
   const results = useMemo<TreatmentCategory[]>(() => {
+    if (selectedCategoryId) return categories.filter(category => category.id === selectedCategoryId);
     const normalizeText = (text: string) => text.trim().toLocaleLowerCase('fa').replace(/[يى]/g, 'ی').replace(/ك/g, 'ک');
     const q = normalizeText(query);
     if (!q) return categories;
@@ -316,7 +318,7 @@ export default function TreatmentsDropdown({
     }
 
     return filtered;
-  }, [categories, query]);
+  }, [categories, query, selectedCategoryId]);
 
   const isSearching = query.trim().length > 0;
 
@@ -329,7 +331,8 @@ export default function TreatmentsDropdown({
   const pickCategory = useCallback(
     (cat: TreatmentCategory) => {
       setQuery(cat.name);
-      setOpen(false);
+      setSelectedCategoryId(cat.id);
+      setOpen(true);
       onSelectCategory?.(cat);
     },
     [onSelectCategory],
@@ -338,6 +341,7 @@ export default function TreatmentsDropdown({
   const pickService = useCallback(
     (sv: TreatmentService, cat: TreatmentCategory) => {
       setQuery(sv.name);
+      setSelectedCategoryId(null);
       setOpen(false);
       onSelectService?.(sv, cat);
     },
@@ -365,6 +369,7 @@ export default function TreatmentsDropdown({
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
+            setSelectedCategoryId(null);
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}

@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import prisma from '@/lib/prisma';
 import { BUSINESS_CATEGORIES } from '@/lib/business-categories';
 import { formatBusinessAddress } from '@/lib/business-address';
+import { imageUrl } from '@/lib/image-server';
 import { ServiceSelection } from '@/components/features/ServiceSelection';
 
 export default async function ServicesPage({ params, searchParams }: {
@@ -45,11 +46,21 @@ export default async function ServicesPage({ params, searchParams }: {
   const suffix = source === 'business' ? '?source=business' : '';
   const base = `/salon/${encodeURIComponent(id)}`;
   const reviews = salon?.reviews || [];
+  let businessImage: string | null = null;
+  if (business?.businessAddress) {
+    try {
+      const address: unknown = JSON.parse(business.businessAddress);
+      if (address && typeof address === 'object' && 'venueImages' in address && Array.isArray(address.venueImages)) {
+        const cover = address.venueImages.find((name: unknown): name is string => typeof name === 'string' && /^[0-9a-f-]{36}\.(jpg|jpeg|png|webp)$/i.test(name));
+        if (cover) businessImage = imageUrl(cover);
+      }
+    } catch { /* Older addresses may be plain text. */ }
+  }
   return <ServiceSelection
     businessId={business ? id : null}
     customerHasPhone={Boolean(customer?.accounts.length)}
     initialSlot={slot && /^\d{13}$/.test(slot) ? Number(slot) : null}
-    salon={{ name: salon?.name || business!.name, address: salon ? salon.address : formatBusinessAddress(business!.businessAddress, business!.businessLocation) || 'آدرس ثبت نشده است', image: salon?.portfolio[0]?.imageUrl || salon?.imageUrl || null, rating: reviews.length ? reviews.reduce((total, review) => total + review.rating, 0) / reviews.length : null, reviewsCount: reviews.length }}
+    salon={{ name: salon?.name || business!.name, address: salon ? salon.address : formatBusinessAddress(business!.businessAddress, business!.businessLocation) || 'آدرس ثبت نشده است', image: salon?.portfolio[0]?.imageUrl || salon?.imageUrl || businessImage, rating: reviews.length ? reviews.reduce((total, review) => total + review.rating, 0) / reviews.length : null, reviewsCount: reviews.length }}
     services={services} backHref={`${base}/book${suffix}`} closeHref={`${base}${suffix}`}
     initialSelected={(selectedParam || '').split(',').filter((id) => services.some((service) => service.id === id))}
     step={step === 'time' ? 'time' : 'services'}

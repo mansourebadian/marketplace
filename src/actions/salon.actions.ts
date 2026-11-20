@@ -56,7 +56,9 @@ export async function getBusinessAsSalon(id: string) {
       id: true, name: true, businessAddress: true, businessLocation: true,
       locations: { orderBy: { createdAt: 'asc' }, take: 1, select: { name: true, openingHours: { select: { day: true, enabled: true, opensAt: true, closesAt: true }, orderBy: { day: 'asc' } } } },
       services: { select: { id: true, name: true, price: true, priceType: true, durationMin: true }, orderBy: { createdAt: 'desc' } },
-      teamMembers: { select: { id: true, firstName: true, lastName: true, jobTitle: true }, orderBy: { createdAt: 'asc' } },
+      owner: { select: { name: true, firstName: true, lastName: true, image: true } },
+      memberServices: { where: { memberKey: 'owner' }, select: { serviceIds: true } },
+      teamMembers: { select: { id: true, firstName: true, lastName: true, jobTitle: true, imageName: true }, orderBy: { createdAt: 'asc' } },
     },
   });
   if (!business) return null;
@@ -73,6 +75,15 @@ export async function getBusinessAsSalon(id: string) {
     if (address.secondOpeningHours && typeof address.secondOpeningHours === 'object' && !Array.isArray(address.secondOpeningHours)) extraHours = address.secondOpeningHours;
   } catch { /* Older addresses can be plain text. */ }
 
+  const ownerAssignment = business.memberServices[0];
+  let ownerServiceIds = business.services.map(service => service.id);
+  if (ownerAssignment) {
+    try {
+      const selected: unknown = JSON.parse(ownerAssignment.serviceIds);
+      ownerServiceIds = Array.isArray(selected) ? selected.filter((id): id is string => typeof id === 'string') : [];
+    } catch { ownerServiceIds = []; }
+  }
+  const ownerOffersServices = business.services.some(service => ownerServiceIds.includes(service.id));
   const description = await getMarketplaceDescription(business.id);
   return {
     id: business.id, name: business.locations[0]?.name || business.name,
@@ -86,10 +97,13 @@ export async function getBusinessAsSalon(id: string) {
     }),
     features: featureGroups.flatMap<{ id: string; label: string }>(group => group.options.map(option => ({ id: option.id, label: option.label }))).filter((_, index) => Boolean(featureMask & (1 << index))),
     services: business.services,
-    teamMembers: business.teamMembers.map((member) => ({
+    teamMembers: [...(ownerOffersServices ? [{
+      id: 'owner', name: business.owner.name || [business.owner.firstName, business.owner.lastName].filter(Boolean).join(' ') || 'مدیر مجموعه',
+      role: 'مدیر مجموعه', avatarUrl: business.owner.image,
+    }] : []), ...business.teamMembers.map((member) => ({
       id: member.id, name: [member.firstName, member.lastName].filter(Boolean).join(' '),
-      role: member.jobTitle || 'عضو تیم', avatarUrl: null,
-    })),
+      role: member.jobTitle || 'عضو تیم', avatarUrl: member.imageName ? imageUrl(member.imageName) : null,
+    }))],
   };
 }
 

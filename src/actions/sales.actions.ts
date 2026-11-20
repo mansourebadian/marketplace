@@ -12,6 +12,7 @@ const schema = z.object({
   paymentType: z.enum(['CASH', 'OTHER', 'GIFT_CARD']),
   quantity: z.coerce.number().int().min(1).max(100000),
   amount: z.coerce.number().int().min(0).max(2147483647),
+  customerId: z.string().max(1000).optional().transform(value => value || null),
 });
 
 export async function createSale(input: unknown): Promise<{ error?: string }> {
@@ -22,8 +23,20 @@ export async function createSale(input: unknown): Promise<{ error?: string }> {
   try {
     const business = await prisma.business.findUnique({ where: { ownerId: session.user.id }, select: { id: true } });
     if (!business) return { error: 'کسب‌وکار پیدا نشد.' };
-    await prisma.businessSale.create({ data: { ...data.data, businessId: business.id } });
+    const result = await prisma.$transaction(async tx => {
+      if (data.data.customerId) {
+        const [reservation, client] = await Promise.all([
+          tx.businessReservation.findFirst({ where: { businessId: business.id, customerId: data.data.customerId }, select: { id: true } }),
+          tx.businessClient.findFirst({ where: { businessId: business.id, id: data.data.customerId }, select: { id: true } }),
+        ]);
+        if (!reservation && !client) return false;
+      }
+      await tx.businessSale.create({ data: { ...data.data, businessId: business.id } });
+      return true;
+    });
+    if (!result) return { error: 'مشتری انتخاب‌شده متعلق به این کسب‌وکار نیست.' };
     revalidatePath('/sales/daily-sales');
+    revalidatePath('/clients/list');
     return {};
   } catch (error) {
     console.error('Creating sale failed', error);
@@ -62,6 +75,7 @@ export async function createQuickSale(input: unknown): Promise<{ error?: string 
     });
     if (!result) return { error: 'مشتری، خدمات یا قیمت‌ها معتبر نیستند؛ صفحه را تازه کنید و دوباره تلاش کنید.' };
     revalidatePath('/sales/daily-sales');
+    revalidatePath('/clients/list');
     return {};
   } catch (error) {
     console.error('Creating quick sale failed', error);
